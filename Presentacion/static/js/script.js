@@ -1,8 +1,4 @@
-/* ----------------------------------------------
-   script.js
-   Lógica de la aplicación
----------------------------------------------- */
-
+// Variables globales
 let map;
 
 function initMap() {
@@ -20,7 +16,7 @@ function initMap() {
     zoom: 16,
     tilt: 60,
     heading: 20,
-    mapId: "TU_MAP_ID",         // Reemplaza por tu MAP ID
+    mapId: "TU_MAP_ID",  // Reemplaza con tu MAP ID
     disableDefaultUI: true,
     restriction: {
       latLngBounds: allowedBounds,
@@ -42,6 +38,7 @@ function initMap() {
     title: "Hotel Ficticio"
   });
 
+  // Evento clic en el marcador
   markerHotel.addListener("click", () => {
     markerHotel.setAnimation(google.maps.Animation.BOUNCE);
     setTimeout(() => {
@@ -53,26 +50,26 @@ function initMap() {
     });
     infoWindow.open(map, markerHotel);
 
-    // Muestra info también en el panel
+    // Muestra info también en el panel lateral
     document.getElementById("infoSection").innerHTML = `
       <h3>Hotel Ficticio</h3>
       <p>Este es un hotel imaginario...</p>
     `;
-    // Asegúrate de que se abra el panel si estaba cerrado
     showSidebar();
   });
 }
 
-// Inicializa el mapa cuando se cargue la ventana
+// Inicializa el mapa al cargar la ventana
 window.onload = initMap;
 
-// Funciones para mostrar info en el panel
+// Muestra info en el panel
 function mostrarHoteles() {
   document.getElementById("infoSection").innerHTML = `
-    <h3>Lista de Hoteles</h3>
+    <h3>Hoteles</h3>
     <ul>
-      <li>Hotel Ficticio (Click en el mapa)</li>
-      <li>...</li>
+      <li>Hotel Ficticio (Haz clic en el mapa)</li>
+      <li>Hotel Panorama</li>
+      <li>Hotel Lago Azul</li>
     </ul>
   `;
   showSidebar();
@@ -81,7 +78,7 @@ function mostrarHoteles() {
 function mostrarRutas() {
   document.getElementById("infoSection").innerHTML = `
     <h3>Rutas Turísticas</h3>
-    <p>Aquí se mostrarían las rutas, polilíneas, etc.</p>
+    <p>Aquí se mostrarían rutas en el mapa (senderismo, bici, etc.)</p>
   `;
   showSidebar();
 }
@@ -89,18 +86,18 @@ function mostrarRutas() {
 function mostrarSitios() {
   document.getElementById("infoSection").innerHTML = `
     <h3>Sitios de Interés</h3>
-    <p>Puedes listar y colocar marcadores en el mapa.</p>
+    <p>Marcadores de monumentos, museos, miradores...</p>
   `;
   showSidebar();
 }
 
-// Función para abrir/cerrar el sidebar
+// Abre / Cierra el sidebar
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
   sidebar.classList.toggle("open");
 }
 
-// Función para forzar que el sidebar se abra
+// Fuerza que el sidebar se abra
 function showSidebar() {
   const sidebar = document.getElementById("sidebar");
   if (!sidebar.classList.contains("open")) {
