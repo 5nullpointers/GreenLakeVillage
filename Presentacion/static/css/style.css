@@ -1,0 +1,78 @@
+/* ----------------------------------------------
+   style.css
+   Estilos de la página
+---------------------------------------------- */
+
+html, body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    overflow: hidden; /* Evita scrolls indeseados */
+}
+
+/* Barra de navegación */
+nav {
+    width: 100%;
+    background-color: #333;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Lista del menú (sin viñetas, alinea a la derecha) */
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    margin-left: auto;
+}
+
+nav li {
+    margin-right: 1rem;
+}
+
+/* Enlaces del menú */
+nav a {
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Mapa a pantalla completa menos la barra de nav */
+#map {
+    width: 100%;
+    height: calc(100vh - 40px); /* 40px = altura de la nav approx. */
+}
+
+/* Panel lateral: inicialmente oculto a la derecha */
+#sidebar {
+    position: absolute;
+    top: 40px; /* Justo por debajo de la barra de navegación */
+    right: 0;
+    width: 300px;
+    height: calc(100vh - 40px);
+    background-color: #f2f2f2;
+    padding: 1rem;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+
+    /* Transición para deslizar de derecha a izquierda */
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+/* Clase para que el sidebar aparezca (deslizar dentro de la pantalla) */
+#sidebar.open {
+    transform: translateX(0);
+}
+
+/* Botón para cerrar la barra */
+#closeSidebar {
+    display: inline-block;
+    margin-bottom: 1rem;
+    padding: 0.3rem 0.6rem;
+    background-color: #ccc;
+    border: none;
+    cursor: pointer;
+}
