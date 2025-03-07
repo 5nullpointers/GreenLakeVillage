@@ -1,78 +1,156 @@
-/* ----------------------------------------------
+/* ------------------------------
    style.css
-   Estilos de la página
----------------------------------------------- */
+   Estilo turístico con animaciones
+------------------------------ */
 
-html, body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    height: 100vh;
-    overflow: hidden; /* Evita scrolls indeseados */
-}
-
-/* Barra de navegación */
-nav {
-    width: 100%;
-    background-color: #333;
-    color: #fff;
-    padding: 0.5rem 1rem;
-    display: flex;
-    align-items: center;
-}
-
-/* Lista del menú (sin viñetas, alinea a la derecha) */
-nav ul {
-    list-style: none;
+/* Reinicios / configuraciones básicas */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    height: 100%;
+    font-family: "Poppins", sans-serif; /* Nuestra fuente principal */
+    background: #fafafa; /* Por si se ve debajo del mapa */
+  }
+  
+  body {
+    overflow: hidden; /* Evita scrolls en la página */
+  }
+  
+  /* Barra de navegación superior */
+  nav {
+    width: 100%;
+    height: 60px;
+    background-color: #009688;  /* Un tono turquesa */
+    color: #fff;
     display: flex;
-    margin-left: auto;
-}
-
-nav li {
-    margin-right: 1rem;
-}
-
-/* Enlaces del menú */
-nav a {
+    align-items: center;
+    padding: 0 1rem;
+  }
+  
+  /* Logo o título en la barra */
+  .nav-logo {
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+  
+  /* Menú de la derecha */
+  nav ul {
+    list-style: none;
+    display: flex;
+    margin-left: auto; /* Para empujar la lista al extremo derecho */
+    align-items: center;
+  }
+  
+  /* Elementos de la lista */
+  nav li {
+    margin-left: 1.5rem;
+  }
+  
+  /* Enlaces del menú */
+  nav a {
     color: #fff;
     text-decoration: none;
-    cursor: pointer;
-}
-
-/* Mapa a pantalla completa menos la barra de nav */
-#map {
+    font-weight: 500;
+    transition: color 0.2s ease, opacity 0.2s ease;
+  }
+  nav a:hover {
+    opacity: 0.7;  /* Efecto hover */
+  }
+  
+  /* Mapa ocupando todo debajo de la barra */
+  #map {
     width: 100%;
-    height: calc(100vh - 40px); /* 40px = altura de la nav approx. */
-}
-
-/* Panel lateral: inicialmente oculto a la derecha */
-#sidebar {
+    height: calc(100vh - 60px); /* 60px ~ altura del nav */
+  }
+  
+  /* Panel lateral */
+  #sidebar {
     position: absolute;
-    top: 40px; /* Justo por debajo de la barra de navegación */
+    top: 60px; /* Justo bajo la barra nav */
     right: 0;
-    width: 300px;
-    height: calc(100vh - 40px);
-    background-color: #f2f2f2;
-    padding: 1rem;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
-
-    /* Transición para deslizar de derecha a izquierda */
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-}
-
-/* Clase para que el sidebar aparezca (deslizar dentro de la pantalla) */
-#sidebar.open {
-    transform: translateX(0);
-}
-
-/* Botón para cerrar la barra */
-#closeSidebar {
-    display: inline-block;
+    width: 320px;
+    height: calc(100vh - 60px);
+    background-color: #fff;
+    border-left: 2px solid #ccc;
+    padding: 1.5rem;
+    box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+  
+    /* Transiciones suaves para simular "desliz" */
+    transform: translateX(110%);
+    opacity: 0;
+    transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+  }
+  
+  /* Cuando el sidebar está “abierto” */
+  #sidebar.open {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+  
+  /* Título interno del panel */
+  #sidebar h2 {
     margin-bottom: 1rem;
-    padding: 0.3rem 0.6rem;
-    background-color: #ccc;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  /* Botón para cerrar la barra (estilo circular) */
+  #closeSidebar {
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: none;
     border: none;
+    color: #333;
+    float: right;
     cursor: pointer;
-}
+    margin-top: -10px;
+    margin-right: -5px;
+    transition: color 0.2s ease;
+  }
+  #closeSidebar:hover {
+    color: #009688;
+  }
+  
+  /* Zona de información en el panel */
+  #infoSection {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-top: 2rem;
+    color: #444;
+  }
+  
+  /* Ejemplo de estilo a listas en la info */
+  #infoSection ul {
+    margin-top: 0.5rem;
+    padding-left: 1.2rem;
+  }
+  #infoSection li {
+    margin-bottom: 0.3rem;
+  }
+  
+  /* Pequeña adaptación responsive */
+  @media (max-width: 768px) {
+    /* Haz la barra un poco más baja en móvil */
+    nav {
+      height: 50px;
+    }
+    #map {
+      height: calc(100vh - 50px);
+    }
+    #sidebar {
+      top: 50px;
+      height: calc(100vh - 50px);
+      width: 100%;
+      box-shadow: none;
+      border-left: none;
+    }
+    #sidebar.open {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
