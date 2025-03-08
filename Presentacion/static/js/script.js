@@ -104,3 +104,30 @@ function showSidebar() {
     sidebar.classList.add("open");
   }
 }
+
+//Chatbot
+function sendMessage() {
+  const userMessage = document.getElementById("user-input").value;
+
+  if (!userMessage) {
+    alert("Por favor escribe un mensaje");
+    return;
+  }
+
+  fetch("/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message: userMessage }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.response) {
+        document.getElementById("chat-response").innerHTML = `<p><strong>IA:</strong> ${data.response}</p>`;
+      } else {
+        document.getElementById("chat-response").innerHTML = `<p><strong>Error:</strong> ${data.error}</p>`;
+      }
+    })
+    .catch(error => console.error("Error:", error));
+}
