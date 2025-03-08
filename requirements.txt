@@ -1,0 +1,8 @@
+#pip install -r requirements.txt
+
+pymongo
+tabulate
+pandas
+python-dotenv
+flask
+openai
