@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 import openai
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 
 app = Flask(__name__,
             static_folder='../Presentacion/static',
@@ -16,8 +16,28 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route('/')
 def home():
-    # Renderiza el template Prueba1.html desde la carpeta "templates"
-    return render_template('Prueba1.html')
+    # Ruta de la página de inicio
+    # Renderiza loginRegister.html
+    return render_template('loginRegister.html')
+
+
+@app.route('/prueba')
+def prueba():
+    return render_template('prueba1.html')
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    # Aquí agregarías la lógica para comprobar los datos del usuario
+    # Por ahora, redirigimos al home (loginRegister.html)
+    return redirect(url_for('home'))
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    # Agregar la lógica para almacenar los datos del usuario
+    # Por ahora, simulamos que el registro fue exitoso y redirigimos al login
+    return redirect(url_for('home'))
 
 
 MAX_HISTORY = 5
