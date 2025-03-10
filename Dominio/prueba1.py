@@ -25,6 +25,10 @@ def home():
 def prueba():
     return render_template('Prueba1.html')
 
+@app.route('/admin')
+def admin():
+    return render_template('Admin.html')
+
 
 @app.route('/login', methods=['POST'])
 def login():
