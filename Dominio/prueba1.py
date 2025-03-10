@@ -25,6 +25,9 @@ def home():
 def prueba():
     return render_template('Prueba1.html')
 
+@app.route('/turista')
+def turista():
+    return render_template('turista.html')
 
 @app.route('/login', methods=['POST'])
 def login():
