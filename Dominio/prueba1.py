@@ -23,7 +23,7 @@ def home():
 
 @app.route('/prueba')
 def prueba():
-    return render_template('prueba1.html')
+    return render_template('Prueba1.html')
 
 
 @app.route('/login', methods=['POST'])
