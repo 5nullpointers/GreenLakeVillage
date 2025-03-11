@@ -53,6 +53,9 @@ def register():
     # Por ahora, simulamos que el registro fue exitoso y redirigimos al login
     return redirect(url_for('login_page'))
 
+@app.route('/contacto')
+def contacto():
+    return render_template('contacto.html')
 
 MAX_HISTORY = 5
 conversation_history = []
