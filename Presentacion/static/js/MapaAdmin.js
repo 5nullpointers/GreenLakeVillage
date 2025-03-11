@@ -61,11 +61,33 @@ function initMap() {
 
   // Inicializar heatmap (ejemplo de datos)
   const heatmapData = [
-    new google.maps.LatLng(47.5626, 13.6493),
-    new google.maps.LatLng(47.5630, 13.6498),
-    new google.maps.LatLng(47.5620, 13.6500),
-    // Aquí se añadirían más puntos de los hoteles para el Heatmap
+    new google.maps.LatLng(47.5636, 13.6367),
+    new google.maps.LatLng(47.5524, 13.6496),
+    new google.maps.LatLng(47.55415, 13.6465),
+    new google.maps.LatLng(47.55245, 13.6377),
+    new google.maps.LatLng(47.56703, 13.65034),
+    new google.maps.LatLng(47.56005, 13.64723),
+    new google.maps.LatLng(47.56238, 13.64962),
+    new google.maps.LatLng(47.56229, 13.66395),
+    new google.maps.LatLng(47.5579, 13.6793),
+    new google.maps.LatLng(47.5555, 13.6821),
+    new google.maps.LatLng(47.5506, 13.6953),
+    new google.maps.LatLng(47.5553, 13.6896),
+    new google.maps.LatLng(47.5573, 13.6909),
+    new google.maps.LatLng(47.55431, 13.6874),
+    new google.maps.LatLng(47.55391, 13.68545),
+    new google.maps.LatLng(47.5524, 13.6798),
+    new google.maps.LatLng(47.5589, 13.682),
+    new google.maps.LatLng(47.55408, 13.6977),
+    new google.maps.LatLng(47.5571, 13.702),
+    new google.maps.LatLng(47.55726, 13.6464),
+    new google.maps.LatLng(47.5575, 13.68524),
+    new google.maps.LatLng(47.5563, 13.6969),
+    new google.maps.LatLng(47.5559, 13.7027),
+    new google.maps.LatLng(47.56025, 13.7074),
+    new google.maps.LatLng(47.55975, 13.70892)
   ];
+  
   heatmap = new google.maps.visualization.HeatmapLayer({
     data: heatmapData,
     map: null // Se inicia desactivado
