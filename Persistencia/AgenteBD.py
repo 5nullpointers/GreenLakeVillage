@@ -23,7 +23,7 @@ class MongoDBAgent:
         try:
             self.client = MongoClient(self.uri)
             self.db = self.client[self.db_name]
-            print("✅ Conexión a MongoDB establecida correctamente")
+            # print("✅ Conexión a MongoDB establecida correctamente")
         except ConnectionFailure as e:
             print(f"❌ Error al conectar con MongoDB: {e}")
 
