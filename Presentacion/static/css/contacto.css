@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    list-style: none;
+}
+
+/* Configuración global del documento */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
+    color: #333;
+    overflow-x: hidden; /* Evita el desplazamiento horizontal */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #009688;
+    padding: 1rem 2rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.nav-logo {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-links li a.active {
+    text-decoration: underline;
+}
+
+/* Contenedor principal para evitar que el footer quede pegado */
+.main-content {
+    flex: 1; /* Permite que esta sección ocupe el espacio restante */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding-bottom: 4rem; /* Espacio para evitar que el contenido se pegue al footer */
+}
+
+/* Sección Contacto */
+.contact-container {
+    width: 80%;
+    max-width: 600px;
+    background: white;
+    margin: 3rem auto;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.contact-container h2 {
+    margin-bottom: 1rem;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Aumentamos la altura del textarea para el mensaje */
+.input-group textarea {
+    resize: none;
+    height: 6rem;
+}
+
+/* Botón */
+.btn-submit {
+    background-color: #009688;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+}
+
+.btn-submit:hover {
+    background-color: #007c73;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #006f5a;
+    color: #fff;
+    font-size: 0.9rem;
+    width: 100%;
+    position: absolute;
+    bottom: -50px; /* Ajustado para que no se pegue al contenido */
+}
+
+.footer p {
+    margin: 0;
+}
+
+.footer p a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.footer p a:hover {
+    text-decoration: underline;
+}
