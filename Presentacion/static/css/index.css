@@ -85,8 +85,8 @@ body {
 
 /* Contenedor principal */
 .main-container {
-    width: 80%;
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1250px;
     margin: 1rem auto;
 }
 
