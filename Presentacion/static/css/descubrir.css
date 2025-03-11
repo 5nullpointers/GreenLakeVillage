@@ -12,14 +12,12 @@
 
 /* ======= Configuración Global ======= */
 html, body {
-    margin: 0;
-    padding: 0;
     width: 100%;
-    min-height: 100vh; /* Permite que el contenido crezca más allá de la pantalla */
+    min-height: 100vh;
     font-family: "Poppins", sans-serif;
     background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
     color: #333;
-    overflow-x: hidden; /* Evita el desplazamiento horizontal */
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
 }
@@ -32,7 +30,6 @@ html, body {
     background-color: #009688;
     padding: 1rem 2rem;
     width: 100%;
-    box-sizing: border-box;
     position: fixed;
     top: 0;
     left: 0;
@@ -64,10 +61,10 @@ html, body {
 .main-container {
     width: 100%;
     max-width: 1250px;
-    margin: 1rem auto;
-    flex: 1; /* Expande el contenido para empujar el footer */
-    padding-top: 80px; /* Ajuste para evitar que el navbar cubra el contenido */
-    padding-bottom: 6rem; /* Espacio extra para evitar que el footer se monte */
+    margin: 0 auto;
+    flex: 1;
+    padding-top: 90px;
+    padding-bottom: 6rem;
 }
 
 /* ======= Hero Section ======= */
@@ -188,17 +185,20 @@ html, body {
     font-weight: 600;
 }
 
-/* ======= Sección de Registro ======= */
+/* ======= Mantener los estilos del contenedor ======= */
 .register-section {
     background: white;
     padding: 2rem;
     margin-top: 2rem;
-    margin-bottom: 5rem; /* Aumentamos la separación con el footer */
+    margin-bottom: 5rem; /* Aumenta la separación con el footer */
     border-radius: 12px;
     text-align: center;
     max-width: 600px;
     margin: auto;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra todo el contenido */
 }
 
 .register-section label {
@@ -214,7 +214,7 @@ html, body {
     margin-top: 1rem;
 }
 
-/* ======= Botón de Registro ======= */
+/* ======= Mantener estilos del botón + Centrarlo ======= */
 .btn-submit {
     background-color: #009688;
     border: none;
@@ -224,8 +224,13 @@ html, body {
     border-radius: 8px;
     cursor: pointer;
     transition: 0.3s;
-    width: 100%;
+    width: fit-content; /* Ajusta el botón al contenido */
+    display: flex;
+    align-items: center; /* Centra el texto dentro del botón */
+    justify-content: center;
     margin-top: 1rem;
+    margin-left: auto;
+    margin-right: auto; /* Centra el botón dentro del contenedor */
 }
 
 .btn-submit:hover {
@@ -238,10 +243,9 @@ html, body {
     padding: 1rem;
     background-color: #006f5a;
     color: #fff;
-    font-size: 0.9rem;
     width: 100%;
-    position: relative; /* Permite que se coloque después del contenido */
-    margin-top: 4rem; /* Agrega más espacio entre el último elemento y el footer */
+    position: relative;
+    margin-top: 6rem;
 }
 
 .footer p {
