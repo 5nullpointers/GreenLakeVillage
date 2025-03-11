@@ -1,11 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    list-style: none;
+}
+
+/* Configuración global del documento */
 html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
     color: #333;
     overflow-x: hidden; /* Evita el desplazamiento horizontal */
@@ -124,17 +135,18 @@ html, body {
     background-color: #006f5a;
     color: #fff;
     font-size: 0.9rem;
-    margin-top: 2rem;
+    width: 100%;
+    position: absolute;
+    bottom: -50px; /* Ajustado para que no se pegue al contenido */
 }
 
 .footer p {
-    margin-bottom: 0.2rem;
+    margin: 0;
 }
 
 .footer p a {
     color: #fff;
     text-decoration: none;
-    margin: 0 0.3rem;
 }
 
 .footer p a:hover {
