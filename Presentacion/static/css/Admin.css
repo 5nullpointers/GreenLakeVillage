@@ -88,7 +88,7 @@ body {
 /* Área Principal (Dashboard) */
 .mapa {
   grid-column: 1 / 5;
-  grid-row: 1 / 26;
+  grid-row: 2 / 26;
   padding: 0; /* Elimina el padding para que el iframe ocupe todo el espacio */
   box-shadow: 0 0 200px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
@@ -121,4 +121,22 @@ body {
 .admin-widget-4 {
   grid-column: 4 / 5;
   grid-row: 26 / 43; /* Ajusta esto para que ocupe más filas */
+}
+
+/* Posicionar las opciones en la primera fila */
+.mapa-opcion-1 {
+  grid-column: 1 / 2;
+  grid-row: 1;
+}
+.mapa-opcion-2 {
+  grid-column: 2 / 3;
+  grid-row: 1;
+}
+.mapa-opcion-3 {
+  grid-column: 3 / 4;
+  grid-row: 1;
+}
+.mapa-opcion-4 {
+  grid-column: 4 / 5;
+  grid-row: 1;
 }
