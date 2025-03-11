@@ -57,6 +57,11 @@ def register():
 def contacto():
     return render_template('contacto.html')
 
+@app.route('/descubrir')
+def descubrir():
+    return render_template('descubrir.html')
+
+
 MAX_HISTORY = 5
 conversation_history = []
 
