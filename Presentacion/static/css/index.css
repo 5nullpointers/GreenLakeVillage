@@ -1,0 +1,251 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Fondo */
+body {
+    background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
+    color: #333;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #009688;
+    padding: 1rem 2rem;
+}
+
+.nav-logo {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-links li a:hover {
+    opacity: 0.75;
+}
+
+/* Hero */
+.hero {
+    text-align: center;
+    color: #fff;
+    padding: 3rem 1.5rem;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.btn-hero {
+    background-color: #006f5a;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-hero:hover {
+    background-color: #005e4d;
+}
+
+/* Contenedor principal */
+.main-container {
+    width: 100%;
+    max-width: 1250px;
+    margin: 1rem auto;
+}
+
+.left-col {
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Tarjetas */
+.bento-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.card {
+    background-color: #fafafa;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.card h3 {
+    margin-bottom: 0.6rem;
+    font-size: 1.1rem;
+}
+
+/* Sección Mapa */
+.map-section {
+    width: 80%;
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.map-section h2 {
+    margin-bottom: 0.8rem;
+}
+
+.map-section p {
+    margin-bottom: 1rem;
+}
+
+/* Mapa */
+#map {
+    width: 100%;
+    height: 500px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+}
+
+/* Sección de Contacto */
+.contact-section {
+    width: 80%;
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.contact-section h2 {
+    margin-bottom: 0.8rem;
+}
+
+.contact-section p {
+    margin-bottom: 1rem;
+}
+
+.contact-section form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.input-box {
+    width: 100%;
+    max-width: 500px;
+}
+
+.input-box input, 
+.input-box textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    outline: none;
+    resize: none;
+}
+
+/* Botón */
+.btn-submit {
+    background-color: #009688;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+    max-width: 500px;
+}
+
+.btn-submit:hover {
+    background-color: #007c73;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #006f5a;
+    color: #fff;
+    font-size: 0.9rem;
+    margin-top: 2rem;
+}
+
+.footer p {
+    margin-bottom: 0.2rem;
+}
+
+.footer p a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 0.3rem;
+}
+
+.footer p a:hover {
+    text-decoration: underline;
+}
+
+/* Responsivo */
+@media screen and (max-width: 900px) {
+    .main-container, .contact-section, .map-section {
+        width: 90%;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+    .hero p {
+        font-size: 1rem;
+    }
+    #map {
+        height: 300px;
+    }
+}
