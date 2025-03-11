@@ -1,7 +1,10 @@
+import sys
 from dotenv import load_dotenv
 import os
 import openai
 from flask import Flask, render_template, request, jsonify, redirect, url_for
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 app = Flask(__name__,
             static_folder='../Presentacion/static',
@@ -13,15 +16,25 @@ load_dotenv()
 # Clave de la API de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+# Conectar a MongoDB
+from Persistencia.AgenteBD import MongoDBAgent
+mongo_agent = MongoDBAgent()
+# Verificar la conexión
+if not mongo_agent.client:
+    print("❌ Error al conectar con MongoDB")
+    exit(1)
+else:
+    print("✅ Conexión a MongoDB establecida correctamente")
+
 
 @app.route('/')
 def index():
     # Ahora este es el index principal
     return render_template('index.html')
 
-@app.route('/prueba')
-def prueba():
-    return render_template('Prueba1.html')
+@app.route('/map')
+def map():
+    return render_template('map.html')
 
 @app.route('/login')
 def login_page():
