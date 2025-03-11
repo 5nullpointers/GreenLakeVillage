@@ -1,5 +1,6 @@
 // Variables globales
 let map;
+let heatmap; // Capa de heatmap
 
 function initMap() {
   const hallstatt = { lat: 47.5626, lng: 13.6493 };
@@ -57,12 +58,52 @@ function initMap() {
     `;
     showSidebar();
   });
+
+  // Inicializar heatmap (ejemplo de datos)
+  const heatmapData = [
+    new google.maps.LatLng(47.5626, 13.6493),
+    new google.maps.LatLng(47.5630, 13.6498),
+    new google.maps.LatLng(47.5620, 13.6500),
+    // Aquí se añadirían más puntos de los hoteles para el Heatmap
+  ];
+  heatmap = new google.maps.visualization.HeatmapLayer({
+    data: heatmapData,
+    map: null // Se inicia desactivado
+  });
+
+  // Asignar eventos a los botones de control del mapa
+  if (document.getElementById("toggleHeatmap")) {
+    document.getElementById("toggleHeatmap").addEventListener("click", toggleHeatmap);
+  }
+  if (document.getElementById("setSatellite")) {
+    document.getElementById("setSatellite").addEventListener("click", () => setMapType("satellite"));
+  }
+  if (document.getElementById("setTerrain")) {
+    document.getElementById("setTerrain").addEventListener("click", () => setMapType("terrain"));
+  }
+  if (document.getElementById("setNormal")) {
+    document.getElementById("setNormal").addEventListener("click", () => setMapType("roadmap"));
+  }
 }
 
 // Inicializa el mapa al cargar la ventana
 window.onload = initMap;
 
-// Muestra info en el panel
+// Función para activar o desactivar el heatmap
+function toggleHeatmap() {
+  if (heatmap.getMap()) {
+    heatmap.setMap(null);
+  } else {
+    heatmap.setMap(map);
+  }
+}
+
+// Cambia el tipo de mapa
+function setMapType(type) {
+  map.setMapTypeId(type);
+}
+
+// Muestra información de hoteles en el panel lateral
 function mostrarHoteles() {
   document.getElementById("infoSection").innerHTML = `
     <h3>Hoteles</h3>
@@ -75,6 +116,7 @@ function mostrarHoteles() {
   showSidebar();
 }
 
+// Muestra información de rutas turísticas en el panel lateral
 function mostrarRutas() {
   document.getElementById("infoSection").innerHTML = `
     <h3>Rutas Turísticas</h3>
@@ -83,6 +125,7 @@ function mostrarRutas() {
   showSidebar();
 }
 
+// Muestra información de sitios de interés en el panel lateral
 function mostrarSitios() {
   document.getElementById("infoSection").innerHTML = `
     <h3>Sitios de Interés</h3>
@@ -91,13 +134,13 @@ function mostrarSitios() {
   showSidebar();
 }
 
-// Abre / Cierra el sidebar
+// Abre o cierra el sidebar
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
   sidebar.classList.toggle("open");
 }
 
-// Fuerza que el sidebar se abra
+// Fuerza la apertura del sidebar
 function showSidebar() {
   const sidebar = document.getElementById("sidebar");
   if (!sidebar.classList.contains("open")) {
@@ -105,7 +148,7 @@ function showSidebar() {
   }
 }
 
-//Chatbot
+// Función para enviar mensajes al chatbot
 function sendMessage() {
   const userMessage = document.getElementById("user-input").value;
 
