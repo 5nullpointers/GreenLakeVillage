@@ -3,7 +3,14 @@ let map;
 let currentInfoWindow = null;  // Para saber cuál InfoWindow está abierto
 
 function initMap() {
-  const hallstatt = { lat: 47.5626, lng: 13.6493 };
+    console.log("Cargando mapa...");
+
+    if (!document.getElementById("map")) {
+        console.error("❌ Error: No se encontró el div con id='map'.");
+        return;
+    }
+
+    const hallstatt = { lat: 47.5626, lng: 13.6493 };
 
   const allowedBounds = {
     north: 47.57,
@@ -12,6 +19,33 @@ function initMap() {
     east: 13.71
   };
 
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: hallstatt,
+        zoom: 16,
+        mapTypeId: "satellite",
+        disableDefaultUI: false,
+    });
+
+    console.log("✅ Mapa cargado correctamente.");
+
+    // Agregar marcador
+    const marker = new google.maps.Marker({
+        position: hallstatt,
+        map: map,
+        title: "GreenLake Village",
+    });
+
+    // Evento clic en el marcador
+    marker.addListener("click", () => {
+        const infoWindow = new google.maps.InfoWindow({
+            content: "<h3>GreenLake Village</h3><p>Un hermoso destino turístico.</p>",
+        });
+        infoWindow.open(map, marker);
+    });
+}
+
+// Asegurar que el mapa se inicializa correctamente cuando la API de Google Maps se carga
+google.maps.event.addDomListener(window, "load", initMap);
   // Creación del mapa
   map = new google.maps.Map(document.getElementById("map"), {
     center: hallstatt,
@@ -192,10 +226,10 @@ function closeAll() {
  * Muestra el panel lateral
  */
 function showSidebar() {
-  const sidebar = document.getElementById("sidebar");
-  if (!sidebar.classList.contains("open")) {
-    sidebar.classList.add("open");
-  }
+    const sidebar = document.getElementById("sidebar");
+    if (!sidebar.classList.contains("open")) {
+        sidebar.classList.add("open");
+    }
 }
 
 /**
@@ -254,6 +288,24 @@ function sendMessage() {
     return;
   }
 
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userMessage }),
+        });
+
+        const data = await response.json();
+
+        if (data.response) {
+            document.getElementById("chat-response").innerHTML = `<p><strong>IA:</strong> ${data.response}</p>`;
+        } else {
+            document.getElementById("chat-response").innerHTML = `<p><strong>Error:</strong> ${data.error}</p>`;
+        }
+    } catch (error) {
+        console.error("❌ Error en el chatbot:", error);
+        document.getElementById("chat-response").innerHTML = `<p><strong>Error:</strong> No se pudo obtener respuesta.</p>`;
+    }
   fetch("/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
