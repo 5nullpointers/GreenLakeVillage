@@ -185,58 +185,6 @@ html, body {
     font-weight: 600;
 }
 
-/* ======= Mantener los estilos del contenedor ======= */
-.register-section {
-    background: white;
-    padding: 2rem;
-    margin-top: 2rem;
-    margin-bottom: 5rem; /* Aumenta la separación con el footer */
-    border-radius: 12px;
-    text-align: center;
-    max-width: 600px;
-    margin: auto;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centra todo el contenido */
-}
-
-.register-section label {
-    font-weight: 600;
-}
-
-.register-section select {
-    width: 100%;
-    padding: 0.8rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    margin-top: 1rem;
-}
-
-/* ======= Mantener estilos del botón + Centrarlo ======= */
-.btn-submit {
-    background-color: #009688;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    color: #fff;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-    width: fit-content; /* Ajusta el botón al contenido */
-    display: flex;
-    align-items: center; /* Centra el texto dentro del botón */
-    justify-content: center;
-    margin-top: 1rem;
-    margin-left: auto;
-    margin-right: auto; /* Centra el botón dentro del contenedor */
-}
-
-.btn-submit:hover {
-    background-color: #007c73;
-}
-
 /* ======= Footer ======= */
 .footer {
     text-align: center;
