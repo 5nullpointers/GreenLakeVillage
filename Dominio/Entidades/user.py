@@ -1,15 +1,20 @@
-class User:
-    def __init__(self, 
-                 user_id=None, 
-                 name="", 
-                 email="", 
-                 password="", 
-                 user_type=""):
-        self.user_id = user_id
-        self.name = name
-        self.email = email
-        self.password = password
-        self.user_type = user_type  # Ej: "tourist", "businessOwner", "admin"
+from dataclasses import dataclass
 
-    def __repr__(self):
-        return f"<User {self.name} ({self.user_type})>"
+@dataclass
+class User:
+    id: int
+    name: str
+    email: str
+    password: str
+
+    def register(self) -> None:
+        """Simula el registro de un usuario"""
+        print(f"Usuario {self.name} registrado con éxito.")
+
+    def login(self) -> None:
+        """Simula el inicio de sesión de un usuario"""
+        print(f"Usuario {self.email} ha iniciado sesión.")
+
+    def logout(self) -> None:
+        """Simula el cierre de sesión de un usuario"""
+        print(f"Usuario {self.email} ha cerrado sesión.")
