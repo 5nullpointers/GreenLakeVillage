@@ -12,18 +12,18 @@ const hotels = [
   { name: "Cray Villas", lat: 47.5579, lng: 13.6793 }, // HECHO
   { name: "Ezmeral Grand Hotel", lat: 47.5555, lng: 13.6821}, // HECHO
   { name: "GreenLake Digital Business Suites", lat: 47.5506, lng: 13.6953}, // HECHO
-  { name: "GreenLake Platinum Heritage Inn", lat: 47.555, lng: 13.6896}, // HECHO
+  { name: "GreenLake Platinum Heritage Inn", lat: 47.5553, lng: 13.6896}, // HECHO
   { name: "InfoSight Boutique Hotel", lat: 47.5573, lng: 13.6909}, // HECHO
-  { name: "Nimble Inn", lat: 47.5560, lng: 13.6930 },
-  { name: "Pointnext Signature Residences & Suites", lat: 47.5562, lng: 13.6942 },
-  { name: "Primera Grand", lat: 47.5564, lng: 13.6954 },
-  { name: "ProLiant Haven", lat: 47.5566, lng: 13.6966 },
-  { name: "ProLiant Place", lat: 47.5568, lng: 13.6978 },
-  { name: "ProLiant Towers", lat: 47.5570, lng: 13.6998 },
-  { name: "Simplivity Golden Plaza Hotel", lat: 47.5572, lng: 13.6935 },
-  { name: "Synergy Golden Grand Hotel", lat: 47.5574, lng: 13.6948 },
-  { name: "dHCI Executive Boutique Hotel", lat: 47.5576, lng: 13.6961 },
-  { name: "Apollo Resort & Spa", lat: 47.5578, lng: 13.6973 },
+  { name: "Nimble Inn", lat: 47.55431, lng: 13.6874}, //HECHO
+  { name: "Pointnext Signature Residences & Suites", lat: 47.55391, lng: 13.68545}, // HECHO
+  { name: "Primera Grand", lat: 47.5524, lng: 13.6798}, // HECHO
+  { name: "ProLiant Haven", lat: 47.5589, lng: 13.682}, // HECHO
+  { name: "ProLiant Place", lat: 47.55408, lng: 13.6977 }, // HECHO
+  { name: "ProLiant Towers", lat: 47.5571, lng: 13.702}, // HECHO
+  { name: "Simplivity Golden Plaza Hotel", lat: 47.55726, lng: 13.6464}, // HECHO
+  { name: "Synergy Golden Grand Hotel", lat: 47.5575, lng: 13.68524}, // HECHO
+  { name: "dHCI Executive Boutique Hotel", lat: 47.5563, lng: 13.6969 }, // HECHO
+  { name: "Apollo Resort & Spa", lat: 47.5559, lng: 13.7027}, // HECHO
   { name: "Apollo Towers", lat: 47.56025, lng: 13.7074 }, // HECHO
   { name: "dHCI Platinum Beach Resort", lat: 47.55975, lng: 13.70892 } // HECHO
 ];
