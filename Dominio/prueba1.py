@@ -34,9 +34,9 @@ def home():
     return render_template('loginRegister.html')
 
 
-@app.route('/prueba')
-def prueba():
-    return render_template('Prueba1.html')
+@app.route('/map')
+def map():
+    return render_template('map.html')
 
 
 @app.route('/login', methods=['POST'])
