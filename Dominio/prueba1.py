@@ -15,32 +15,30 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 @app.route('/')
-def home():
-    # Ruta de la página de inicio
-    # Renderiza loginRegister.html
-    return render_template('loginRegister.html')
-
+def index():
+    # Ahora este es el index principal
+    return render_template('index.html')
 
 @app.route('/prueba')
 def prueba():
     return render_template('Prueba1.html')
 
-@app.route('/turista')
-def turista():
-    return render_template('turista.html')
+@app.route('/login')
+def login_page():
+    # Ahora la ruta '/login' redirige a loginRegister.html
+    return render_template('loginRegister.html')
 
 @app.route('/login', methods=['POST'])
 def login():
     # Aquí agregarías la lógica para comprobar los datos del usuario
-    # Por ahora, redirigimos al home (loginRegister.html)
-    return redirect(url_for('home'))
-
+    # Por ahora, redirigimos al index (index.html)
+    return redirect(url_for('index'))
 
 @app.route('/register', methods=['POST'])
 def register():
     # Agregar la lógica para almacenar los datos del usuario
     # Por ahora, simulamos que el registro fue exitoso y redirigimos al login
-    return redirect(url_for('home'))
+    return redirect(url_for('login_page'))
 
 
 MAX_HISTORY = 5
