@@ -65,12 +65,12 @@ function initMap() {
   // Centro del mapa
   const centerCoords = { lat: 47.5626, lng: 13.6493 };
 
-  // Límites permitidos para el mapa (puedes ajustarlos)
+  // Límites permitidos para el mapa
   const allowedBounds = {
-    north: 47.57,
+    north: 47.58,
     south: 47.55,
     west: 13.63,
-    east: 13.71
+    east: 13.72
   };
 
   // Creación del mapa
