@@ -17,7 +17,6 @@ function initMap() {
     zoom: 16,
     tilt: 60,
     heading: 20,
-    mapId: "TU_MAP_ID",  // Reemplaza con tu MAP ID
     disableDefaultUI: true,
     restriction: {
       latLngBounds: allowedBounds,
@@ -90,7 +89,9 @@ function initMap() {
   
   heatmap = new google.maps.visualization.HeatmapLayer({
     data: heatmapData,
-    map: null // Se inicia desactivado
+    map: null, // Se inicia desactivado
+    radius: 100, // Aumenta el radio de dispersión
+    opacity: 0.8 // Ajusta la opacidad
   });
 
   // Asignar eventos a los botones de control del mapa
@@ -123,6 +124,19 @@ function toggleHeatmap() {
 // Cambia el tipo de mapa
 function setMapType(type) {
   map.setMapTypeId(type);
+  // Aplica un estilo global para quitar todos los íconos (POI, tránsito, etc.)
+  map.setOptions({
+    styles: [
+      // Oculta todas las etiquetas de texto
+      { featureType: "all", elementType: "labels", stylers: [{ visibility: "off" }] },
+      // Oculta específicamente los íconos (incluye POI, transit, etc.)
+      { featureType: "all", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+      // Deshabilita la representación geométrica de puntos de interés
+      { featureType: "poi", elementType: "geometry", stylers: [{ visibility: "off" }] },
+      // Deshabilita la representación de elementos de tránsito
+      { featureType: "transit", elementType: "geometry", stylers: [{ visibility: "off" }] }
+    ]
+  });
 }
 
 // Muestra información de hoteles en el panel lateral
