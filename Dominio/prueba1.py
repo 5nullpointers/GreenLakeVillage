@@ -250,3 +250,5 @@ def api_ratings():
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+    # Mis commits los coge como isma
