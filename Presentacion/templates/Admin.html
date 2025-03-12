@@ -10,24 +10,36 @@
   <div class="admin-container">
     <!-- Menú Superior -->
     <nav class="admin-menu">
-      <div class="logo">Mi Admin</div>
-      <ul>
-        <li><a href="/admin">Inicio</a></li>
-        <li><a href="#">Usuarios</a></li>
-        <li><a href="#">Reportes</a></li>
-        <li><a href="#">Configuración</a></li>
-      </ul>
+      <div class="logo">Mi Admin - Green Lake Village</div>
+      <div class="user-profile">
+        <img src="/static/images/profile.png" alt="Imagen de perfil" class="profile-img" />
+        <span class="user-name">Nombre de Usuario</span>
+        <div class="user-dropdown" id="userDropdown">
+          <ul>
+            <li><a href="/">Cerrar sesión</a></li>
+          </ul>
+        </div>
+      </div>
     </nav>
     
     <!-- Contenido Principal -->
     <div class="admin-content">
       <div class="admin-grid">
         <!-- Opciones Mapa -->
-        <div class="panel mapa-opcion-1">Opcion 1</div>
-        <div class="panel mapa-opcion-2">Opcion 2</div>
-        <div class="panel mapa-opcion-3">Opcion 3</div>
-        <div class="panel mapa-opcion-4">Opcion 4</div>
+        <div class="panel mapa-opcion-1">
+          <ul>
+            <li><a href="/admin">Inicio</a></li>
+            <li><a href="#">Usuarios</a></li>
+            <li><a href="#">Reportes</a></li>
+            <li><a href="#">Configuración</a></li>
+          </ul>
+        </div>
 
+        <div class="Bienvenida">
+          <p>hola Pablo,</p>
+          <h2>Overview</h2>
+        </div>
+        
         <!-- Área Principal (Dashboard) -->
         <div class="panel mapa">
           <!-- Incrustar Prueba1.html -->
@@ -35,12 +47,13 @@
         </div>
         
         <!-- Widgets: Primer Grupo -->
-        <div class="panel admin-widget-1">Widget 1</div>
+        <!-- <div class="panel admin-widget-1">Widget 1</div> -->
         <div class="panel admin-widget-2">Widget 2</div>
         <div class="panel admin-widget-3">Widget 3</div>
         <div class="panel admin-widget-4">Widget 4</div>
       </div>
     </div>
   </div>
+  <script src="/static/js/Admin.js"></script>
 </body>
 </html>
