@@ -2,6 +2,7 @@ import sys
 import signal
 from dotenv import load_dotenv
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import openai
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from Entidades.RutasTuristicas import RutasTuristicas
@@ -9,6 +10,7 @@ from Entidades.OcupacionHotelera import OcupacionHotelera
 from Entidades.OpinionesTuristicas import OpinionesTuristicas
 from Entidades.Sostenibilidad import Sostenibilidad
 from Entidades.UsoTransporte import UsoTransporte
+from Persistencia.DAOS.OpinionesTuristicasDAO import OpinionesTuristicasDAO
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -209,6 +211,27 @@ def chat():
     except Exception as e:
         return jsonify({"error": f"Error desconocido: {str(e)}"}), 500
 
+
+@app.route('/api/ratings')
+def api_ratings():
+    """
+    Retorna un JSON con la media de puntuación y el número de opiniones
+    para cada hotel, con el nombre del servicio como clave.
+    """
+    agregados = OpinionesTuristicasDAO.obtener_agregados()
+    # Convertir la lista a un diccionario, ej.:
+    # {
+    #    "Alletra Boutique Hotel": { "media_puntuacion": 4.3, "numero_comentarios": 12 },
+    #    ...
+    # }
+    ratings_dict = {
+        entry["_id"]: {
+            "media_puntuacion": entry["media_puntuacion"],
+            "numero_comentarios": entry["numero_comentarios"]
+        }
+        for entry in agregados
+    }
+    return jsonify(ratings_dict)
 
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
