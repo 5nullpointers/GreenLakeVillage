@@ -167,6 +167,20 @@ def contacto():
 def descubrir():
     return render_template('descubrir.html')
 
+@app.route('/api/hoteles')
+def api_hoteles():
+    """
+    Retorna un JSON con todos los hoteles guardados en MongoDB.
+    """
+    hoteles = list(mongo_agent.db["hoteles"].find({}))
+    
+    # Convertir ObjectId a string para no tener problemas al serializar
+    for h in hoteles:
+        h["_id"] = str(h["_id"])
+    
+    return jsonify(hoteles)
+
+
 
 MAX_HISTORY = 5
 conversation_history = []
