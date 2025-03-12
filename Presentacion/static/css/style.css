@@ -40,7 +40,7 @@ nav {
 nav ul {
   list-style: none;
   display: flex;
-  margin-left: auto; /* Para empujar la lista al extremo derecho */
+  margin-left: auto;
   align-items: center;
 }
 
@@ -70,7 +70,7 @@ nav a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999; /* encima de todo */
+  z-index: 9999;
   transition: opacity 0.5s ease;
 }
 
@@ -95,25 +95,42 @@ nav a:hover {
   height: calc(100vh - 60px);
 }
 
-/* Panel lateral */
+/* Panel lateral base */
 #sidebar {
   position: absolute;
-  top: 60px; /* Justo bajo la barra nav */
-  right: 0;
+  top: 60px; /* Debajo del nav */
   width: 320px;
   height: calc(100vh - 60px);
   background-color: #fff;
-  border-left: 2px solid #ccc;
   padding: 1.5rem;
-  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
-
-  /* Transiciones suaves para simular "desliz" */
-  transform: translateX(110%);
-  opacity: 0;
   transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+  opacity: 0;
 }
 
-#sidebar.open {
+/* Panel lateral para posición derecha */
+#sidebar.right {
+  right: 0;
+  left: auto;
+  border-left: 2px solid #ccc;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
+  transform: translateX(110%);
+}
+
+#sidebar.right.open {
+  transform: translateX(0%);
+  opacity: 1;
+}
+
+/* Panel lateral para posición izquierda */
+#sidebar.left {
+  left: 0;
+  right: auto;
+  border-right: 2px solid #ccc;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+  transform: translateX(-110%);
+}
+
+#sidebar.left.open {
   transform: translateX(0%);
   opacity: 1;
 }
@@ -170,7 +187,12 @@ nav a:hover {
     height: calc(100vh - 50px);
     width: 100%;
     box-shadow: none;
-    border-left: none;
+    border: none;
+    transform: translateY(110%);
+  }
+  #sidebar.open {
+    transform: translateY(0%);
+    opacity: 1;
   }
 }
 

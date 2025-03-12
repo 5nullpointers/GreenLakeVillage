@@ -28,3 +28,57 @@ class OpinionesTuristicasDAO:
     @staticmethod
     def borrar_dato(filtro):
         return mongoDBAgent.delete_one(OpinionesTuristicasDAO.COLLECTION, filtro)
+
+
+    # Metodo para obtener las puntuaciones de los hoteles 
+    @staticmethod
+    def obtener_agregados():
+        """
+        Ejecuta la agregación para obtener la media de puntuación y el número de opiniones
+        para cada hotel (según la lista definida).
+        """
+        pipeline = [
+            {
+                "$match": {
+                    "nombre_servicio": {
+                        "$in": [
+                            "Alletra Boutique Hotel", 
+                            "Alletra Diamond Grand Hotel", 
+                            "Alletra Haven", 
+                            "Alletra Resort", 
+                            "Apollo Diamond Suites", 
+                            "Apollo Executive Beach Resort", 
+                            "Aruba Lodge", 
+                            "Aruba Luxury Lodge", 
+                            "Cray Villas", 
+                            "Ezmeral Grand Hotel", 
+                            "GreenLake Digital Business Suites", 
+                            "GreenLake Platinum Heritage Inn", 
+                            "InfoSight Boutique Hotel", 
+                            "Pointnext Signature Residences & Suites", 
+                            "Primera Grand", 
+                            "ProLiant Haven", 
+                            "ProLiant Place", 
+                            "ProLiant Towers", 
+                            "Simplivity Golden Plaza Hotel", 
+                            "Synergy Golden Grand Hotel", 
+                            "dHCI Executive Boutique Hotel", 
+                            "Apollo Resort & Spa", 
+                            "Apollo Towers", 
+                            "dHCI Platinum Beach Resort"
+                        ]
+                    }
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$nombre_servicio",
+                    "media_puntuacion": { "$avg": "$puntuacion" },
+                    "numero_comentarios": { "$sum": 1 }
+                }
+            },
+            {
+                "$sort": { "numero_comentarios": -1 }
+            }
+        ]
+        return list(mongoDBAgent.db[OpinionesTuristicasDAO.COLLECTION].aggregate(pipeline))
