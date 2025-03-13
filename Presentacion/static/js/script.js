@@ -148,6 +148,7 @@ function getSidePanelHTML(hotel, rating) {
   const attractionsList = hotel.atraccionesCercanas?.map(a => `<li>${a}</li>`).join("") || "";
   const restaurantsList = hotel.restaurantesCercanos?.map(r => `<li>${r}</li>`).join("") || "";
   const eventsList = hotel.eventosProximos?.map(e => `<li>${e}</li>`).join("") || "";
+  const detailsURL = `/hoteles/${hotel._id}`;
 
   return `
     <div class="dropdown-container">
@@ -165,7 +166,7 @@ function getSidePanelHTML(hotel, rating) {
           <p class="price">Desde <strong>$${hotel.precio || 0}</strong> por noche</p>
           <div class="buttons">
             <a href="#" class="btn reserve">Reservar Ahora</a>
-            <a href="#" class="btn details">Ver Más Detalles</a>
+            <a href="${detailsURL}" class="btn details">Ver Más Detalles</a>
             <a href="#" class="btn map">📍 Cómo Llegar</a>
           </div>
         </div>

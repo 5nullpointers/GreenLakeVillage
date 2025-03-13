@@ -259,6 +259,33 @@ def api_ratings():
     }
     return jsonify(ratings_dict)
 
+from bson import ObjectId
+from flask import render_template, abort
+
+@app.route('/hoteles/<string:hotel_id>')
+def hotel_detalle(hotel_id):
+    """
+    Muestra una página con más detalles de un hotel,
+    buscando en la colección "hoteles" por su _id.
+    """
+    # Convertir la cadena hotel_id en ObjectId
+    try:
+        obj_id = ObjectId(hotel_id)
+    except:
+        return abort(400, description="ID inválido")
+
+    # Buscar el hotel en la colección
+    hotel = mongo_agent.db["hoteles"].find_one({"_id": obj_id})
+    if not hotel:
+        return abort(404, description="Hotel no encontrado")
+
+    # Convertir _id a string para no tener problemas en la plantilla
+    hotel["_id"] = str(hotel["_id"])
+
+    # Renderizamos una plantilla con la info del hotel
+    return render_template('hotel_detalles.html', hotel=hotel)
+
+
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
     app.run(host='0.0.0.0', port=5000, debug=True)
