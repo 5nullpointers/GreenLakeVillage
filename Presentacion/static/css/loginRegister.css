@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
 
-/* Reset básico */
+/* === Reset básico === */
 * {
     margin: 0;
     padding: 0;
@@ -10,32 +10,27 @@
     list-style: none;
 }
 
-/* Configuración global del documento */
+/* === Configuración global === */
 html, body {
-    margin: 0;
-    padding: 0;
     width: 100%;
-    height: 100%;
-    font-family: "Poppins", sans-serif;
+    height: 100vh;               /* Ocupar toda la ventana */
+    overflow: hidden;            /* Quita barra de desplazamiento vertical */
     background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
     color: #333;
-    overflow-x: hidden; /* Evita el desplazamiento horizontal */
-    display: flex;
-    flex-direction: column;
 }
 
-/* ======= ENCABEZADO (NAVBAR) ======= */
+/* === NAVBAR FIJO === */
 .navbar {
+    position: fixed;             /* Fijo en la parte superior */
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #009688;
+    padding: 1rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #009688;
-    padding: 1rem 2rem;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
+    z-index: 999;
 }
 
 .nav-logo {
@@ -45,7 +40,6 @@ html, body {
 }
 
 .nav-links {
-    list-style: none;
     display: flex;
     gap: 1.5rem;
 }
@@ -57,41 +51,38 @@ html, body {
 }
 
 .nav-links li a:hover {
-    text-decoration: underline;
+    opacity: 0.75;
 }
 
-/* ======= AJUSTE DEL CONTENEDOR ======= */
-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
-    padding-top: 100px; /* Ajuste para que el navbar no cubra el contenido */
-}
-
+/* === CONTENEDOR CENTRADO (container) === */
 .container {
-    position: relative;
+    position: absolute;
+    /* Centrado vertical y horizontal */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
     width: 850px;
     height: 550px;
     background: #fff;
-    margin: 20px auto;
     border-radius: 30px;
     box-shadow: 0 0 30px rgba(0, 0, 0, .2);
     overflow: hidden;
+    z-index: 1;
 }
 
-/* ======= PIE DE PÁGINA (FOOTER) ======= */
+/* === FOOTER FIJO === */
 .footer {
+    position: fixed;        /* Fijo en la parte inferior */
+    bottom: 0;
+    left: 0;
+    width: 100%;
     text-align: center;
     padding: 1rem;
     background-color: #006f5a;
     color: #fff;
     font-size: 0.9rem;
-    width: 100%;
-    position: absolute;
-    bottom: -50px; /* Ajustado para que no se pegue al contenido */
+    z-index: 999;
 }
 
 .footer p {
@@ -102,15 +93,14 @@ body {
     color: #fff;
     text-decoration: none;
 }
-
 .footer p a:hover {
     text-decoration: underline;
 }
 
-/* ======= ESTILOS ORIGINALES ======= */
+/* === ESTILOS DEL CONTENIDO EN .container === */
 .container h1 {
     font-size: 36px;
-    margin: -10px 0;
+    margin: 10px 0;
 }
 
 .container p {
@@ -145,6 +135,7 @@ body {
     visibility: visible;
 }
 
+/* Inputs y botones */
 .input-box {
     position: relative;
     margin: 30px 0;
@@ -212,6 +203,7 @@ body {
     margin: 0 8px;
 }
 
+/* === FORMA CURVA (toggle-box) === */
 .toggle-box {
     position: absolute;
     width: 100%;
@@ -279,22 +271,21 @@ body {
     box-shadow: none;
 }
 
+/* === MEDIA QUERIES (ajusta según necesites) === */
 @media screen and (max-width: 650px) {
     .container {
-        height: calc(100vh - 40px);
+        width: 90%;
+        height: 70%;
     }
-
     .form-box {
         bottom: 0;
         width: 100%;
         height: 70%;
     }
-
     .container.active .form-box {
         right: 0;
         bottom: 30%;
     }
-
     .toggle-box::before {
         left: 0;
         top: -270%;
@@ -302,31 +293,25 @@ body {
         height: 300%;
         border-radius: 20vw;
     }
-
     .container.active .toggle-box::before {
         left: 0;
         top: 70%;
     }
-
     .container.active .toggle-panel.toggle-left {
         left: 0;
         top: -30%;
     }
-
     .toggle-panel {
         width: 100%;
         height: 30%;
     }
-
     .toggle-panel.toggle-left {
         top: 0;
     }
-
     .toggle-panel.toggle-right {
         right: 0;
         bottom: -30%;
     }
-
     .container.active .toggle-panel.toggle-right {
         bottom: 0;
     }
@@ -336,7 +321,6 @@ body {
     .form-box {
         padding: 20px;
     }
-
     .toggle-panel h1 {
         font-size: 30px;
     }
