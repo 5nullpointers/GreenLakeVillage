@@ -15,7 +15,7 @@ html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100%;
+    min-height: 100vh; /* Permite que el contenido crezca más allá de la altura de la pantalla */
     font-family: "Poppins", sans-serif;
     background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
     color: #333;
@@ -128,7 +128,7 @@ html, body {
     background-color: #007c73;
 }
 
-/* Footer */
+/* ======= PIE DE PÁGINA (FOOTER) ======= */
 .footer {
     text-align: center;
     padding: 1rem;
@@ -136,8 +136,8 @@ html, body {
     color: #fff;
     font-size: 0.9rem;
     width: 100%;
-    position: absolute;
-    bottom: -50px; /* Ajustado para que no se pegue al contenido */
+    position: relative; /* Permite que el footer se acomode debajo del contenido */
+    margin-top: auto; /* Empuja el footer hacia abajo cuando haya poco contenido */
 }
 
 .footer p {
