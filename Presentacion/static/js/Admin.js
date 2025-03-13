@@ -12,4 +12,37 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function() {
         dropdown.classList.remove('open');
     });
+
+    // Nuevo: Cambiar imágenes de las opciones del menú
+    const opciones = document.querySelectorAll('.mapa-opcion-1 li');
+    
+    // Define las nuevas rutas para cada opción
+    const nuevasImagenes = [
+        "/static/images/inicioBlanco.png",
+        "/static/images/profileBlanco.png",
+        "/static/images/ForoBlanco.png",
+        "/static/images/ReseñasBlanco.png"
+    ];
+    
+    opciones.forEach((opcion, index) => {
+        // Al pasar el ratón, cambia la imagen
+        opcion.addEventListener('mouseenter', function() {
+            const img = opcion.querySelector('img');
+            if (img && nuevasImagenes[index]) {
+                // Guarda el src original para volver a él después
+                if (!img.dataset.original) {
+                    img.dataset.original = img.src;
+                }
+                img.src = nuevasImagenes[index];
+            }
+        });
+        
+        // Al quitar el ratón, restaura la imagen original
+        opcion.addEventListener('mouseleave', function() {
+            const img = opcion.querySelector('img');
+            if (img && img.dataset.original) {
+                img.src = img.dataset.original;
+            }
+        });
+    });
 });
