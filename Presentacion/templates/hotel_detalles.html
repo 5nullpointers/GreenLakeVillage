@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ hotel.nombre }} - Detalles</title>
+</head>
+<body>
+  <h1>{{ hotel.nombre }}</h1>
+  <img src="/static/Images/Hoteles/{{ hotel.imagen or 'default.jpg' }}" alt="{{ hotel.nombre }}">
+  
+  <p><strong>Descripción:</strong></p>
+  <p>{{ hotel.descripcion }}</p>
+  
+  <p><strong>Precio:</strong> {{ hotel.precio }} €</p>
+  
+  <h3>Servicios</h3>
+  <ul>
+    {% for servicio in hotel.servicios %}
+      <li>{{ servicio }}</li>
+    {% endfor %}
+  </ul>
+  
+  <h3>Atracciones Cercanas</h3>
+  <ul>
+    {% for atraccion in hotel.atraccionesCercanas %}
+      <li>{{ atraccion }}</li>
+    {% endfor %}
+  </ul>
+  
+  <!-- ... resto de información que quieras mostrar ... -->
+  
+  <p><a href="{{ url_for('map') }}">Volver al mapa</a></p>
+</body>
+</html>
