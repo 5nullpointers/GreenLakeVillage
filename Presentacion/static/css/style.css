@@ -99,12 +99,13 @@ nav a:hover {
 #sidebar {
   position: absolute;
   top: 60px; /* Debajo del nav */
-  width: 320px;
+  width: 400px;
   height: calc(100vh - 60px);
   background-color: #fff;
   padding: 1.5rem;
   transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
   opacity: 0;
+  overflow-y: auto;  
 }
 
 /* Panel lateral para posición derecha */

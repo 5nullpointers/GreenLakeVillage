@@ -140,6 +140,9 @@ function getSidePanelHTML(hotel, rating) {
       (${rating.numero_comentarios} opiniones)`;
   }
 
+  // IMPORTANTE: Aquí reemplazamos \\n por <br>
+  const descConSaltos = (hotel.descripcion || "").replace(/\\n/g, "<br>");
+
   // Listas dinámicas
   const servicesList = hotel.servicios?.map(s => `<li>${s}</li>`).join("") || "";
   const attractionsList = hotel.atraccionesCercanas?.map(a => `<li>${a}</li>`).join("") || "";
@@ -154,7 +157,8 @@ function getSidePanelHTML(hotel, rating) {
         <div class="hotel-info">
           <h2>${hotel.nombre}</h2>
           <p class="rating">${ratingText}</p>
-          <p class="description">${hotel.descripcion || ""}</p>
+          <p class="description">${descConSaltos}</p>
+          <p><strong>Servicios</strong></p>
           <ul class="services">
             ${servicesList}
           </ul>
@@ -183,6 +187,7 @@ function getSidePanelHTML(hotel, rating) {
     </div>
   `;
 }
+
 
 // =======================
 // 4) Lógica del Panel Lateral e InfoWindow
@@ -248,11 +253,14 @@ function toggleSidebar() {
 // 5) Botón "Hoteles" (lista en panel lateral)
 // =======================
 function mostrarHoteles() {
+  // Creamos el listado de hoteles
   let content = '<h3>Listado de Hoteles</h3><ul>';
   hotels.forEach((hotel, index) => {
     content += `<li class="hotel-item" data-index="${index}" style="cursor:pointer;">${hotel.nombre}</li>`;
   });
   content += '</ul>';
+
+  // Insertamos el listado en el contenedor infoSection
   document.getElementById("infoSection").innerHTML = content;
   
   // Agregamos el listener para cada item de la lista
@@ -260,14 +268,33 @@ function mostrarHoteles() {
     item.addEventListener('click', function() {
       const index = this.getAttribute('data-index');
       const hotel = hotels[index];
+
       if (hotel && hotel.marker) {
-        // Disparamos el evento click en el marcador del hotel, simulando el clic del usuario
+        // Disparamos el evento click en el marcador del hotel (simula el clic del usuario en el mapa)
         google.maps.event.trigger(hotel.marker, 'click');
+      }
+
+      // === NUEVO: Mostramos la información del hotel en el panel lateral ===
+      if (hotel) {
+        // Reemplazamos los "\n" por <br> para que se vean como saltos de línea en HTML
+        const descripcionConSaltos = hotel.descripcion.replace(/\\n/g, '<br>');
+
+        // Creamos el HTML que queremos mostrar
+        let infoHotelHTML = `
+          <h3>${hotel.nombre}</h3>
+          <p>${descripcionConSaltos}</p>
+          <p><strong>Precio:</strong> ${hotel.precio} €</p>
+          <h4>Servicios</h4>
+          <ul>
+            ${hotel.servicios.map(servicio => `<li>${servicio}</li>`).join('')}
+          </ul>
+        `;
+
+        // Mostramos la información en el mismo contenedor (o en otro, si lo prefieres)
+        document.getElementById("infoSection").innerHTML = infoHotelHTML;
       }
     });
   });
-  
-  showSidebar();
 }
 
 // =======================
