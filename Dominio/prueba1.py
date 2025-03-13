@@ -11,18 +11,31 @@ from Entidades.OpinionesTuristicas import OpinionesTuristicas
 from Entidades.Sostenibilidad import Sostenibilidad
 from Entidades.UsoTransporte import UsoTransporte
 from Persistencia.DAOS.OpinionesTuristicasDAO import OpinionesTuristicasDAO
+from Persistencia.DAOS.UserDAO import UserDAO
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# --- Codificador JSON personalizado ---
+from flask.json.provider import DefaultJSONProvider
+from bson import ObjectId
+
+class CustomJSONProvider(DefaultJSONProvider):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return super().default(o)
+# ------------------------------------
 
 app = Flask(__name__,
             static_folder='../Presentacion/static',
             template_folder='../Presentacion/templates')
+app.json_provider_class = CustomJSONProvider
+app.json = app.json_provider_class(app)
 
 # Cargar variables de entorno desde .env
 load_dotenv()
 
 # Clave de la API de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 '''
 Manejador de señales para Ctrl+C
@@ -138,6 +151,11 @@ def index():
     # Ahora este es el index principal
     return render_template('index.html')
 
+@app.route('/users', methods=['GET'])
+def users():
+    usuarios = UserDAO.obtener_todos()
+    return jsonify(usuarios), 200
+
 @app.route('/map')
 def map():
     return render_template('map.html')
@@ -180,11 +198,8 @@ def api_hoteles():
     
     return jsonify(hoteles)
 
-
-
 MAX_HISTORY = 5
 conversation_history = []
-
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -201,22 +216,18 @@ def chat():
 
         # Limitar el historial solo a los últimos MAX_HISTORY mensajes
         # Multiplicamos por 2 porque cada mensaje tiene respuesta de la IA
-        conversation_history_trimmed = conversation_history[-(
-            MAX_HISTORY * 2):]
+        conversation_history_trimmed = conversation_history[-(MAX_HISTORY * 2):]
 
         # Crear el mensaje con el historial recortado
         response = client.chat.completions.create(
             model="gpt-4",
-            messages=[
-                {"role": "system", "content": "Eres un asistente virtual para facilitar ayuda turística de rutas y hoteles..."}
-            ] + conversation_history_trimmed
+            messages=[{"role": "system", "content": "Eres un asistente virtual para facilitar ayuda turística de rutas y hoteles..."}] + conversation_history_trimmed
         )
 
         chat_response = response.choices[0].message.content
 
         # Agregar la respuesta de la IA al historial
-        conversation_history.append(
-            {"role": "assistant", "content": chat_response})
+        conversation_history.append({"role": "assistant", "content": chat_response})
 
         return jsonify({"response": chat_response})
 
@@ -224,7 +235,6 @@ def chat():
         return jsonify({"error": f"Error en OpenAI: {str(e)}"}), 500
     except Exception as e:
         return jsonify({"error": f"Error desconocido: {str(e)}"}), 500
-
 
 @app.route('/api/ratings')
 def api_ratings():
@@ -250,5 +260,3 @@ def api_ratings():
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
     app.run(host='0.0.0.0', port=5000, debug=True)
-
-    # Mis commits los coge como isma
