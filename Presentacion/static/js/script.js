@@ -89,6 +89,9 @@ function crearMarcadores() {
       }
     });
 
+    // Guardamos el marcador en el objeto hotel para acceder a él luego desde la lista
+    hotel.marker = marker;
+
     // Creamos un InfoWindow (tarjeta pequeña)
     const infoWindow = new google.maps.InfoWindow();
 
@@ -124,6 +127,7 @@ function crearMarcadores() {
     });
   });
 }
+
 
 // =======================
 // 3) Construir Tarjeta Grande
@@ -245,11 +249,24 @@ function toggleSidebar() {
 // =======================
 function mostrarHoteles() {
   let content = '<h3>Listado de Hoteles</h3><ul>';
-  hotels.forEach(hotel => {
-    content += `<li>${hotel.nombre}</li>`;
+  hotels.forEach((hotel, index) => {
+    content += `<li class="hotel-item" data-index="${index}" style="cursor:pointer;">${hotel.nombre}</li>`;
   });
   content += '</ul>';
   document.getElementById("infoSection").innerHTML = content;
+  
+  // Agregamos el listener para cada item de la lista
+  document.querySelectorAll('.hotel-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const index = this.getAttribute('data-index');
+      const hotel = hotels[index];
+      if (hotel && hotel.marker) {
+        // Disparamos el evento click en el marcador del hotel, simulando el clic del usuario
+        google.maps.event.trigger(hotel.marker, 'click');
+      }
+    });
+  });
+  
   showSidebar();
 }
 
