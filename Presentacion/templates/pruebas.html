@@ -1,0 +1,115 @@
+<div class="dropdown-container">
+    <div class="hotel-card">
+        <img src="hotel-image.jpg" alt="Apollo Diamond Suites" class="hotel-image">
+        <div class="hotel-info">
+            <h2>Apollo Diamond Suites</h2>
+            <p class="rating">⭐ 4.0 (127 opiniones)</p>
+            <p class="description">Un lujoso hotel con vista al lago, perfecto para una escapada relajante o unas vacaciones inolvidables.</p>
+            <ul class="services">
+                <li>🏊 Piscina</li>
+                <li>💆 Spa</li>
+                <li>🍽 Restaurante Gourmet</li>
+                <li>🌅 Vistas Panorámicas</li>
+                <li>📶 Wi-Fi gratuito</li>
+                <li>🚗 Estacionamiento privado</li>
+            </ul>
+            <p class="price">Desde <strong>$250</strong> por noche</p>
+            <div class="buttons">
+                <a href="#" class="btn reserve">Reservar Ahora</a>
+                <a href="#" class="btn details">Ver Más Detalles</a>
+                <a href="#" class="btn map">📍 Cómo Llegar</a>
+            </div>
+        </div>
+    </div>
+    <div class="nearby-info">
+        <h3>🏞 Atracciones Cercanas</h3>
+        <ul>
+            <li>🌲 Rutas de Senderismo</li>
+            <li>🚤 Paseos en Barco</li>
+            <li>📸 Miradores con vistas impresionantes</li>
+        </ul>
+        <h3>🍽 Restaurantes Recomendados</h3>
+        <ul>
+            <li>🍕 Trattoria del Lago</li>
+            <li>🥩 Steakhouse Green Valley</li>
+            <li>🍷 Wine & Dine</li>
+        </ul>
+        <h3>🎉 Eventos Próximos</h3>
+        <ul>
+            <li>🎶 Festival de Música del Lago - 15 de Julio</li>
+            <li>🛶 Campeonato de Remo - 22 de Julio</li>
+        </ul>
+    </div>
+</div>
+
+<style>
+    .dropdown-container {
+        width: 350px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        font-family: Arial, sans-serif;
+    }
+    .hotel-card {
+        display: flex;
+        flex-direction: column;
+    }
+    .hotel-image {
+        width: 100%;
+        border-radius: 8px;
+    }
+    .hotel-info h2 {
+        margin: 10px 0;
+        font-size: 18px;
+    }
+    .rating {
+        font-size: 14px;
+        color: #f4b400;
+    }
+    .description {
+        font-size: 14px;
+        margin: 5px 0;
+    }
+    .services {
+        list-style: none;
+        padding: 0;
+        font-size: 14px;
+    }
+    .services li {
+        margin: 3px 0;
+    }
+    .price {
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    .buttons {
+        display: flex;
+        flex-direction: column;
+    }
+    .btn {
+        text-align: center;
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: white;
+        font-size: 14px;
+    }
+    .reserve { background: #4CAF50; }
+    .details { background: #2196F3; }
+    .map { background: #FF9800; }
+    .nearby-info {
+        margin-top: 15px;
+    }
+    .nearby-info h3 {
+        font-size: 16px;
+        margin: 10px 0 5px 0;
+    }
+    .nearby-info ul {
+        list-style: none;
+        padding: 0;
+        font-size: 14px;
+    }
+</style>
