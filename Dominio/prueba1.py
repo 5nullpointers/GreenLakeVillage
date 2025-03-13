@@ -169,9 +169,27 @@ def login_page():
 
 @app.route('/login', methods=['POST'])
 def login():
-    # Aquí agregarías la lógica para comprobar los datos del usuario
-    # Por ahora, redirigimos al index (index.html)
-    return redirect(url_for('index'))
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    from pymongo import MongoClient
+    MongoClient = MongoClient()
+    user_dao = UserDAO(MongoClient)
+    
+    # Buscar el usuario por email
+    user = UserDAO.find_by_email(email)
+    
+    # Verificar si se encontró el usuario y la contraseña es correcta.
+    if user and user.get("password") == password:
+        # Redirigir según el tipo de usuario.
+        if user.get("user_type") == "admin":
+            return redirect(url_for("map"))
+        else:
+            return redirect(url_for("index"))
+    else:
+        error_message = "Credenciales incorrectas. Por favor, intenta de nuevo."
+        # Se envía el mensaje de error al renderizar la página de login
+        return render_template('loginRegister.html', error=error_message)
 
 @app.route('/register', methods=['POST'])
 def register():

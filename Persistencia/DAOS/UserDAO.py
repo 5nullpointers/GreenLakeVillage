@@ -5,6 +5,14 @@ class UserDAO:
     global mongoDBAgent
     mongoDBAgent = MongoDBAgent()
 
+    def __init__(self, config=None):
+        # Para futuras inicializaciones o uso de configuración
+        self.config = config
+
+    @staticmethod
+    def find_by_email(email: str):
+        return mongoDBAgent.find_one(UserDAO.COLLECTION, {"email": email})
+
     @staticmethod
     def insertar_dato(dato):
         return mongoDBAgent.insert_one(UserDAO.COLLECTION, dato)
