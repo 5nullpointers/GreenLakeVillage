@@ -158,7 +158,9 @@ def users():
 
 @app.route('/map')
 def map():
-    return render_template('map.html')
+    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+    return render_template('map.html', google_maps_api_key=google_maps_api_key)
+
 
 @app.route('/login')
 def login_page():
