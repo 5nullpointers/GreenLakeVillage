@@ -86,6 +86,7 @@ body {
 
 .user-dropdown a:hover {
   background: #f0f0f0;
+  border-radius: 12px;
 }
 
 .profile-img {
