@@ -1,0 +1,230 @@
+/* Importar la fuente Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* Estilos Globales */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  text-decoration: none;
+  list-style: none;
+}
+
+/* Fondo del body con degradado */
+body {
+  background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
+  min-height: 100vh;
+}
+
+/* Contenedor principal */
+.admin-container {
+  width: 100vw;
+  height: 100vh;
+  background: #8ACFC8;
+}
+
+/* Menú Superior */
+.admin-menu {
+  height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  background: #009688;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.admin-menu .logo {
+  font-size: 24px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-weight: bold;
+  position: relative;
+}
+
+/* Dropdown */
+.user-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+}
+
+.user-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.user-dropdown li {
+  margin: 0;
+  color: black;
+}
+
+.user-dropdown a {
+  color: black;
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+}
+
+.user-dropdown a:hover {
+  background: #f0f0f0;
+  border-radius: 12px;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+/* Contenido Principal scrollable */
+.admin-content {
+  height: calc(100vh - 70px);
+  padding: 20px;
+  overflow-y: auto;
+  margin-top: 70px;
+}
+
+/* Distribución en grid */
+.admin-grid {
+  display: grid;
+  grid-template-columns: 275px repeat(3, 1fr);
+  grid-auto-rows: auto;
+  gap: 16px;
+}
+
+/* Panel Izquierdo */
+.mapa-opcion-1 {
+  grid-column: 1 / 2;
+  grid-row: 1 / 49;
+  position: sticky;
+  top: 0px;
+  z-index: 1;
+  text-align: left;
+}
+
+.mapa-opcion-1 ul {
+  margin-top: 10px;
+}
+
+.mapa-opcion-1 li {
+  transition: background-color 0.3s, color 0.3s;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 12px;
+  color: #000;
+  font-weight: bold;
+}
+
+.mapa-opcion-1 li:hover {
+  background-color: #009688;
+  color: #fff;
+}
+
+.mapa-opcion-1 li a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.option-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Sección de Bienvenida */
+.Bienvenida {
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: -10px;
+  margin-left: 20px;
+}
+
+.Bienvenida p {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
+
+.Bienvenida h2 {
+  font-size: 28px;
+  margin-top: -10px;
+  margin-left: 10px;
+  font-weight: normal;
+  color: white;
+}
+
+/* Paneles */
+.panel {
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  text-align: center;
+}
+
+/* Área Principal */
+.mapa {
+  grid-column: 2 / 5;
+  grid-row: 3 / 40;
+  padding: 0;
+  box-shadow: 0 0 200px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  position: relative;
+}
+
+/* Iframe del mapa */
+#mapIframe {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Widgets */
+.admin-widget-2 {
+  grid-column: 2 / 3;
+  grid-row: 40 / 80;
+}
+
+.admin-widget-3 {
+  grid-column: 3 / 4;
+  grid-row: 40 / 80;
+}
+
+.admin-widget-4 {
+  grid-column: 4 / 5;
+  grid-row: 40 / 80;
+}

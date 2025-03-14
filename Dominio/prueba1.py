@@ -174,6 +174,10 @@ def login_page():
 def MapaAdmin():
     return render_template('MapaAdmin.html')
 
+@app.route('/admin/UsuariosAdmin')
+def UsuariosAdmin():
+    return render_template('UsuariosAdmin.html')
+
 @app.route('/admin')
 def admin():
     return render_template('Admin.html')
@@ -189,15 +193,26 @@ def login():
 
     usuario = UserDAO.obtener_dato({"email": email})
     if usuario:
-        # Si ya se almacena la contraseña hasheada, usamos check_password_hash
-        if check_password_hash(usuario.get("pass"), password):
-            session['user_id'] = str(usuario["_id"])
-            session['user_name'] = usuario.get("name")
-            flash("Inicio de sesión exitoso!")
-            return redirect(url_for('index'))
+        if usuario.get("type") != "Admin":
+            # Si ya se almacena la contraseña hasheada, usamos check_password_hash
+            if check_password_hash(usuario.get("pass"), password):
+                session['user_id'] = str(usuario["_id"])
+                session['user_name'] = usuario.get("name")
+                flash("Inicio de sesión exitoso!")
+                return redirect(url_for('index'))
+            else:
+                flash("Contraseña incorrecta.")
+                return redirect(url_for('login_page'))
         else:
-            flash("Contraseña incorrecta.")
-            return redirect(url_for('login_page'))
+             # Si ya se almacena la contraseña hasheada, usamos check_password_hash
+            if check_password_hash(usuario.get("pass"), password):
+                session['user_id'] = str(usuario["_id"])
+                session['user_name'] = usuario.get("name")
+                flash("Inicio de sesión exitoso!")
+                return redirect(url_for('admin'))
+            else:
+                flash("Contraseña incorrecta.")
+                return redirect(url_for('login_page'))
     else:
         flash("Usuario no encontrado.")
         return redirect(url_for('login_page'))
