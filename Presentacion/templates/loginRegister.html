@@ -1,100 +1,98 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login/Registro - GreenLake Village</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/loginRegister.css') }}">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login/Registro - GreenLake Village</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/loginRegister.css') }}">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
-
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-logo">GreenLake Village</div>
-        <ul class="nav-links">
-            <li><a href="/">Inicio</a></li>
-            <li><a href="#">Rutas</a></li>
-            <li><a href="/contacto">Contacto</a></li>
-        </ul>
-    </nav>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-logo">GreenLake Village</div>
+    <ul class="nav-links">
+      <li><a href="/">Inicio</a></li>
+      <li><a href="#">Rutas</a></li>
+      <li><a href="/contacto">Contacto</a></li>
+    </ul>
+  </nav>
 
-    <!-- Contenedor del formulario -->
-    <div class="container">
-        <div class="form-box login">
-            <form action="/prueba">
-                <h1>Login</h1>
-                <div class="input-box">
-                    <input type="text" placeholder="Username" required>
-                    <i class='bx bxs-user'></i>
-                </div>
-                <div class="input-box">
-                    <input type="password" placeholder="Password" required>
-                    <i class='bx bxs-lock-alt'></i>
-                </div>
-                <div class="forgot-link">
-                    <a href="#">¿Olvidaste tu contraseña?</a>
-                </div>
-                <button type="submit" class="btn">Login</button>
-                <p>o inicia sesión con:</p>
-                <div class="social-icons">
-                    <a href="#"><i class='bx bxl-google'></i></a>
-                    <a href="#"><i class='bx bxl-facebook'></i></a>
-                    <a href="#"><i class='bx bxl-github'></i></a>
-                    <a href="#"><i class='bx bxl-linkedin'></i></a>
-                </div>
-            </form>
+  <!-- Contenedor del formulario -->
+  <div class="container">
+    <!-- Formulario de Login -->
+    <div class="form-box login">
+      <form action="/login" method="POST">
+        <h1>Login</h1>
+        <div class="input-box">
+          <input type="text" name="email" placeholder="Email" required>
+          <i class='bx bxs-user'></i>
         </div>
-
-        <div class="form-box register">
-            <form action="/">
-                <h1>Registro</h1>
-                <div class="input-box">
-                    <input type="text" placeholder="Username" required>
-                    <i class='bx bxs-user'></i>
-                </div>
-                <div class="input-box">
-                    <input type="email" placeholder="Email" required>
-                    <i class='bx bxs-envelope'></i>
-                </div>
-                <div class="input-box">
-                    <input type="password" placeholder="Password" required>
-                    <i class='bx bxs-lock-alt'></i>
-                </div>
-                <button type="submit" class="btn">Registrarse</button>
-                <p>o regístrate con:</p>
-                <div class="social-icons">
-                    <a href="#"><i class='bx bxl-google'></i></a>
-                    <a href="#"><i class='bx bxl-facebook'></i></a>
-                    <a href="#"><i class='bx bxl-github'></i></a>
-                    <a href="#"><i class='bx bxl-linkedin'></i></a>
-                </div>
-            </form>
+        <div class="input-box">
+          <input type="password" name="password" placeholder="Password" required>
+          <i class='bx bxs-lock-alt'></i>
         </div>
-
-        <div class="toggle-box">
-            <div class="toggle-panel toggle-left">
-                <h1>¡Bienvenido!</h1>
-                <p>¿No tienes cuenta?</p>
-                <button class="btn register-btn">Registrarse</button>
-            </div>
-
-            <div class="toggle-panel toggle-right">
-                <h1>¡Te extrañamos!</h1>
-                <p>¿Ya tienes una cuenta?</p>
-                <button class="btn login-btn">Iniciar sesión</button>
-            </div>
+        <div class="forgot-link">
+          <a href="#">¿Olvidaste tu contraseña?</a>
         </div>
+        <button type="submit" class="btn">Login</button>
+        <p>o inicia sesión con:</p>
+        <div class="social-icons">
+          <a href="#"><i class='bx bxl-google'></i></a>
+          <a href="#"><i class='bx bxl-facebook'></i></a>
+          <a href="#"><i class='bx bxl-github'></i></a>
+          <a href="#"><i class='bx bxl-linkedin'></i></a>
+        </div>
+      </form>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <p>© 2025 GreenLake Village | <a href="#">Política de Privacidad</a> | <a href="#">Términos de Uso</a></p>
-    </footer>
+    <!-- Formulario de Registro -->
+    <div class="form-box register">
+      <form action="/register" method="POST">
+        <h1>Registro</h1>
+        <div class="input-box">
+          <input type="text" name="name" placeholder="Username" required>
+          <i class='bx bxs-user'></i>
+        </div>
+        <div class="input-box">
+          <input type="email" name="email" placeholder="Email" required>
+          <i class='bx bxs-envelope'></i>
+        </div>
+        <div class="input-box">
+          <input type="password" name="password" placeholder="Password" required>
+          <i class='bx bxs-lock-alt'></i>
+        </div>
+        <button type="submit" class="btn">Registrarse</button>
+        <p>o regístrate con:</p>
+        <div class="social-icons">
+          <a href="#"><i class='bx bxl-google'></i></a>
+          <a href="#"><i class='bx bxl-facebook'></i></a>
+          <a href="#"><i class='bx bxl-github'></i></a>
+          <a href="#"><i class='bx bxl-linkedin'></i></a>
+        </div>
+      </form>
+    </div>
 
-    <script src="{{ url_for('static', filename='js/loginRegister.js') }}"></script>
+    <div class="toggle-box">
+      <div class="toggle-panel toggle-left">
+        <h1>¡Bienvenido!</h1>
+        <p>¿No tienes cuenta?</p>
+        <button class="btn register-btn">Registrarse</button>
+      </div>
+      <div class="toggle-panel toggle-right">
+        <h1>¡Te extrañamos!</h1>
+        <p>¿Ya tienes una cuenta?</p>
+        <button class="btn login-btn">Iniciar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 GreenLake Village | <a href="#">Política de Privacidad</a> | <a href="#">Términos de Uso</a></p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/loginRegister.js') }}"></script>
 </body>
-
 </html>
