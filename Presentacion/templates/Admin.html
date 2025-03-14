@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel de Administración</title>
   <link rel="stylesheet" href="/static/css/Admin.css" />
 </head>
+
 <body>
   <div class="admin-container">
     <!-- Menú Superior -->
@@ -22,11 +24,11 @@
         </div>
       </div>
     </nav>
-    
+
     <!-- Contenido Principal -->
     <div class="admin-content">
       <div class="admin-grid">
-        <!-- Opciones Menu -->
+        <!-- Panel Izquierdo (Barra lateral) -->
         <div class="panel mapa-opcion-1">
           <ul>
             <li>
@@ -48,19 +50,18 @@
           </ul>
         </div>
 
+        <!-- Sección de Bienvenida -->
         <div class="Bienvenida">
           <p>hola Pablo,</p>
           <h2>Overview</h2>
         </div>
-        
+
         <!-- Área Principal (Dashboard) -->
         <div class="panel mapa">
-          <!-- Incrustar Prueba1.html -->
-          <iframe id="mapIframe" src="/MapaAdmin" ></iframe>
+          <iframe id="mapIframe" src="/MapaAdmin"></iframe>
         </div>
-        
-        <!-- Widgets: Primer Grupo -->
-        <!-- <div class="panel admin-widget-1">Widget 1</div> -->
+
+        <!-- Widgets -->
         <div class="panel admin-widget-2">Widget 2</div>
         <div class="panel admin-widget-3">Widget 3</div>
         <div class="panel admin-widget-4">Widget 4</div>
@@ -69,4 +70,5 @@
   </div>
   <script src="/static/js/Admin.js"></script>
 </body>
+
 </html>
