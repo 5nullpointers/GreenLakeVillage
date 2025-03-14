@@ -170,8 +170,6 @@ def login_page():
     # Ahora la ruta '/login' redirige a loginRegister.html
     return render_template('loginRegister.html')
 
-
-
 @app.route('/MapaAdmin')
 def MapaAdmin():
     return render_template('MapaAdmin.html')
@@ -179,7 +177,6 @@ def MapaAdmin():
 @app.route('/admin')
 def admin():
     return render_template('Admin.html')
-
 
 @app.route('/login', methods=['POST'])
 def login():
