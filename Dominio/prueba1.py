@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import openai
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from Entidades.RutasTuristicas import RutasTuristicas
 from Entidades.OcupacionHotelera import OcupacionHotelera
 from Entidades.OpinionesTuristicas import OpinionesTuristicas
@@ -30,12 +30,15 @@ app = Flask(__name__,
 app.json_provider_class = CustomJSONProvider
 app.json = app.json_provider_class(app)
 
+# Configurar clave secreta para sesiones y mensajes flash
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 # Cargar variables de entorno desde .env
 load_dotenv()
 
 # Clave de la API de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+from werkzeug.security import generate_password_hash, check_password_hash
 
 '''
 Manejador de señales para Ctrl+C
@@ -169,15 +172,57 @@ def login_page():
 
 @app.route('/login', methods=['POST'])
 def login():
-    # Aquí agregarías la lógica para comprobar los datos del usuario
-    # Por ahora, redirigimos al index (index.html)
-    return redirect(url_for('index'))
+    email = request.form.get('email')
+    password = request.form.get('password')
 
+    if not email or not password:
+        flash("Por favor, completa ambos campos.")
+        return redirect(url_for('login_page'))
+
+    usuario = UserDAO.obtener_dato({"email": email})
+    if usuario:
+        # Si ya se almacena la contraseña hasheada, usamos check_password_hash
+        if check_password_hash(usuario.get("pass"), password):
+            session['user_id'] = str(usuario["_id"])
+            session['user_name'] = usuario.get("name")
+            flash("Inicio de sesión exitoso!")
+            return redirect(url_for('index'))
+        else:
+            flash("Contraseña incorrecta.")
+            return redirect(url_for('login_page'))
+    else:
+        flash("Usuario no encontrado.")
+        return redirect(url_for('login_page'))
+
+# Ruta de registro: procesar formulario de registro
 @app.route('/register', methods=['POST'])
 def register():
-    # Agregar la lógica para almacenar los datos del usuario
-    # Por ahora, simulamos que el registro fue exitoso y redirigimos al login
+    name = request.form.get('name')
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    if not name or not email or not password:
+        flash("Todos los campos son obligatorios.")
+        return redirect(url_for('login_page'))
+
+    # Verificar si el usuario ya existe
+    if UserDAO.obtener_dato({"email": email}):
+        flash("El correo ya está registrado.")
+        return redirect(url_for('login_page'))
+
+    # Hashear la contraseña antes de guardarla
+    hashed_password = generate_password_hash(password)
+    nuevo_usuario = {
+        "name": name,
+        "email": email,
+        "pass": hashed_password,
+        "type": "Tourist"  # o asignar otro tipo según corresponda
+    }
+
+    UserDAO.insertar_dato(nuevo_usuario)
+    flash("Registro exitoso. Ahora puedes iniciar sesión.")
     return redirect(url_for('login_page'))
+
 
 @app.route('/contacto')
 def contacto():
