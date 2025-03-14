@@ -2,34 +2,65 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ hotel.nombre }} - Detalles</title>
   <link rel="stylesheet" href="../static/css/hotel_detalles.css">
+  <style>
+    /* Fondo dinámico con transición */
+    body::before {
+      content: "";
+      background: url('/static/Images/Hoteles/{{ hotel.imagen or "default.jpg" }}') no-repeat center center fixed;
+      background-size: cover;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -1;
+      filter: brightness(50%);
+      transition: filter 0.5s;
+    }
+    body:hover::before {
+      filter: brightness(60%);
+    }
+  </style>
 </head>
 <body>
-  <h1>{{ hotel.nombre }}</h1>
-  <img src="/static/Images/Hoteles/{{ hotel.imagen or 'default.jpg' }}" alt="{{ hotel.nombre }}">
+  <!-- Título principal -->
+  <h1 class="hidden">{{ hotel.nombre }}</h1>
   
-  <p><strong>Descripción:</strong></p>
-  <p>{{ hotel.descripcion }}</p>
+  <!-- Layout principal a dos columnas -->
+  <div class="main-layout">
+    <!-- Columna Izquierda -->
+    <div class="left-column hidden">
+      <h3>Descripción</h3>
+      <p>{{ hotel.descripcion }}</p>
+      <h3>Precio</h3>
+      <p><strong>{{ hotel.precio }} €</strong></p>
+      <!-- Imagen del hotel (opcional) -->
+      <img src="/static/Images/Hoteles/{{ hotel.imagen or 'default.jpg' }}" alt="{{ hotel.nombre }}">
+    </div>
+    
+    <!-- Columna Derecha -->
+    <div class="right-column hidden">
+      <h3>Servicios</h3>
+      <ul>
+        {% for servicio in hotel.servicios %}
+          <li>{{ servicio }}</li>
+        {% endfor %}
+      </ul>
+      
+      <h3>Atracciones Cercanas</h3>
+      <ul>
+        {% for atraccion in hotel.atraccionesCercanas %}
+          <li>{{ atraccion }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
   
-  <p><strong>Precio:</strong> {{ hotel.precio }} €</p>
-  
-  <h3>Servicios</h3>
-  <ul>
-    {% for servicio in hotel.servicios %}
-      <li>{{ servicio }}</li>
-    {% endfor %}
-  </ul>
-  
-  <h3>Atracciones Cercanas</h3>
-  <ul>
-    {% for atraccion in hotel.atraccionesCercanas %}
-      <li>{{ atraccion }}</li>
-    {% endfor %}
-  </ul>
-
-    <!-- Sección de Opiniones -->
-  <div id="opiniones">
+  <!-- Contenedor de Opiniones -->
+  <div class="hidden" id="opiniones">
     <h2>Opiniones de clientes</h2>
     <p>
       <strong>Calificación media:</strong>
@@ -39,21 +70,21 @@
         No hay opiniones aún.
       {% endif %}
     </p>
-
+    
     <div id="lista-opiniones">
       {% for opinion in opiniones[:5] %}
-        <div class="opinion">
+        <div class="opinion hidden">
           <p>
             <strong>{{ opinion.fecha }}:</strong>
             {{ opinion.comentario }} (Puntuación: {{ opinion.puntuacion }})
           </p>
         </div>
       {% endfor %}
-
+      
       {% if opiniones|length > 5 %}
         <div id="opinion-adicional" style="display: none;">
           {% for opinion in opiniones[5:] %}
-            <div class="opinion">
+            <div class="opinion hidden">
               <p>
                 <strong>{{ opinion.fecha }}:</strong>
                 {{ opinion.comentario }} (Puntuación: {{ opinion.puntuacion }})
@@ -65,9 +96,24 @@
       {% endif %}
     </div>
   </div>
-
-  <!-- Script para alternar la visualización de opiniones adicionales -->
+  
+  <!-- Script para animaciones y toggle de opiniones -->
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      document.querySelectorAll('.hidden').forEach(el => {
+        observer.observe(el);
+      });
+    });
+    
     function toggleOpiniones() {
       var extraOpiniones = document.getElementById('opinion-adicional');
       var button = document.getElementById('mostrar-mas-btn');
@@ -80,9 +126,6 @@
       }
     }
   </script>
-
-  
-  <!-- ... resto de información que quieras mostrar ... -->
   
   <p><a href="{{ url_for('map') }}">Volver al mapa</a></p>
 </body>
