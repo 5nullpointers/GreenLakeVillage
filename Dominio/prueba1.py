@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import openai
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, flash, session
 from Entidades.RutasTuristicas import RutasTuristicas
 from Entidades.OcupacionHotelera import OcupacionHotelera
 from Entidades.OpinionesTuristicas import OpinionesTuristicas
@@ -44,6 +44,18 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 from werkzeug.security import generate_password_hash, check_password_hash
+
+'''
+Manejador de señales para Ctrl+C
+'''
+def signal_handler(sig, frame):
+    print("\nSe ha presionado Ctrl+C. Saliendo de forma segura...")
+    # Detener la aplicación de Flask
+    app.do_teardown_appcontext()
+    sys.exit(0)
+
+# Asociar el manejador a la señal SIGINT (Ctrl+C)
+signal.signal(signal.SIGINT, signal_handler)
 
 # Conectar a MongoDB
 from Persistencia.AgenteBD import MongoDBAgent
@@ -322,7 +334,6 @@ def register():
     name = request.form.get('name')
     email = request.form.get('email')
     password = request.form.get('password')
-    blocked = False
 
     if not name or not email or not password:
         flash("Todos los campos son obligatorios.")
@@ -332,6 +343,19 @@ def register():
     if UserDAO.obtener_dato({"email": email}):
         flash("El correo ya está registrado.")
         return redirect(url_for('login_page'))
+
+    # Hashear la contraseña antes de guardarla
+    hashed_password = generate_password_hash(password)
+    nuevo_usuario = {
+        "name": name,
+        "email": email,
+        "pass": hashed_password,
+        "type": "Tourist"  # o asignar otro tipo según corresponda
+    }
+
+    UserDAO.insertar_dato(nuevo_usuario)
+    flash("Registro exitoso. Ahora puedes iniciar sesión.")
+    return redirect(url_for('login_page'))
 
     # Hashear la contraseña antes de guardarla
     hashed_password = generate_password_hash(password)
