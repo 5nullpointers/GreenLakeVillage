@@ -3,6 +3,7 @@ let currentInfoWindow = null; // Para saber cuál InfoWindow está abierto
 
 // Almacenará la lista de hoteles que viene de MongoDB
 let hotels = [];
+let restaurants = [];
 
 // Variable global para almacenar la información de ratings
 let ratingsInfo = {};
@@ -59,6 +60,32 @@ function initMap() {
     .then(response => response.json())
     .then(data => {
       hotels = data; // Guardamos la lista de hoteles
+      return fetch('/api/restaurantes');
+    })
+    .then(response => response.json())
+    .then(data => {
+      restaurants = data;
+      // 3) Luego obtenemos las puntuaciones desde /api/ratings (si lo deseas)
+      return fetch('/api/ratings');
+    })
+    .then(response => response.json())
+    .then(ratingsData => {
+      ratingsInfo = ratingsData; // Guardamos el diccionario de ratings
+      // 4) Creamos los marcadores en el mapa
+      crearMarcadores();
+    })
+    .catch(error => console.error("Error al cargar datos:", error));
+
+  // 3) Primero obtenemos la lista de restaurantes desde MongoDB
+  fetch('/api/restaurantes')
+    .then(response => response.json())
+    .then(data => {
+      restaurants = data; // Guardamos la lista de restaurantes
+      return fetch('/api/restaurantes');
+    })
+    .then(response => response.json())
+    .then(data => {
+      restaurants = data;
       // 3) Luego obtenemos las puntuaciones desde /api/ratings (si lo deseas)
       return fetch('/api/ratings');
     })
@@ -123,6 +150,47 @@ function crearMarcadores() {
 
       // Tarjeta grande (panel lateral) con más detalles
       const sidePanelHTML = getSidePanelHTML(hotel, ratingData);
+      openMarkerInfo(marker, infoWindow, sidePanelHTML);
+    });
+  });
+
+  // Marcar restaurantes
+  restaurants.forEach(restaurant => {
+    const marker = new google.maps.Marker({
+      position: { lat: restaurant.lat, lng: restaurant.lng },
+      map: map,
+      title: restaurant.nombre,
+      icon: {
+        url: "/static/Images/restaurante.png",
+        scaledSize: new google.maps.Size(80, 80)
+      }
+    });
+    restaurant.marker = marker;
+
+    const infoWindow = new google.maps.InfoWindow();
+    marker.addListener("click", () => {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(() => marker.setAnimation(null), 1500);
+
+      const ratingData = ratingsInfo[restaurant.nombre] || null;
+      let ratingContent = "<p>Sin opiniones</p>";
+      if (ratingData) {
+        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)}
+          (${ratingData.numero_comentarios} opiniones)</p>`;
+      }
+
+      infoWindow.setContent(`
+        <div style="min-width:250px">
+          <img src="/static/Images/Restaurantes/${restaurant.imagen || "default.jpg"}"
+               alt="${restaurant.nombre}"
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <h3>${restaurant.nombre}</h3>
+          ${ratingContent}
+        </div>
+      `);
+      infoWindow.open(map, marker);
+
+      const sidePanelHTML = getSidePanelHTML(restaurant, ratingData);
       openMarkerInfo(marker, infoWindow, sidePanelHTML);
     });
   });

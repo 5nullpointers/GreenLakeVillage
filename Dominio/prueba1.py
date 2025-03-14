@@ -200,6 +200,19 @@ def api_hoteles():
     
     return jsonify(hoteles)
 
+@app.route('/api/restaurantes')
+def api_restaurantes():
+    """
+    Retorna un JSON con todos los restaurantes guardados en MongoDB.
+    """
+    restaurantes = list(mongo_agent.db["restaurantes"].find({}))
+    
+    # Convertir ObjectId a string para no tener problemas al serializar
+    for r in restaurantes:
+        r["_id"] = str(r["_id"])
+    
+    return jsonify(restaurantes)
+
 MAX_HISTORY = 5
 conversation_history = []
 

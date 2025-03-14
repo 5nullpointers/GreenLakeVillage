@@ -82,3 +82,47 @@ class OpinionesTuristicasDAO:
             }
         ]
         return list(mongoDBAgent.db[OpinionesTuristicasDAO.COLLECTION].aggregate(pipeline))
+    
+    # Metodo para obtener las puntuaciones de los restaurantes
+    @staticmethod
+    def obtener_agregados_restaurante():
+        pipeline = [
+            {
+                "$match": {
+                    "nombre_servicio": {
+                        "$in": [
+                            "Fábrica Miralles & Asociados S.C.P Restaurante",
+                            "Comercial Bru y asociados S.L.L. Restaurante",
+                            "Transportes Bou S.L. Restaurante",
+                            "Banco Mendez S.Com. Restaurante",
+                            "Grupo Pascual S.Com. Restaurante",
+                            "Familia Barrera S.Com. Restaurante",
+                            "Mir & Asociados S.L. Restaurante",
+                            "Suministros Pujol y asociados S.A.T. Restaurante",
+                            "Eric Landa Chaparro S.A.U Restaurante",
+                            "Minería TVGI S.L.N.E Restaurante",
+                            "Grupo Antón S.L. Restaurante",
+                            "Grupo Rivas S.A.T. Restaurante",
+                            "Alimentación GDF S.Coop. Restaurante",
+                            "Suministros BL S.Coop. Restaurante",
+                            "Tecnologías Española S.Coop. Restaurante",
+                            "Finanzas Coronado y asociados S.L. Restaurante",
+                            "Industrias EGVE S.Coop. Restaurante",
+                            "Instalaciones Española S.L.L. Restaurante",
+                            "Sola y asociados S.Com. Restaurante"
+                        ]
+                    }
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$nombre_servicio",
+                    "media_puntuacion": { "$avg": "$puntuacion" },
+                    "numero_comentarios": { "$sum": 1 }
+                }
+            },
+            {
+                "$sort": { "numero_comentarios": -1 }
+            }
+        ]
+        return list(mongoDBAgent.db[OpinionesTuristicasDAO.COLLECTION].aggregate(pipeline))
