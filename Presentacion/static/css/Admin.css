@@ -1,5 +1,5 @@
 /* Importar la fuente Poppins */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 /* Estilos Globales */
 * {
@@ -30,10 +30,15 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1rem; 
+  padding: 0 1rem;
   background: #009688;
-  border-radius: 3px solid #eee;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-menu .logo {
+  font-size: 24px;
+  font-weight: 600;
+  color: #fff;
 }
 
 .user-profile {
@@ -41,20 +46,21 @@ body {
   align-items: center;
   color: #fff;
   font-weight: bold;
-  position: relative; /* Nuevo: para posicionar el dropdown */
+  position: relative;
 }
 
+/* Dropdown */
 .user-dropdown {
   position: absolute;
-  top: 40px; /* Ajusta la posición según necesidad */
+  top: 40px;
   right: 0;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 12px;
   padding: 8px;
-  opacity: 0;               /* Iniciamos ocultos */
-  visibility: hidden;       /* Iniciamos no visibles */
-  transform: translateY(-10px);  /* Posición inicial ligeramente elevada */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
   transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
   z-index: 1000;
 }
@@ -96,128 +102,50 @@ body {
   margin-right: 0.5rem;
 }
 
-.admin-menu .logo {
-  font-size: 24px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.admin-menu ul {
-  display: flex;
-  gap: 24px;
-}
-
-.admin-menu li {
-  list-style: none;
-}
-
-/* Contenido principal debajo del menú */
+/* Contenido Principal scrollable */
 .admin-content {
   height: calc(100vh - 70px);
+  /* Toda la altura excepto el menú superior */
   padding: 20px;
   overflow-y: auto;
 }
 
-/* Layout en grid para el panel */
+/* Distribución en grid del contenido */
 .admin-grid {
   display: grid;
-  grid-template-columns: 250px repeat(3, 1fr); /* Primera columna */
+  grid-template-columns: 275px repeat(3, 1fr);
   grid-auto-rows: auto;
   gap: 16px;
 }
 
-/* Paneles */
-.panel {
-  background: #fff;
-  padding: 16px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  text-align: center;
-}
-
-/* Estilos para la sección de bienvenida */
-.Bienvenida {
-  text-align: left;
-  margin-top: 10px;
-  margin-bottom: -10px;
-  margin-left: 20px;
-}
-
-.Bienvenida p {
-  font-size: 20px;
-  color: #333;
-  font-weight: bold;
-  color: white;
-}
-
-.Bienvenida h2 {
-  font-size: 28px;
-  color: #333;
-  margin-top: -10px;
-  margin-left: 10px;
-  font-weight: normal;
-  color: white;
-}
-
-/* Área Principal (Dashboard) */
-.mapa {
-  grid-column: 2 / 5;
-  grid-row: 3 / 26;
-  /* margin-top: -20px; Acerca el mapa al texto de bienvenida */
-  padding: 0; /* Elimina el padding para que el iframe ocupe todo el espacio */
-  box-shadow: 0 0 200px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  text-align: left;
-  position: relative; /* Añade posición relativa para el iframe */
-}
-
-#mapIframe {
-  width: 100%;
-  height: 100%;
-  border-radius: 12px; /* Elimina el borde del iframe */
-  position: absolute; /* Posiciona el iframe absolutamente dentro del contenedor */
-  top: 0;
-  left: 0;
-}
-
-/* Widgets: Primer Grupo */
-.admin-widget-1 {
-  grid-column: 1 / 2;
-  grid-row: 26 / 40; /* Ajusta esto para que ocupe más filas */
-}
-.admin-widget-2 {
-  grid-column: 2 / 3;
-  grid-row: 26 / 40; /* Ajusta esto para que ocupe más filas */
-}
-.admin-widget-3 {
-  grid-column: 3 / 4;
-  grid-row: 26 / 40; /* Ajusta esto para que ocupe más filas */
-}
-.admin-widget-4 {
-  grid-column: 4 / 5;
-  grid-row: 26 / 40; /* Ajusta esto para que ocupe más filas */
-}
-
-/* Posicionar las opciones en la primera fila */
+/* Panel Izquierdo: aplica sticky para que quede fijo */
 .mapa-opcion-1 {
   grid-column: 1 / 2;
-  grid-row: 1 / 40;
+  grid-row: 1 / 49;
+  position: sticky;
+  top: 0px;
+  /* Debajo del menú */
+  z-index: 1;
   text-align: left;
+}
+
+/* Estilos para la lista en la barra lateral */
+.mapa-opcion-1 ul {
+  margin-top: 10px;
 }
 
 .mapa-opcion-1 li {
   transition: background-color 0.3s, color 0.3s;
-  padding: 10px; /* Ajusta el padding según tus necesidades */
+  padding: 10px;
   cursor: pointer;
   border-radius: 12px;
-  color: #000; /* Color de las letras */
+  color: #000;
   font-weight: bold;
 }
 
 .mapa-opcion-1 li:hover {
-  background-color: #009688; /* Color sólido del cuadrado */
-  border-radius: 12px;
-  color: #fff; /* Color de las letras */
+  background-color: #009688;
+  color: #fff;
 }
 
 .mapa-opcion-1 li a {
@@ -230,4 +158,71 @@ body {
   height: 20px;
   margin-right: 8px;
   vertical-align: middle;
+}
+
+/* Sección de Bienvenida */
+.Bienvenida {
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: -10px;
+  margin-left: 20px;
+}
+
+.Bienvenida p {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
+
+.Bienvenida h2 {
+  font-size: 28px;
+  margin-top: -10px;
+  margin-left: 10px;
+  font-weight: normal;
+  color: white;
+}
+
+/* Paneles: Marcos blancos */
+.panel {
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  text-align: center;
+}
+
+/* Área Principal (Dashboard) */
+.mapa {
+  grid-column: 2 / 5;
+  grid-row: 3 / 40;
+  padding: 0;
+  box-shadow: 0 0 200px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  position: relative;
+}
+
+/* Iframe del mapa */
+#mapIframe {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Widgets */
+.admin-widget-2 {
+  grid-column: 2 / 3;
+  grid-row: 40 / 80;
+}
+
+.admin-widget-3 {
+  grid-column: 3 / 4;
+  grid-row: 40 / 80;
+}
+
+.admin-widget-4 {
+  grid-column: 4 / 5;
+  grid-row: 40 / 80;
 }
