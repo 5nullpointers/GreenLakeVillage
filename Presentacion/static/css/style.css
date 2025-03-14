@@ -14,14 +14,11 @@ html,
 body {
   height: 100%;
   font-family: "Poppins", sans-serif;
-  /* Nuestra fuente principal */
   background: #fafafa;
-  /* Por si se ve debajo del mapa */
 }
 
 body {
-  overflow: hidden;
-  /* Evita scrolls en la página */
+  overflow: hidden; /* Evita scrolls en la página */
 }
 
 /* Barra de navegación superior */
@@ -29,34 +26,28 @@ nav {
   width: 100%;
   height: 60px;
   background-color: #009688;
-  /* Un tono turquesa */
   color: #fff;
   display: flex;
   align-items: center;
   padding: 0 1rem;
 }
 
-/* Logo o título en la barra */
 .nav-logo {
   font-weight: 600;
   font-size: 1.2rem;
 }
 
-/* Menú de la derecha */
 nav ul {
   list-style: none;
   display: flex;
   margin-left: auto;
-  /* Para empujar la lista al extremo derecho */
   align-items: center;
 }
 
-/* Elementos de la lista */
 nav li {
   margin-left: 1.5rem;
 }
 
-/* Enlaces del menú */
 nav a {
   color: #fff;
   text-decoration: none;
@@ -66,49 +57,91 @@ nav a {
 
 nav a:hover {
   opacity: 0.7;
-  /* Efecto hover */
 }
 
-/* Mapa ocupando todo debajo de la barra */
+/* Overlay de carga */
+#loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 6px solid #ccc;
+  border-top: 6px solid #009688;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mapa a pantalla completa debajo del nav */
 #map {
   width: 100%;
   height: calc(100vh - 60px);
-  /* 60px ~ altura del nav */
 }
 
-/* Panel lateral */
+/* Panel lateral base */
 #sidebar {
   position: absolute;
-  top: 60px;
-  /* Justo bajo la barra nav */
-  right: 0;
-  width: 320px;
+  top: 60px; /* Debajo del nav */
+  width: 400px;
   height: calc(100vh - 60px);
   background-color: #fff;
-  border-left: 2px solid #ccc;
   padding: 1.5rem;
-  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
-
-  /* Transiciones suaves para simular "desliz" */
-  transform: translateX(110%);
-  opacity: 0;
   transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+  opacity: 0;
+  overflow-y: auto;  
 }
 
-/* Cuando el sidebar está “abierto” */
-#sidebar.open {
+/* Panel lateral para posición derecha */
+#sidebar.right {
+  right: 0;
+  left: auto;
+  border-left: 2px solid #ccc;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
+  transform: translateX(110%);
+}
+
+#sidebar.right.open {
   transform: translateX(0%);
   opacity: 1;
 }
 
-/* Título interno del panel */
+/* Panel lateral para posición izquierda */
+#sidebar.left {
+  left: 0;
+  right: auto;
+  border-right: 2px solid #ccc;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+  transform: translateX(-110%);
+}
+
+#sidebar.left.open {
+  transform: translateX(0%);
+  opacity: 1;
+}
+
 #sidebar h2 {
   margin-bottom: 1rem;
   font-size: 1.2rem;
   font-weight: 600;
 }
 
-/* Botón para cerrar la barra (estilo circular) */
 #closeSidebar {
   font-size: 1.5rem;
   font-weight: bold;
@@ -126,7 +159,6 @@ nav a:hover {
   color: #009688;
 }
 
-/* Zona de información en el panel */
 #infoSection {
   font-size: 0.95rem;
   line-height: 1.4;
@@ -134,7 +166,6 @@ nav a:hover {
   color: #444;
 }
 
-/* Ejemplo de estilo a listas en la info */
 #infoSection ul {
   margin-top: 0.5rem;
   padding-left: 1.2rem;
@@ -144,54 +175,120 @@ nav a:hover {
   margin-bottom: 0.3rem;
 }
 
-/* Pequeña adaptación responsive */
+/* Responsivo */
 @media (max-width: 768px) {
-
-  /* Haz la barra un poco más baja en móvil */
   nav {
     height: 50px;
   }
-
   #map {
     height: calc(100vh - 50px);
   }
-
   #sidebar {
     top: 50px;
     height: calc(100vh - 50px);
     width: 100%;
     box-shadow: none;
-    border-left: none;
+    border: none;
+    transform: translateY(110%);
   }
-
   #sidebar.open {
-    transform: translateX(0);
+    transform: translateY(0%);
     opacity: 1;
   }
 }
 
-/* Estilos del chat de asistencia AI */
-#chat-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 300px;
-  background: white;
-  padding: 15px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-textarea {
+/* Tarjeta desplegable para el panel lateral (grande) */
+.dropdown-container {
   width: 100%;
-  height: 60px;
-  margin-bottom: 10px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  font-family: Arial, sans-serif;
 }
 
-button {
-  background-color: #009688;
-  color: white;
-  border: none;
+.hotel-card {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.hotel-image {
+  width: 100%;
+  border-radius: 8px;
+  max-height: 200px;
+  object-fit: cover;
+}
+
+.hotel-info h2 {
+  margin: 10px 0;
+  font-size: 18px;
+}
+
+.rating {
+  font-size: 14px;
+  color: #f4b400;
+}
+
+.description {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.services {
+  list-style: none;
+  padding: 0;
+  font-size: 14px;
+}
+
+.services li {
+  margin: 3px 0;
+}
+
+.price {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn {
+  text-align: center;
   padding: 8px;
-  cursor: pointer;
+  margin-top: 5px;
+  border-radius: 5px;
+  text-decoration: none;
+  color: white;
+  font-size: 14px;
+}
+
+.reserve {
+  background: #4CAF50;
+}
+
+.details {
+  background: #2196F3;
+}
+
+.map {
+  background: #FF9800;
+}
+
+.nearby-info {
+  margin-top: 15px;
+}
+
+.nearby-info h3 {
+  font-size: 16px;
+  margin: 10px 0 5px 0;
+}
+
+.nearby-info ul {
+  list-style: none;
+  padding: 0;
+  font-size: 14px;
 }

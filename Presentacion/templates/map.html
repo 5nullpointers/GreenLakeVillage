@@ -5,13 +5,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Green Lake Village</title>
-
   <!-- Fuente Poppins (Google Fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- Carga CSS desde /static/css/style.css -->
+  <!-- Carga CSS -->
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
@@ -27,34 +26,27 @@
     </ul>
   </nav>
 
+  <!-- Overlay de carga con un spinner -->
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
   <!-- Mapa a pantalla completa -->
   <div id="map"></div>
 
   <!-- Panel lateral (deslizable) -->
   <div id="sidebar">
     <button id="closeSidebar" onclick="toggleSidebar()">×</button>
-    <!-- Usamos un símbolo “×” para un estilo minimalista -->
-
     <h2>Panel de Información</h2>
     <div id="infoSection"></div>
   </div>
 
-  <!-- Carga la API de Google Maps (reemplaza TU_API_KEY y TU_MAP_ID) -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwlZsP6orMJgEUaad0eNY3aJd-nVgvUz0&map_ids=TU_MAP_ID"></script>
+  <!-- Carga la API de Google Maps -->
+  <!-- Sustituye TU_API_KEY y TU_MAP_ID por los tuyos -->
+  <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&map_ids=TU_MAP_ID"></script>
 
-  <!-- Carga JS desde /static/js/script.js -->
+  <!-- Carga JS principal -->
   <script src="/static/js/script.js"></script>
-
-  <!-- PruebaChatOpenAi 
-  <div id="chat-container">
-    <h2>Asistente</h2>
-    <textarea id="user-input" placeholder="Haz una pregunta"></textarea>
-    <button onclick="sendMessage()">Enviar</button>
-    <div id="chat-response"></div>
-  </div>
-  -->
-
 </body>
 
 </html>

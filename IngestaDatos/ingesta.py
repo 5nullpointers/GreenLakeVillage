@@ -1,9 +1,13 @@
+from dotenv import load_dotenv
 import pandas as pd
+import os
 import pymongo
 from pymongo import MongoClient
 
 # Conectar a MongoDB (local)
-client = MongoClient("mongodb://localhost:27017/")
+load_dotenv()
+password = os.getenv("BBDD_PASSWD")
+client = MongoClient(f"mongodb+srv://GreenLakeDBUser:{password}@greenlakedb.6rrmk.mongodb.net/?retryWrites=true&w=majority&appName=GreenLakeDB")
 db = client["turismo_db"]  # Nombre de la base de datos
 
 # Definir archivos y colecciones
