@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Fondo y estilo global del body */
+body {
+    background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
+    color: #333;
+    padding: 2rem;
+    line-height: 1.6;
+}
+
+/* Título principal del hotel */
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* Imagen del hotel */
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Descripción y Precio */
+p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+strong {
+    font-weight: 600;
+}
+
+/* Listas para Servicios y Atracciones */
+ul {
+    margin-left: 1rem;
+    margin-bottom: 1rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
+
+/* Sección de Opiniones */
+#opiniones {
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+
+#opiniones h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+#opiniones p {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* Opiniones individuales */
+.opinion {
+    border-bottom: 1px solid #ccc;
+    padding: 0.75rem 0;
+}
+
+.opinion:last-child {
+    border-bottom: none;
+}
+
+/* Botón "Mostrar más" */
+#mostrar-mas-btn {
+    background-color: #009688;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    display: block;
+    margin: 1rem auto;
+    transition: background-color 0.3s;
+}
+
+#mostrar-mas-btn:hover {
+    background-color: #007c73;
+}
+
+/* Enlace "Volver al mapa" */
+a {
+    color: #009688;
+    font-weight: 600;
+    text-align: center;
+    display: block;
+    margin-top: 2rem;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsividad */
+@media screen and (max-width: 600px) {
+    body {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    p, li {
+        font-size: 1rem;
+    }
+
+    #opiniones {
+        padding: 1rem;
+    }
+}

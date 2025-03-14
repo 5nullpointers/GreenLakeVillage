@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GreenLake Village - Turista</title>
+    <link rel="stylesheet" href="../static/css/index.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">GreenLake Village</div>
+        <ul class="nav-links">
+            <li><a href="#">Rutas</a></li>
+            <li><a href="/contacto">Contacto</a></li>
+            <li><a href="/login">Iniciar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>¡Bienvenido a GreenLake Village!</h1>
+            <p>Turismo Inteligente y Sostenible</p>
+            <button class="btn-hero" onclick="window.location.href='/descubrir'">Descubre Más</button>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="left-col">
+            <h2>Plan Recomendado</h2>
+            <p>GreenLake Village te ofrece experiencias únicas en naturaleza, gastronomía y cultura.</p>
+            <div class="bento-container">
+                <article class="card">
+                    <h3>Ruta del Lago</h3>
+                    <p>Recorrido panorámico con vistas inigualables, posibilidad de kayak y picnic junto al lago.</p>
+                </article>
+                <article class="card">
+                    <h3>Tour Gastronómico</h3>
+                    <p>Platos típicos locales, mercados artesanales y catas de vino regional.</p>
+                </article>
+                <article class="card">
+                    <h3>Noche Cultural</h3>
+                    <p>Espectáculos de danza y música folclórica bajo las estrellas.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <section class="map-section">
+        <h2>Mapa de GreenLake Village</h2>
+        <p>Puedes ubicar la zona exacta en el siguiente mapa:</p>
+        <div id="map"></div>
+    </section>
+
+    <footer class="footer">
+        <p>© 2025 GreenLake Village |
+            <a href="#">Política de Privacidad</a> |
+            <a href="#">Términos de Uso</a>
+        </p>
+    </footer>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwlZsP6orMJgEUaad0eNY3aJd-nVgvUz0&map_ids=TU_MAP_ID"></script>
+    <script src="../static/js/index.js"></script>
+    <script src="../static/js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+/* ======= Reset General ======= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    list-style: none;
+}
+
+/* ======= Configuración Global ======= */
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
+    color: #333;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ======= Navbar ======= */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #009688;
+    padding: 1rem 2rem;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.nav-logo {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-links li a:hover {
+    text-decoration: underline;
+}
+
+/* ======= Contenedor Principal ======= */
+.main-container {
+    width: 100%;
+    max-width: 1250px;
+    margin: 0 auto;
+    flex: 1;
+    padding-top: 90px;
+    padding-bottom: 6rem;
+}
+
+/* ======= Hero Section ======= */
+.hero {
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    padding: 6rem 2rem;
+    background: url('../img/greenlake.jpg') center/cover;
+}
+
+.hero-content {
+    max-width: 900px;
+    margin: 0 auto;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+.hero h1 {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.btn-hero {
+    background-color: #006f5a;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-hero:hover {
+    background-color: #005e4d;
+}
+
+/* ======= Sección de Innovación ======= */
+.innovation-section {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    max-width: 1000px;
+    text-align: center;
+}
+
+/* ======= Sección de Tecnología ======= */
+.tech-section {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.tech-boxes {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.tech-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 30%;
+    min-width: 280px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.tech-card:hover {
+    transform: scale(1.05);
+}
+
+.tech-card h3 {
+    color: #009688;
+    margin-bottom: 0.8rem;
+}
+
+/* ======= Sección de Ranking ======= */
+.ranking-section {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.leaderboard {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-top: 1rem;
+    max-width: 600px;
+    margin: auto;
+}
+
+.leaderboard ul {
+    list-style: none;
+    padding: 0;
+}
+
+.leaderboard ul li {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+    padding: 0.8rem;
+    background: #009688;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* ======= Footer ======= */
+.footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #006f5a;
+    color: #fff;
+    width: 100%;
+    position: relative;
+    margin-top: 6rem;
+}
+
+.footer p {
+    margin: 0;
+}
+
+.footer p a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.footer p a:hover {
+    text-decoration: underline;
+}
+
+/* ======= Responsividad ======= */
+@media screen and (max-width: 900px) {
+    .main-container {
+        width: 95%;
+    }
+
+    .tech-boxes {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tech-card {
+        width: 90%;
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .tech-card {
+        width: 100%;
+    }
+
+    .leaderboard ul li {
+        font-size: 1rem;
+    }
+}
