@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>{{ hotel.nombre }} - Detalles</title>
+  <link rel="stylesheet" href="../static/css/hotel_detalles.css">
 </head>
 <body>
   <h1>{{ hotel.nombre }}</h1>
@@ -26,6 +27,60 @@
       <li>{{ atraccion }}</li>
     {% endfor %}
   </ul>
+
+    <!-- Sección de Opiniones -->
+  <div id="opiniones">
+    <h2>Opiniones de clientes</h2>
+    <p>
+      <strong>Calificación media:</strong>
+      {% if avg_rating %}
+        {{ avg_rating | round(1) }}
+      {% else %}
+        No hay opiniones aún.
+      {% endif %}
+    </p>
+
+    <div id="lista-opiniones">
+      {% for opinion in opiniones[:5] %}
+        <div class="opinion">
+          <p>
+            <strong>{{ opinion.fecha }}:</strong>
+            {{ opinion.comentario }} (Puntuación: {{ opinion.puntuacion }})
+          </p>
+        </div>
+      {% endfor %}
+
+      {% if opiniones|length > 5 %}
+        <div id="opinion-adicional" style="display: none;">
+          {% for opinion in opiniones[5:] %}
+            <div class="opinion">
+              <p>
+                <strong>{{ opinion.fecha }}:</strong>
+                {{ opinion.comentario }} (Puntuación: {{ opinion.puntuacion }})
+              </p>
+            </div>
+          {% endfor %}
+        </div>
+        <button id="mostrar-mas-btn" onclick="toggleOpiniones()">Mostrar más</button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Script para alternar la visualización de opiniones adicionales -->
+  <script>
+    function toggleOpiniones() {
+      var extraOpiniones = document.getElementById('opinion-adicional');
+      var button = document.getElementById('mostrar-mas-btn');
+      if (extraOpiniones.style.display === 'none') {
+        extraOpiniones.style.display = 'block';
+        button.innerText = 'Mostrar menos';
+      } else {
+        extraOpiniones.style.display = 'none';
+        button.innerText = 'Mostrar más';
+      }
+    }
+  </script>
+
   
   <!-- ... resto de información que quieras mostrar ... -->
   

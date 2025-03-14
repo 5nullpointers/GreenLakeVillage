@@ -29,6 +29,24 @@ class OpinionesTuristicasDAO:
     def borrar_dato(filtro):
         return mongoDBAgent.delete_one(OpinionesTuristicasDAO.COLLECTION, filtro)
 
+    @staticmethod
+    def obtener_opiniones_y_media(hotel_nombre):
+        """
+        Obtiene todas las opiniones y calcula la media de puntuación para un hotel dado.
+        Filtra por el campo 'nombre_servicio', que debe coincidir con el nombre del hotel.
+        Las opiniones se ordenan por fecha (más recientes primero).
+        Retorna una tupla: (lista_de_opiniones, media_puntuacion)
+        """
+        filtro = {"nombre_servicio": hotel_nombre}
+        # Orden descendente: las opiniones más recientes primero
+        opiniones = list(mongoDBAgent.db[OpinionesTuristicasDAO.COLLECTION].find(filtro).sort("fecha", -1))
+        if opiniones:
+            media = sum(opinion.get("puntuacion", 0) for opinion in opiniones) / len(opiniones)
+        else:
+            media = None
+        return opiniones, media
+
+
 
     # Metodo para obtener las puntuaciones de los hoteles 
     @staticmethod

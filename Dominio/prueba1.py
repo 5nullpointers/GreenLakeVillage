@@ -310,25 +310,24 @@ from flask import render_template, abort
 @app.route('/hoteles/<string:hotel_id>')
 def hotel_detalle(hotel_id):
     """
-    Muestra una página con más detalles de un hotel,
-    buscando en la colección "hoteles" por su _id.
+    Muestra una página con más detalles de un hotel, incluyendo la sección de opiniones.
     """
-    # Convertir la cadena hotel_id en ObjectId
     try:
         obj_id = ObjectId(hotel_id)
     except:
         return abort(400, description="ID inválido")
 
-    # Buscar el hotel en la colección
     hotel = mongo_agent.db["hoteles"].find_one({"_id": obj_id})
     if not hotel:
         return abort(404, description="Hotel no encontrado")
-
-    # Convertir _id a string para no tener problemas en la plantilla
     hotel["_id"] = str(hotel["_id"])
 
-    # Renderizamos una plantilla con la info del hotel
-    return render_template('hotel_detalles.html', hotel=hotel)
+    # Obtener opiniones y la media de la puntuación mediante el DAO
+    opiniones, avg_rating = OpinionesTuristicasDAO.obtener_opiniones_y_media(hotel["nombre"])
+
+    return render_template('hotel_detalles.html', hotel=hotel, opiniones=opiniones, avg_rating=avg_rating)
+
+
 
 
 if __name__ == '__main__':
