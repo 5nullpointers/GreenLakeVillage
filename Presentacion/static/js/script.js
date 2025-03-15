@@ -4,6 +4,9 @@ let currentInfoWindow = null; // Para saber cuál InfoWindow está abierto
 // Almacenará la lista de hoteles que viene de MongoDB
 let hotels = [];
 
+// Almacenará la lista de rutas en el mapa
+let routes = [];
+
 // Variable global para almacenar la información de ratings
 let ratingsInfo = {};
 
@@ -69,6 +72,14 @@ function initMap() {
       crearMarcadores();
     })
     .catch(error => console.error("Error al cargar datos:", error));
+  
+  // 3) Obtenemos las rutas desde MongoDB
+  fetch('/api/rutas')
+    .then(response => response.json())
+    .then(data => {
+      routes = data; // Guardamos la lista de rutas
+    })
+    .catch(error => console.error("Error al cargar rutas:", error));
 }
 
 // =======================
@@ -303,8 +314,40 @@ function mostrarHoteles() {
 // =======================
 function mostrarRutas() {
   // Lógica para mostrar rutas en el panel, si procede
-  document.getElementById("infoSection").innerHTML = "<h3>Rutas Turísticas</h3><p>Próximamente...</p>";
-  showSidebar();
+  // document.getElementById("infoSection").innerHTML = "<h3>Rutas Turísticas</h3><p>Próximamente...</p>";
+  let content = '<h3>Rutas Turísticas</h3><ul>';
+  routes.forEach((route, index) => {
+    const formattedName = route.ruta_nombre.replace(/ - \\d+(\\.\\d+)?$/, '');
+    content += `<li class="route-item" data-index="${index}" style="cursor:pointer;">${formattedName}</li>`;
+  });
+  content += '</ul>';
+
+  // Insertamos el listado en el contenedor infoSection
+  document.getElementById("infoSection").innerHTML = content;
+
+  // Agregamos el listener para cada item de la lista
+  document.querySelectorAll('.route-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const index = this.getAttribute('data-index');
+      const route = routes[index];
+
+      if (route) {
+
+        const formattedName = route.ruta_nombre.replace(/ - \\d+(\\.\\d+)?$/, '');
+
+        // Creamos el HTML que queremos mostrar
+        let infoRouteHTML = `
+          <h3>${formattedName}</h3>
+          <p><strong>Tipo de ruta:</strong> ${route.tipo_ruta}</p>
+          <p><strong>Duración:</strong> ${route.longitud_km} horas</p>
+          <p><strong>Inicio:</strong> ${route.duracion_hr}</p>
+        `;
+
+        // Mostramos la información en el mismo contenedor (o en otro, si lo prefieres)
+        document.getElementById("infoSection").innerHTML = infoRouteHTML;
+      }
+    });
+  });
 }
 
 function mostrarSitios() {

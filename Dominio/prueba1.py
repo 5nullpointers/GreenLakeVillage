@@ -40,18 +40,6 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
-'''
-Manejador de señales para Ctrl+C
-'''
-def signal_handler(sig, frame):
-    print("\nSe ha presionado Ctrl+C. Saliendo de forma segura...")
-    # Detener la aplicación de Flask
-    app.do_teardown_appcontext()
-    sys.exit(0)
-
-# Asociar el manejador a la señal SIGINT (Ctrl+C)
-signal.signal(signal.SIGINT, signal_handler)
-
 # Conectar a MongoDB
 from Persistencia.AgenteBD import MongoDBAgent
 from Persistencia.DAOS.RutasTuristicasDAO import RutasTuristicasDAO
@@ -67,87 +55,6 @@ if not mongo_agent.client:
 else:
     # print("✅ Conexión a MongoDB establecida correctamente")
     pass
-
-global lista_rutas
-global lista_ocupaciones
-global lista_opiniones
-global lista_sostenibilidad
-global lista_transporte
-# Obtener los datos de la colección de rutas turísticas y guardarlos en un objeto RutasTuristicas
-try:
-    # Obtener rutas turísticas
-    rutas_turisticas = RutasTuristicasDAO.obtener_todos()
-    lista_rutas = [
-        RutasTuristicas(
-            ruta_nombre=ruta["ruta_nombre"],
-            tipo_ruta=ruta["tipo_ruta"],
-            longitud_km=ruta["longitud_km"],
-            duracion_hr=ruta["duracion_hr"],
-            popularidad=ruta["popularidad"]
-        ) for ruta in rutas_turisticas
-    ]
-
-    # Obtener ocupación hotelera
-    ocupaciones = OcupacionHoteleraDAO.obtener_todos()
-    lista_ocupaciones = [
-        OcupacionHotelera(
-            hotel_nombre=ocup["hotel_nombre"],
-            fecha=ocup["fecha"],
-            tasa_ocupacion=ocup["tasa_ocupacion"],
-            reservas_confirmadas=ocup["reservas_confirmadas"],
-            cancelaciones=ocup["cancelaciones"],
-            precio_promedio_noche=ocup["precio_promedio_noche"]
-        ) for ocup in ocupaciones
-    ]
-
-    # Obtener opiniones turísticas
-    opiniones = OpinionesTuristicasDAO.obtener_todos()
-    lista_opiniones = [
-        OpinionesTuristicas(
-            fecha=op["fecha"],
-            tipo_servicio=op["tipo_servicio"],
-            nombre_servicio=op["nombre_servicio"],
-            puntuacion=op["puntuacion"],
-            comentario=op["comentario"],
-            idioma=op.get("idioma", None)
-        ) for op in opiniones
-    ]
-
-    # Obtener datos de sostenibilidad
-    sostenibilidad = SostenibilidadDAO.obtener_todos()
-    lista_sostenibilidad = [
-        Sostenibilidad(
-            hotel_nombre=datos["hotel_nombre"],
-            consumo_energia_kwh=datos["consumo_energia_kwh"],
-            residuos_generados_kg=datos["residuos_generados_kg"],
-            porcentaje_reciclaje=datos["porcentaje_reciclaje"],
-            uso_agua_m3=datos["uso_agua_m3"],
-            fecha=datos["fecha"]
-        ) for datos in sostenibilidad
-    ]
-
-    # Obtener datos de uso de transporte
-    uso_transporte = UsoTransporteDAO.obtener_todos()
-    lista_transporte = [
-        UsoTransporte(
-            fecha=trans["fecha"],
-            tipo_transporte=trans["tipo_transporte"],
-            num_usuarios=trans["num_usuarios"],
-            tiempo_viaje_promedio_min=trans["tiempo_viaje_promedio_min"],
-            ruta_popular=trans["ruta_popular"]
-        ) for trans in uso_transporte
-    ]
-    # print("✅ Datos obtenidos correctamente")
-    # # Imprimir la cantidad de datos obtenidos de cada colección
-    # print(f"📊 {len(lista_rutas)} rutas turísticas")
-    # print(f"🏨 {len(lista_ocupaciones)} datos de ocupación hotelera")
-    # print(f"🗣️ {len(lista_opiniones)} opiniones turísticas")
-    # print(f"🌱 {len(lista_sostenibilidad)} datos de sostenibilidad")
-    # print(f"🚗 {len(lista_transporte)} datos de uso de transporte")
-
-except Exception as e:
-    print(f"❌ Error al obtener los datos: {str(e)}")
-
 
 @app.route('/')
 def index():
@@ -244,6 +151,19 @@ def api_hoteles():
         h["_id"] = str(h["_id"])
     
     return jsonify(hoteles)
+
+@app.route('/api/rutas')
+def api_rutas():
+    """
+    Retorna un JSON con todas las rutas turísticas guardadas en MongoDB.
+    """
+    rutas = list(mongo_agent.db["rutas_turisticas"].find({}))
+    
+    # Convertir ObjectId a string para no tener problemas al serializar
+    for r in rutas:
+        r["_id"] = str(r["_id"])
+    
+    return jsonify(rutas)
 
 MAX_HISTORY = 5
 conversation_history = []
