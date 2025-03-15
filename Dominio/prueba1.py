@@ -227,6 +227,7 @@ def admin():
 def login():
     email = request.form.get('email')
     password = request.form.get('password')
+    # blocked = request.form.get('blocked')
 
     if not email or not password:
         flash("Por favor, completa ambos campos.")
@@ -234,6 +235,12 @@ def login():
 
     usuario = UserDAO.obtener_dato({"email": email})
     if usuario:
+        if usuario.get("blocked") == True:
+            return """<script>
+                        alert('Usuario bloqueado: Tu cuenta ha sido bloqueada. Por favor, contacta soporte para más información.');
+                        window.location.href = '/login';
+                      </script>"""
+
         if usuario.get("type") != "Admin":
             # Si ya se almacena la contraseña hasheada, usamos check_password_hash
             if check_password_hash(usuario.get("pass"), password):
