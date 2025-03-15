@@ -211,7 +211,7 @@ label {
 }
 
 .user-dropdown li {
-  margin: 0;
+  margin: 10px;
   color: black;
 }
 
@@ -243,6 +243,13 @@ label {
   margin-left: 20px;
 }
 
+.option-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
 /* Nuevo layout para menú lateral y panel blanco */
 .layout {
     display: flex;
@@ -255,6 +262,7 @@ label {
     padding: 20px;
     margin: 10px; /* se reduce el margen para disminuir la separación */
     border-radius: 12px;
+    height: 670px;         /* altura fija */
 }
 
 .panelBlancoMenu {
@@ -264,13 +272,7 @@ label {
     margin: 10px; /* se reduce el margen para disminuir la separación */
     width: 200px;
     border-radius: 12px;
-}
-
-.option-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-  vertical-align: middle;
+    height: 670px;         /* altura fija */
 }
 
 /* Estilos para la lista en la barra lateral */
