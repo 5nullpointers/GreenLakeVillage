@@ -1,7 +1,7 @@
 // Se asume que la validación de que el usuario es admin se ha realizado en el servidor antes de renderizar esta página.
 
 let userData = [];
-const itemsPerPage = 9;
+const itemsPerPage = 8;
 let page = 1;
 
 fetch('/users')
@@ -115,4 +115,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Llama a updateTable() cada vez que se cambia el <select>
     document.getElementById('recordsPerPage').addEventListener('change', updateTable);
+});
+
+// Nuevo: Cambiar imágenes de las opciones del menú
+const opciones = document.querySelectorAll('.menuPanel li');
+    
+// Define las nuevas rutas para cada opción
+const nuevasImagenes = [
+    "/static/images/inicioBlanco.png",
+    "/static/images/profileBlanco.png",
+    "/static/images/ForoBlanco.png",
+    "/static/images/ReseñasBlanco.png"
+];
+
+opciones.forEach((opcion, index) => {
+    // Al pasar el ratón, cambia la imagen
+    opcion.addEventListener('mouseenter', function() {
+        const img = opcion.querySelector('img');
+        if (img && nuevasImagenes[index]) {
+            // Guarda el src original para volver a él después
+            if (!img.dataset.original) {
+                img.dataset.original = img.src;
+            }
+            img.src = nuevasImagenes[index];
+        }
+    });
+    
+    // Al quitar el ratón, restaura la imagen original
+    opcion.addEventListener('mouseleave', function() {
+        const img = opcion.querySelector('img');
+        if (img && img.dataset.original) {
+            img.src = img.dataset.original;
+        }
+    });
 });
