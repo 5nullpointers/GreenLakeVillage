@@ -84,6 +84,26 @@ class OpinionesTuristicasDAO:
                             "Apollo Resort & Spa", 
                             "Apollo Towers", 
                             "dHCI Platinum Beach Resort"
+                            # Agregar restaurantes:
+                            "Alimentación GDF S.Coop. Restaurante",
+                            "Banco Mendez S.Com. Restaurante",
+                            "Comercial Bru y asociados S.L.L. Restaurante",
+                            "Eric Landa Chaparro S.A.U Restaurante",
+                            "Familia Barrera S.Com. Restaurante",
+                            "Finanzas Coronado y asociados S.L. Restaurante",
+                            "Fábrica Miralles & Asociados S.C.P Restaurante",
+                            "Grupo Antón S.L. Restaurante",
+                            "Grupo Pascual S.Com. Restaurante",
+                            "Grupo Rivas S.A.T. Restaurante",
+                            "Industrias EGVE S.Coop. Restaurante",
+                            "Instalaciones Española S.L.L. Restaurante",
+                            "Minería TVGI S.L.N.E Restaurante",
+                            "Mir & Asociados S.L. Restaurante",
+                            "Sola y asociados S.Com. Restaurante",
+                            "Suministros BL S.Coop. Restaurante",
+                            "Suministros Pujol y asociados S.A.T. Restaurante",
+                            "Tecnologías Española S.Coop. Restaurante",
+                            "Transportes Bou S.L. Restaurante"
                         ]
                     }
                 }

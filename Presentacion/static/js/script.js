@@ -7,6 +7,9 @@ let hotels = [];
 // Almacenará la lista de rutas en el mapa
 let routes = [];
 
+// Almacenará la lista de restaurantes en el mapa
+let restaurants = [];
+
 // Variable global para almacenar la información de ratings
 let ratingsInfo = {};
 
@@ -72,8 +75,29 @@ function initMap() {
       crearMarcadores();
     })
     .catch(error => console.error("Error al cargar datos:", error));
+
+  // 3) Primero obtenemos la lista de restaurantes desde MongoDB
+  fetch('/api/restaurantes')
+    .then(response => response.json())
+    .then(data => {
+      restaurants = data; // Guardamos la lista de restaurantes
+      return fetch('/api/restaurantes');
+    })
+    .then(response => response.json())
+    .then(data => {
+      restaurants = data;
+      // 3) Luego obtenemos las puntuaciones desde /api/ratings (si lo deseas)
+      return fetch('/api/ratings');
+    })
+    .then(response => response.json())
+    .then(ratingsData => {
+      ratingsInfo = ratingsData; // Guardamos el diccionario de ratings
+      // 4) Creamos los marcadores en el mapa
+      crearMarcadoresHoteles();
+    })
+    .catch(error => console.error("Error al cargar datos:", error));
   
-  // 3) Obtenemos las rutas desde MongoDB
+  // 4) Obtenemos las rutas desde MongoDB
   fetch('/api/rutas')
     .then(response => response.json())
     .then(data => {
@@ -139,10 +163,64 @@ function crearMarcadores() {
   });
 }
 
+function crearMarcadoresHoteles() {
+  restaurants.forEach(restaurant => {
+    const marker = new google.maps.Marker({
+      position: { lat: restaurant.lat, lng: restaurant.lng },
+      map: map,
+      title: restaurant.nombre,
+      icon: {
+        url: "/static/Images/restaurante.png",
+        scaledSize: new google.maps.Size(80, 80)
+      }
+    });
+    restaurant.marker = marker;
+
+    const infoWindow = new google.maps.InfoWindow();
+    marker.addListener("click", () => {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(() => marker.setAnimation(null), 1500);
+
+      const ratingData = ratingsInfo[restaurant.nombre] || null;
+      let ratingContent = "<p>Sin opiniones</p>";
+      if (ratingData) {
+        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)}
+          (${ratingData.numero_comentarios} opiniones)</p>`;
+      }
+
+      infoWindow.setContent(`
+        <div style="min-width:250px">
+          <img src="/static/Images/Restaurantes/${restaurant.imagen || "default.jpg"}"
+               alt="${restaurant.nombre}"
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <h3>${restaurant.nombre}</h3>
+          ${ratingContent}
+        </div>
+      `);
+      infoWindow.open(map, marker);
+
+      const sidePanelHTML = getSidePanelHTML(restaurant, ratingData);
+      openMarkerInfo(marker, infoWindow, sidePanelHTML);
+    });
+  });
+}
+
 
 // =======================
 // 3) Construir Tarjeta Grande
 // =======================
+
+// Función para cambiar la imagen por defecto si no se encuentra la imagen original
+function cambiarImagenFallback(img, imagenNombre) {
+  // Intentar cargar desde la carpeta "Restaurantes"
+  img.onerror = function() {
+      // Si tampoco está en "Restaurantes", usar la imagen por defecto de Hoteles
+      img.src = "/static/Images/Hoteles/default.jpg";
+  };
+  img.src = "/static/Images/Restaurantes/" + imagenNombre;
+}
+
+
 function getSidePanelHTML(hotel, rating) {
   // rating: { media_puntuacion, numero_comentarios }
   let ratingText = "⭐ 0.0 (0 opiniones)";
@@ -165,6 +243,7 @@ function getSidePanelHTML(hotel, rating) {
     <div class="dropdown-container">
       <div class="hotel-card">
         <img src="/static/Images/Hoteles/${hotel.imagen || "default.jpg"}"
+             onerror="cambiarImagenFallback(this, '${hotel.imagen}')"
              alt="${hotel.nombre}" class="hotel-image">
         <div class="hotel-info">
           <h2>${hotel.nombre}</h2>
@@ -317,7 +396,7 @@ function mostrarRutas() {
   // document.getElementById("infoSection").innerHTML = "<h3>Rutas Turísticas</h3><p>Próximamente...</p>";
   let content = '<h3>Rutas Turísticas</h3><ul>';
   routes.forEach((route, index) => {
-    const formattedName = route.ruta_nombre.replace(/ - \\d+(\\.\\d+)?$/, '');
+    const formattedName = route.ruta_nombre.replace(/ - \d+(\.\d+)?$/, ''); // Elimina el número al final
     content += `<li class="route-item" data-index="${index}" style="cursor:pointer;">${formattedName}</li>`;
   });
   content += '</ul>';
@@ -333,14 +412,14 @@ function mostrarRutas() {
 
       if (route) {
 
-        const formattedName = route.ruta_nombre.replace(/ - \\d+(\\.\\d+)?$/, '');
+        const formattedName = route.ruta_nombre.replace(/ - \d+(\.\d+)?$/, '');
 
         // Creamos el HTML que queremos mostrar
         let infoRouteHTML = `
           <h3>${formattedName}</h3>
           <p><strong>Tipo de ruta:</strong> ${route.tipo_ruta}</p>
-          <p><strong>Duración:</strong> ${route.longitud_km} horas</p>
-          <p><strong>Inicio:</strong> ${route.duracion_hr}</p>
+          <p><strong>Longitud (Km):</strong> ${route.longitud_km} Km</p>
+          <p><strong>Duración:</strong> ${route.duracion_hr} horas</p>
         `;
 
         // Mostramos la información en el mismo contenedor (o en otro, si lo prefieres)
