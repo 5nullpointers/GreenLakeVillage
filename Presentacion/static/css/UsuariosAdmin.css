@@ -10,7 +10,7 @@
 /* ===== Estilos generales de la página ===== */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
+  background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
 }
 
 h1 {
@@ -241,5 +241,65 @@ label {
   align-items: center;
   margin-right: 20px;
   margin-left: 20px;
+}
+
+/* Nuevo layout para menú lateral y panel blanco */
+.layout {
+    display: flex;
+    margin-top: 10px; /* nuevo margen para separar de superiorAdmin */
+}
+
+.panelBlanco {
+    flex: 1;
+    background-color: #fff;
+    padding: 20px;
+    margin: 10px; /* se reduce el margen para disminuir la separación */
+    border-radius: 12px;
+}
+
+.panelBlancoMenu {
+    background-color: #fff;
+    text-align: left;
+    padding: 20px;
+    margin: 10px; /* se reduce el margen para disminuir la separación */
+    width: 200px;
+    border-radius: 12px;
+}
+
+.option-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Estilos para la lista en la barra lateral */
+.panelBlancoMenu ul {
+  list-style: none;
+  margin-top: 10px;
+  padding: 0;
+}
+
+.panelBlancoMenu li {
+  transition: background-color 0.3s, color 0.3s;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 12px;
+  color: #000;
+  font-weight: bold;
+}
+
+.panelBlancoMenu li:hover {
+  background-color: #009688;
+  color: #fff;
+}
+
+.panelBlancoMenu li a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.containerPrincipal h1 {
+  text-align: left;
 }
 
