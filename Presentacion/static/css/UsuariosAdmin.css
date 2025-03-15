@@ -1,31 +1,163 @@
-/* Importar la fuente Poppins */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-/* Estilos Globales */
+/* ===== Reset básico (opcional) ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-  text-decoration: none;
-  list-style: none;
 }
 
-/* Fondo del body con degradado */
+/* ===== Estilos generales de la página ===== */
 body {
-  background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
-  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
 }
 
-/* Contenedor principal */
-.admin-container {
-  width: 100vw;
-  height: 100vh;
-  background: #8ACFC8;
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+#recordsPerPage {
+  margin-bottom: 20px;
+  padding: 5px;
+}
+
+/* ===== Estilos de la tabla ===== */
+#userTable {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden; /* Para respetar los bordes redondeados en las celdas */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#userTable thead {
+  background-color: #f2f2f2;
+}
+
+#userTable thead tr {
+  font-weight: bold;
+}
+
+#userTable th,
+#userTable td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Resalta la fila al pasar el mouse */
+#userTable tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Filas alternas (striped) */
+#userTable tbody tr:nth-child(even) {
+  background-color: #fcfcfc;
+}
+
+/* Cursor en los th para indicar que se puede ordenar */
+#userTable th {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ===== Etiquetas de estado ===== */
+.status-verified {
+  display: inline-block;
+  padding: 5px 8px;
+  color: #fff;
+  background-color: #28a745; /* Verde */
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  min-width: 90px;
+}
+
+.status-unverified {
+  display: inline-block;
+  padding: 5px 8px;
+  color: #333;
+  background-color: #e0e0e0; /* Gris claro */
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  min-width: 90px;
+}
+
+/* ===== Rol (opcional, si quieres distinguir visualmente) ===== */
+.role-admin {
+  font-weight: bold;
+  color: #007bff; /* Azul */
+}
+
+.role-user {
+  color: #555;
+}
+
+/* ===== Botones de acción (Editar/Eliminar) ===== */
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  margin: 2px;
+}
+
+/* Botón Editar */
+.btn-edit {
+  background-color: #007bff; /* Azul */
+  color: #fff;
+}
+
+/* Botón Eliminar */
+.btn-delete {
+  background-color: #dc3545; /* Rojo */
+  color: #fff;
+}
+
+/* ===== Paginación ===== */
+.paginas {
+  display: flex;
+  justify-content: right;
+  margin-top: 20px;
+  margin-right: 20px;
+}
+
+.page-num {
+  min-width: 30px;
+  height: 30px;
+  margin: 0; /* Se elimina la separación lateral */
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #009688; /* Color de letras para botones habilitados */
+  cursor: pointer;
+  padding: 0 6px;
+}
+
+.page-num:disabled {
+  color: gray; /* Color de letras para botones deshabilitados */
+}
+
+.page-num.active {
+  background-color: #009688;
+  color: #fff;
+  border-color: #009688;
 }
 
 /* Menú Superior */
-.admin-menu {
+.superiorAdmin {
   height: 70px;
   display: flex;
   justify-content: space-between;
@@ -33,14 +165,9 @@ body {
   padding: 0 1rem;
   background: #009688;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 999;
 }
 
-.admin-menu .logo {
+.superiorAdmin .logo {
   font-size: 24px;
   font-weight: 600;
   color: #fff;
@@ -80,6 +207,7 @@ body {
   list-style: none;
   margin: 0;
   padding: 0;
+  flex-direction: column;
 }
 
 .user-dropdown li {
@@ -106,125 +234,12 @@ body {
   margin-right: 0.5rem;
 }
 
-/* Contenido Principal scrollable */
-.admin-content {
-  height: calc(100vh - 70px);
-  padding: 20px;
-  overflow-y: auto;
-  margin-top: 70px;
-}
-
-/* Distribución en grid */
-.admin-grid {
-  display: grid;
-  grid-template-columns: 275px repeat(3, 1fr);
-  grid-auto-rows: auto;
-  gap: 16px;
-}
-
-/* Panel Izquierdo */
-.mapa-opcion-1 {
-  grid-column: 1 / 2;
-  grid-row: 1 / 49;
-  position: sticky;
-  top: 0px;
-  z-index: 1;
-  text-align: left;
-}
-
-.mapa-opcion-1 ul {
-  margin-top: 10px;
-}
-
-.mapa-opcion-1 li {
-  transition: background-color 0.3s, color 0.3s;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 12px;
-  color: #000;
-  font-weight: bold;
-}
-
-.mapa-opcion-1 li:hover {
-  background-color: #009688;
-  color: #fff;
-}
-
-.mapa-opcion-1 li a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.option-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
-/* Sección de Bienvenida */
-.Bienvenida {
-  text-align: left;
-  margin-top: 10px;
-  margin-bottom: -10px;
+/* Nueva regla para alinear la info de registros y la paginación en la misma fila */
+.info-pagination-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 20px;
   margin-left: 20px;
 }
 
-.Bienvenida p {
-  font-size: 20px;
-  font-weight: bold;
-  color: white;
-}
-
-.Bienvenida h2 {
-  font-size: 28px;
-  margin-top: -10px;
-  margin-left: 10px;
-  font-weight: normal;
-  color: white;
-}
-
-/* Paneles */
-.panel {
-  background: #fff;
-  padding: 16px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  text-align: center;
-}
-
-/* Área Principal */
-.mapa {
-  grid-column: 2 / 5;
-  grid-row: 3 / 40;
-  padding: 0;
-  box-shadow: 0 0 200px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  position: relative;
-}
-
-/* Iframe del mapa */
-#mapIframe {
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-/* Widgets */
-.admin-widget-2 {
-  grid-column: 2 / 3;
-  grid-row: 40 / 80;
-}
-
-.admin-widget-3 {
-  grid-column: 3 / 4;
-  grid-row: 40 / 80;
-}
-
-.admin-widget-4 {
-  grid-column: 4 / 5;
-  grid-row: 40 / 80;
-}
