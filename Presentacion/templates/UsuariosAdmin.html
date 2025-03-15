@@ -6,20 +6,44 @@
     <link rel="stylesheet" href="/static/css/UsuariosAdmin.css">
 </head>
 <body>
-    <h1>Administración de Usuarios</h1>
-    <table id="userTable" border="1" cellspacing="0" cellpadding="5">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Tipo</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Los usuarios se cargarán aquí dinámicamente -->
-        </tbody>
-    </table>
+    <!-- Barra de navegación superior -->
+    <nav class="superiorAdmin">
+        <div class="logo">Mi Admin - Green Lake Village</div>
+        <div class="user-profile">
+          <img src="/static/images/profile.png" alt="Imagen de perfil" class="profile-img" />
+          <span class="user-name">Nombre de Usuario</span>
+          <div class="user-dropdown" id="userDropdown">
+            <ul>
+              <li><a href="#">Configuración</a></li>
+              <li><a href="/">Cerrar sesión</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    <!-- contenedor de la tabla -->
+    <div class="containerPrincipal">
+        <h1>Administración de Usuarios</h1>
+        <table id="userTable" border="1" cellspacing="0" cellpadding="5">
+            <thead>
+                <tr>
+                    <!-- Eliminada la columna ID -->
+                    <th onclick="sortColumn(0)">Nombre</th>
+                    <th onclick="sortColumn(1)">Email</th>
+                    <th onclick="sortColumn(2)">Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Los usuarios se cargarán aquí dinámicamente -->
+            </tbody>
+        </table>
+        <!-- Agrupamos el div de info y el de paginación en una misma fila -->
+        <div class="info-pagination-row">
+            <div id="recordInfo" class="record-info"></div>
+            <div class="paginas" id="paginationControls"></div>
+        </div>
+    </div>
 
     <script src="/static/js/UsuariosAdmin.js"></script>
 </body>
