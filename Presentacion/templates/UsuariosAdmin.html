@@ -13,7 +13,7 @@
     <div class="logo">Mi Admin - Green Lake Village</div>
     <div class="user-profile">
       <img src="/static/images/profile.png" alt="Imagen de perfil" class="profile-img" />
-      <span class="user-name">Nombre de Usuario</span>
+      <span class="user-name">{{ session.user_name or 'Nombre de Usuario' }}</span>
       <div class="user-dropdown" id="userDropdown">
         <ul>
           <li><a href="#">Configuración</a></li>

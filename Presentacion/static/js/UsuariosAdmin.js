@@ -1,7 +1,7 @@
 // Se asume que la validación de que el usuario es admin se ha realizado en el servidor antes de renderizar esta página.
 
 let userData = [];
-const itemsPerPage = 8;
+const itemsPerPage = 7;
 let page = 1;
 
 fetch('/users')
