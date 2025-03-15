@@ -159,6 +159,47 @@ def users():
     usuarios = UserDAO.obtener_todos()
     return jsonify(usuarios), 200
 
+# Metodo para bloquear al usuario
+@app.route('/admin/blockUser', methods=['POST'])
+def block_user():
+    data = request.get_json()
+    user_id = data.get("id")
+    if not user_id:
+        return jsonify({"error": "ID de usuario no proporcionado."}), 400
+    try:
+        from bson import ObjectId
+        # Actualizar directamente en la colección "users"
+        result = mongo_agent.db['usuarios'].update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"blocked": True}}
+        )
+        if result.modified_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "No se pudo actualizar el usuario."}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Metodo para desbloquear al usuario
+@app.route('/admin/unblockUser', methods=['POST'])
+def unblock_user():
+    data = request.get_json()
+    user_id = data.get("id")
+    if not user_id:
+        return jsonify({"error": "ID de usuario no proporcionado."}), 400
+    try:
+        from bson import ObjectId
+        result = mongo_agent.db['usuarios'].update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"blocked": False}}
+        )
+        if result.modified_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "No se pudo actualizar el usuario."}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/map')
 def map():
     google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')

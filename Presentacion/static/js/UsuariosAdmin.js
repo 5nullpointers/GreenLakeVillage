@@ -49,13 +49,22 @@ function updateTable() {
         row.appendChild(tdType);
 
         const tdActions = document.createElement("td");
-        // Podemos usar innerHTML o crear los botones con createElement
+        // Se añade el atributo data-userid para identificar el usuario
         tdActions.innerHTML = `
         <button class="btn btn-edit">Editar</button>
         <button class="btn btn-delete">Eliminar</button>
-        <button class="btn btn-block">${user.blocked ? "Desbloquear" : "Bloquear"}</button>
+        <button class="btn btn-block" data-userid="${user._id}">${user.blocked ? "Desbloquear" : "Bloquear"}</button>
         `;
         row.appendChild(tdActions);
+
+        // Asignar listener al botón: bloquea si no está bloqueado, desbloquea si ya lo está
+        row.querySelector('.btn-block').addEventListener('click', function() {
+            if (!user.blocked) {
+                blockUser(user._id);
+            } else {
+                unblockUser(user._id);
+            }
+        });
 
         tbody.appendChild(row);
     });
@@ -64,6 +73,43 @@ function updateTable() {
     let endRecord = Math.min(end, userData.length);
     document.getElementById('recordInfo').textContent = `Mostrando del número ${startRecord} al ${endRecord} de un total de ${userData.length} registros`;
     renderPagination();
+}
+
+// Función para bloquear al usuario (ya existente)
+function blockUser(userId) {
+    fetch('/admin/blockUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: userId, blocked: true })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Actualizar el objeto user correspondiente en userData
+        const user = userData.find(u => u._id === userId);
+        if (user) {
+            user.blocked = true;
+        }
+        updateTable();
+    })
+    .catch(error => console.error("Error al bloquear el usuario:", error));
+}
+
+// Nueva función para desbloquear al usuario
+function unblockUser(userId) {
+    fetch('/admin/unblockUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: userId, blocked: false })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const user = userData.find(u => u._id === userId);
+        if (user) {
+            user.blocked = false;
+        }
+        updateTable();
+    })
+    .catch(error => console.error("Error al desbloquear el usuario:", error));
 }
 
 function renderPagination() {
