@@ -223,6 +223,10 @@ def UsuariosAdmin():
 def admin():
     return render_template('Admin.html')
 
+@app.route('/UserBlock')
+def UserBlock():
+    return render_template('UserBlocked.html')
+
 @app.route('/login', methods=['POST'])
 def login():
     email = request.form.get('email')
@@ -236,10 +240,7 @@ def login():
     usuario = UserDAO.obtener_dato({"email": email})
     if usuario:
         if usuario.get("blocked") == True:
-            return """<script>
-                        alert('Usuario bloqueado: Tu cuenta ha sido bloqueada. Por favor, contacta soporte para más información.');
-                        window.location.href = '/login';
-                      </script>"""
+            return redirect(url_for('UserBlock'))
 
         if usuario.get("type") != "Admin":
             # Si ya se almacena la contraseña hasheada, usamos check_password_hash
