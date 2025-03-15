@@ -37,6 +37,13 @@ function updateTable() {
         tdEmail.textContent = user.email;
         row.appendChild(tdEmail);
 
+        const tdStatus = document.createElement("td");
+        const statusSquare = document.createElement("span");
+        statusSquare.textContent = user.blocked ? "Bloqueado" : "Activo";
+        statusSquare.classList.add(user.blocked ? "status-blocked" : "status-active");
+        tdStatus.appendChild(statusSquare);
+        row.appendChild(tdStatus);
+
         const tdType = document.createElement("td");
         tdType.textContent = user.type;
         row.appendChild(tdType);

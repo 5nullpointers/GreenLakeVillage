@@ -93,6 +93,30 @@ label {
   min-width: 90px;
 }
 
+.status-blocked {
+    display: inline-block;
+    padding: 5px;
+    background-color: red;
+    color: #fff;
+    border: 1px solid red;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+}
+
+.status-active {
+    display: inline-block;
+    padding: 5px;
+    background-color: #009688;
+    color: #fff;
+    border: 1px solid #009688;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+}
+
 /* ===== Rol (opcional, si quieres distinguir visualmente) ===== */
 .role-admin {
   font-weight: bold;

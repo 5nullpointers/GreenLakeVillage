@@ -223,6 +223,7 @@ def register():
     name = request.form.get('name')
     email = request.form.get('email')
     password = request.form.get('password')
+    blocked = False
 
     if not name or not email or not password:
         flash("Todos los campos son obligatorios.")
@@ -239,7 +240,8 @@ def register():
         "name": name,
         "email": email,
         "pass": hashed_password,
-        "type": "Tourist"  # o asignar otro tipo según corresponda
+        "type": "Tourist",  # o asignar otro tipo según corresponda
+        "blocked": blocked
     }
 
     UserDAO.insertar_dato(nuevo_usuario)
