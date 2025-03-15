@@ -53,6 +53,7 @@ function updateTable() {
         tdActions.innerHTML = `
         <button class="btn btn-edit">Editar</button>
         <button class="btn btn-delete">Eliminar</button>
+        <button class="btn btn-block">${user.blocked ? "Desbloquear" : "Bloquear"}</button>
         `;
         row.appendChild(tdActions);
 
