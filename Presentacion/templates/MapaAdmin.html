@@ -22,14 +22,19 @@
 
   <!-- Controles sobre el mapa -->
   <div class="map-controls">
-    <button id="toggleHeatmap">Mapa de Calor</button>
-    <button id="setSatellite">Satélite</button>
-    <button id="setTerrain">Terreno</button>
-    <button id="setNormal">Normal</button>
+    <div class="heatmap-group">
+      <button id="toggleHeatmap">Mapa de Calor</button>
+    </div>
+    <div class="maptype-group">
+      <button id="setSatellite">Satélite</button>
+      <button id="setTerrain">Terreno</button>
+      <button id="setNormal">Normal</button>
+    </div>
   </div>
 
   <!-- Carga la API de Google Maps (reemplaza TU_API_KEY y TU_MAP_ID) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwlZsP6orMJgEUaad0eNY3aJd-nVgvUz0&map_ids=TU_MAP_ID&libraries=visualization"></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwlZsP6orMJgEUaad0eNY3aJd-nVgvUz0&map_ids=TU_MAP_ID&libraries=visualization"></script>
 
   <!-- Carga JS desde /static/js/script.js -->
   <script src="/static/js/MapaAdmin.js"></script>

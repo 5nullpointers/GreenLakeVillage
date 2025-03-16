@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel de Administración</title>
+  <!-- Enlaza tu hoja de estilos principal -->
   <link rel="stylesheet" href="/static/css/Admin.css" />
 </head>
 
@@ -12,10 +13,12 @@
   <div class="admin-container">
     <!-- Menú Superior -->
     <nav class="admin-menu">
-      <div class="logo">Mi Admin - Green Lake Village</div>
+      <div class="left-section">
+        <div class="logo">Mi Admin - Green Lake Village</div>
+      </div>
       <div class="user-profile">
-        <img src="/static/images/profile.png" alt="Imagen de perfil" class="profile-img" />
-        <span class="user-name">Nombre de Usuario</span>
+        <!-- Se ha eliminado el span del nombre -->
+        <img src="/static/images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
         <div class="user-dropdown" id="userDropdown">
           <ul>
             <li><a href="#">Configuración</a></li>
@@ -28,46 +31,108 @@
     <!-- Contenido Principal -->
     <div class="admin-content">
       <div class="admin-grid">
-        <!-- Panel Izquierdo (Barra lateral) -->
-        <div class="panel mapa-opcion-1">
+        <!-- Barra lateral -->
+        <div class="sidebar" id="sidebar">
           <ul>
-            <li>
+            <!-- Se marca la opción activa con "active" -->
+            <li class="active">
               <img src="/static/images/inicio.png" alt="Inicio" class="option-icon" />
-              <a href="/admin">Inicio</a>
+              <span class="text-label"><a href="/admin">Inicio</a></span>
             </li>
             <li>
               <img src="/static/images/profile.png" alt="Usuarios" class="option-icon" />
-              <a href="#">Usuarios</a>
+              <span class="text-label"><a href="#">Usuarios</a></span>
             </li>
             <li>
               <img src="/static/images/Foro.png" alt="Foro" class="option-icon" />
-              <a href="#">Foro</a>
+              <span class="text-label"><a href="#">Foro</a></span>
             </li>
             <li>
               <img src="/static/images/Reseñas.png" alt="Reseñas" class="option-icon" />
-              <a href="#">Reseñas</a>
+              <span class="text-label"><a href="#">Reseñas</a></span>
             </li>
           </ul>
         </div>
 
-        <!-- Sección de Bienvenida -->
+        <!-- Sección de Bienvenida + Tarjetas -->
         <div class="Bienvenida">
-          <p>hola Pablo,</p>
-          <h2>Overview</h2>
+          <div class="welcome-text">
+            <p>Hola, Pablo</p>
+            <h2>Overview</h2>
+          </div>
+          <div class="cards-row">
+            <div class="info-card">
+              <img src="/static/images/Dinero.png" alt="Dinero icon" class="card-icon-left">
+              <div class="card-text">
+                <h3>Ingresos totales</h3>
+                <p>35,200€</p>
+              </div>
+            </div>
+            <div class="info-card">
+              <img src="/static/images/Visitantes.png" alt="Visitantes icon" class="card-icon-left">
+              <div class="card-text">
+                <h3>Visitantes totales</h3>
+                <p>17,500 visitantes</p>
+              </div>
+            </div>
+            <div class="info-card">
+              <img src="/static/images/huellaAmbiental.png" alt="Huella icon" class="card-icon-left">
+              <div class="card-text">
+                <h3>Huella ambiental</h3>
+                <p>48,000 kWh</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Área Principal (Dashboard) -->
+        <!-- Panel principal: Mapa + Estadísticas -->
         <div class="panel mapa">
-          <iframe id="mapIframe" src="/MapaAdmin"></iframe>
+          <div class="map-stats-container">
+            <div class="map-container">
+              <iframe id="mapIframe" src="/MapaAdmin"></iframe>
+            </div>
+            <div class="stats-container">
+              <div class="stat-item">
+                <p>Tasa de ocupación</p>
+                <span>98,250 Users (70%)</span>
+                <div class="stat-bar">
+                  <div class="stat-bar-fill" style="width: 70%;"></div>
+                </div>
+              </div>
+              <div class="stat-item">
+                <p>Reservas confirmadas</p>
+                <span>32,100 Users (30%)</span>
+                <div class="stat-bar">
+                  <div class="stat-bar-fill" style="width: 30%;"></div>
+                </div>
+              </div>
+              <div class="stat-item">
+                <p>Cancelaciones</p>
+                <span>23,650 Users (15%)</span>
+                <div class="stat-bar">
+                  <div class="stat-bar-fill" style="width: 25%;"></div>
+                </div>
+              </div>
+              <div class="stat-item">
+                <p>Porcentaje de satisfacción</p>
+                <span>98,250 Users (90%)</span>
+                <div class="stat-bar">
+                  <div class="stat-bar-fill" style="width: 90%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Widgets -->
+        <!-- Otros Widgets (opcional) -->
         <div class="panel admin-widget-2">Widget 2</div>
         <div class="panel admin-widget-3">Widget 3</div>
         <div class="panel admin-widget-4">Widget 4</div>
       </div>
     </div>
   </div>
+
+  <!-- Enlaza tu script principal -->
   <script src="/static/js/Admin.js"></script>
 </body>
 

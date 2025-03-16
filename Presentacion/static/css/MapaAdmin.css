@@ -5,219 +5,240 @@
 
 /* Reinicios / configuraciones básicas */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  html,
-  body {
-    height: 100%;
-    font-family: "Poppins", sans-serif;
-    /* Nuestra fuente principal */
-    background: #fafafa;
-    /* Por si se ve debajo del mapa */
-  }
-  
-  body {
-    overflow: hidden;
-    /* Evita scrolls en la página */
-  }
-  
-  /* Barra de navegación superior */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: "Poppins", sans-serif;
+  /* Nuestra fuente principal */
+  background: #fafafa;
+  /* Por si se ve debajo del mapa */
+}
+
+body {
+  overflow: hidden;
+  /* Evita scrolls en la página */
+}
+
+/* Barra de navegación superior */
+nav {
+  width: 100%;
+  height: 60px;
+  background-color: #009688;
+  /* Un tono turquesa */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+/* Logo o título en la barra */
+.nav-logo {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+/* Menú de la derecha */
+nav ul {
+  list-style: none;
+  display: flex;
+  margin-left: auto;
+  /* Para empujar la lista al extremo derecho */
+  align-items: center;
+}
+
+/* Elementos de la lista */
+nav li {
+  margin-left: 1.5rem;
+}
+
+/* Enlaces del menú */
+nav a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.map-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 1);
+  border-radius: 8px;
+  padding: 8px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Agrupación individual para cada grupo de botones */
+.map-controls .heatmap-group,
+.map-controls .maptype-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Separa visualmente el grupo de Heatmap del grupo de tipos de mapa */
+.map-controls .heatmap-group {
+  border-bottom: 3px solid #009688;
+  padding-bottom: 16px;
+  margin-bottom: 8px;
+}
+
+.map-controls button {
+  border: none;
+  border-radius: 6px;
+  background: #009688;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 12px;
+  transition: background 0.3s;
+}
+
+.map-controls button:hover {
+  background: #00796b;
+}
+
+.map-controls button.active {
+  background: #004d47;
+}
+
+nav a:hover {
+  opacity: 0.7;
+  /* Efecto hover */
+}
+
+/* Mapa ocupando todo debajo de la barra */
+#map {
+  width: 100%;
+  height: calc(100vh - 0px);
+  /* 60px ~ altura del nav */
+}
+
+/* Panel lateral */
+#sidebar {
+  position: absolute;
+  top: 60px;
+  /* Justo bajo la barra nav */
+  right: 0;
+  width: 320px;
+  height: calc(100vh - 60px);
+  background-color: #fff;
+  border-left: 2px solid #ccc;
+  padding: 1.5rem;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
+
+  /* Transiciones suaves para simular "desliz" */
+  transform: translateX(110%);
+  opacity: 0;
+  transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+}
+
+/* Cuando el sidebar está “abierto” */
+#sidebar.open {
+  transform: translateX(0%);
+  opacity: 1;
+}
+
+/* Título interno del panel */
+#sidebar h2 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Botón para cerrar la barra (estilo circular) */
+#closeSidebar {
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: none;
+  border: none;
+  color: #333;
+  float: right;
+  cursor: pointer;
+  margin-top: -10px;
+  margin-right: -5px;
+  transition: color 0.2s ease;
+}
+
+#closeSidebar:hover {
+  color: #009688;
+}
+
+/* Zona de información en el panel */
+#infoSection {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-top: 2rem;
+  color: #444;
+}
+
+/* Ejemplo de estilo a listas en la info */
+#infoSection ul {
+  margin-top: 0.5rem;
+  padding-left: 1.2rem;
+}
+
+#infoSection li {
+  margin-bottom: 0.3rem;
+}
+
+/* Pequeña adaptación responsive */
+@media (max-width: 768px) {
+
+  /* Haz la barra un poco más baja en móvil */
   nav {
-    width: 100%;
-    height: 60px;
-    background-color: #009688;
-    /* Un tono turquesa */
-    color: #fff;
-    display: flex;
-    align-items: center;
-    padding: 0 1rem;
-  }
-  
-  /* Logo o título en la barra */
-  .nav-logo {
-    font-weight: 600;
-    font-size: 1.2rem;
-  }
-  
-  /* Menú de la derecha */
-  nav ul {
-    list-style: none;
-    display: flex;
-    margin-left: auto;
-    /* Para empujar la lista al extremo derecho */
-    align-items: center;
-  }
-  
-  /* Elementos de la lista */
-  nav li {
-    margin-left: 1.5rem;
-  }
-  
-  /* Enlaces del menú */
-  nav a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s ease, opacity 0.2s ease;
+    height: 50px;
   }
 
-  .map-controls {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 10; /* Asegura que se muestre por encima del mapa */
-    background: rgba(255, 255, 255, 0.8);
-    padding: 10px;
-    border-radius: 5px;
-  }
-  
-  .map-controls button {
-    margin: 5px;
-    padding: 8px 12px;
-    border: none;
-    background-color: #009688;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: background 0.3s ease;
-  }
-  
-  .map-controls button:hover {
-    background-color: #00796b;
-  }
-  
-  
-  nav a:hover {
-    opacity: 0.7;
-    /* Efecto hover */
-  }
-  
-  /* Mapa ocupando todo debajo de la barra */
   #map {
-    width: 100%;
-    height: calc(100vh - 0px);
-    /* 60px ~ altura del nav */
+    height: calc(100vh - 50px);
   }
-  
-  /* Panel lateral */
+
   #sidebar {
-    position: absolute;
-    top: 60px;
-    /* Justo bajo la barra nav */
-    right: 0;
-    width: 320px;
-    height: calc(100vh - 60px);
-    background-color: #fff;
-    border-left: 2px solid #ccc;
-    padding: 1.5rem;
-    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
-  
-    /* Transiciones suaves para simular "desliz" */
-    transform: translateX(110%);
-    opacity: 0;
-    transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    top: 50px;
+    height: calc(100vh - 50px);
+    width: 100%;
+    box-shadow: none;
+    border-left: none;
   }
-  
-  /* Cuando el sidebar está “abierto” */
+
   #sidebar.open {
-    transform: translateX(0%);
+    transform: translateX(0);
     opacity: 1;
   }
-  
-  /* Título interno del panel */
-  #sidebar h2 {
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
-  
-  /* Botón para cerrar la barra (estilo circular) */
-  #closeSidebar {
-    font-size: 1.5rem;
-    font-weight: bold;
-    background: none;
-    border: none;
-    color: #333;
-    float: right;
-    cursor: pointer;
-    margin-top: -10px;
-    margin-right: -5px;
-    transition: color 0.2s ease;
-  }
-  
-  #closeSidebar:hover {
-    color: #009688;
-  }
-  
-  /* Zona de información en el panel */
-  #infoSection {
-    font-size: 0.95rem;
-    line-height: 1.4;
-    margin-top: 2rem;
-    color: #444;
-  }
-  
-  /* Ejemplo de estilo a listas en la info */
-  #infoSection ul {
-    margin-top: 0.5rem;
-    padding-left: 1.2rem;
-  }
-  
-  #infoSection li {
-    margin-bottom: 0.3rem;
-  }
-  
-  /* Pequeña adaptación responsive */
-  @media (max-width: 768px) {
-  
-    /* Haz la barra un poco más baja en móvil */
-    nav {
-      height: 50px;
-    }
-  
-    #map {
-      height: calc(100vh - 50px);
-    }
-  
-    #sidebar {
-      top: 50px;
-      height: calc(100vh - 50px);
-      width: 100%;
-      box-shadow: none;
-      border-left: none;
-    }
-  
-    #sidebar.open {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-  
-  /* Estilos del chat de asistencia AI */
-  #chat-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 300px;
-    background: white;
-    padding: 15px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-  }
-  
-  textarea {
-    width: 100%;
-    height: 60px;
-    margin-bottom: 10px;
-  }
-  
-  button {
-    background-color: #009688;
-    color: white;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
-  }
+}
+
+/* Estilos del chat de asistencia AI */
+#chat-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  background: white;
+  padding: 15px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+textarea {
+  width: 100%;
+  height: 60px;
+  margin-bottom: 10px;
+}
+
+button {
+  background-color: #009688;
+  color: white;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+}

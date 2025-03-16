@@ -2,6 +2,16 @@
 let map;
 let heatmap; // Capa de heatmap
 
+// Referencias a los botones del grupo Heatmap
+let btnToggleHeatmap;
+
+// Referencias a los botones del grupo MapType
+let btnSatellite, btnTerrain, btnNormal;
+let mapTypeButtons = []; // Array para los botones de tipo de mapa
+
+/**
+ * Función principal de inicialización del mapa
+ */
 function initMap() {
   const hallstatt = { lat: 47.5626, lng: 13.6493 };
 
@@ -12,6 +22,7 @@ function initMap() {
     east: 13.71
   };
 
+  // Inicializa el mapa de Google
   map = new google.maps.Map(document.getElementById("map"), {
     center: hallstatt,
     zoom: 16,
@@ -38,7 +49,7 @@ function initMap() {
     title: "Hotel Ficticio"
   });
 
-  // Evento clic en el marcador
+  // Evento clic en el marcador (rebote y ventana de info)
   markerHotel.addListener("click", () => {
     markerHotel.setAnimation(google.maps.Animation.BOUNCE);
     setTimeout(() => {
@@ -58,7 +69,7 @@ function initMap() {
     showSidebar();
   });
 
-  // Inicializar heatmap (ejemplo de datos)
+  // Datos de ejemplo para el Heatmap
   const heatmapData = [
     new google.maps.LatLng(47.5636, 13.6367),
     new google.maps.LatLng(47.5524, 13.6496),
@@ -86,60 +97,124 @@ function initMap() {
     new google.maps.LatLng(47.56025, 13.7074),
     new google.maps.LatLng(47.55975, 13.70892)
   ];
-  
+
+  // Crea la capa de heatmap, inicialmente apagada (map: null)
   heatmap = new google.maps.visualization.HeatmapLayer({
     data: heatmapData,
-    map: null, // Se inicia desactivado
-    radius: 100, // Aumenta el radio de dispersión
-    opacity: 0.8 // Ajusta la opacidad
+    map: null,
+    radius: 100,
+    opacity: 0.8
   });
 
-  // Asignar eventos a los botones de control del mapa
-  if (document.getElementById("toggleHeatmap")) {
-    document.getElementById("toggleHeatmap").addEventListener("click", toggleHeatmap);
+  // Obtiene las referencias a los botones
+  btnToggleHeatmap = document.getElementById("toggleHeatmap");
+  btnSatellite = document.getElementById("setSatellite");
+  btnTerrain = document.getElementById("setTerrain");
+  btnNormal = document.getElementById("setNormal");
+
+  // Define el array de botones de tipo de mapa
+  mapTypeButtons = [btnSatellite, btnTerrain, btnNormal];
+
+  // Asigna eventos al botón de Heatmap
+  if (btnToggleHeatmap) {
+    btnToggleHeatmap.addEventListener("click", toggleHeatmap);
   }
-  if (document.getElementById("setSatellite")) {
-    document.getElementById("setSatellite").addEventListener("click", () => setMapType("satellite"));
+  // Asigna eventos a los botones de tipo de mapa
+  if (btnSatellite) {
+    btnSatellite.addEventListener("click", () => setMapType("satellite"));
   }
-  if (document.getElementById("setTerrain")) {
-    document.getElementById("setTerrain").addEventListener("click", () => setMapType("terrain"));
+  if (btnTerrain) {
+    btnTerrain.addEventListener("click", () => setMapType("terrain"));
   }
-  if (document.getElementById("setNormal")) {
-    document.getElementById("setNormal").addEventListener("click", () => setMapType("roadmap"));
+  if (btnNormal) {
+    btnNormal.addEventListener("click", () => setMapType("roadmap"));
+  }
+
+  // Si deseas marcar por defecto un botón de tipo de mapa como activo (por ejemplo, Satélite):
+  if (btnSatellite) {
+    highlightActiveMapTypeButton(btnSatellite);
   }
 }
 
-// Inicializa el mapa al cargar la ventana
+/**
+ * Se llama al cargar la ventana
+ */
 window.onload = initMap;
 
-// Función para activar o desactivar el heatmap
+/**
+ * Activa/Desactiva el heatmap
+ * Este botón actúa de forma independiente, es decir, su estado activo
+ * no afecta ni es afectado por los botones de tipo de mapa.
+ */
 function toggleHeatmap() {
+  if (!heatmap) return;
+
   if (heatmap.getMap()) {
+    // Si el heatmap está activo, se apaga y se quita el resaltado en su botón
     heatmap.setMap(null);
+    btnToggleHeatmap.classList.remove("active");
   } else {
+    // Si estaba apagado, se enciende y se resalta el botón de heatmap
     heatmap.setMap(map);
+    btnToggleHeatmap.classList.add("active");
   }
 }
 
-// Cambia el tipo de mapa
+/**
+ * Cambia el tipo de mapa (satellite, terrain, roadmap, etc.)
+ * Aquí solo se afectan los botones de tipo de mapa.
+ */
 function setMapType(type) {
   map.setMapTypeId(type);
-  // Aplica un estilo global para quitar todos los íconos (POI, tránsito, etc.)
+
+  // Aplica un estilo global para quitar íconos y etiquetas
   map.setOptions({
     styles: [
-      // Oculta todas las etiquetas de texto
       { featureType: "all", elementType: "labels", stylers: [{ visibility: "off" }] },
-      // Oculta específicamente los íconos (incluye POI, transit, etc.)
       { featureType: "all", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-      // Deshabilita la representación geométrica de puntos de interés
       { featureType: "poi", elementType: "geometry", stylers: [{ visibility: "off" }] },
-      // Deshabilita la representación de elementos de tránsito
       { featureType: "transit", elementType: "geometry", stylers: [{ visibility: "off" }] }
     ]
   });
+
+  // Dependiendo del "type", resalta el botón correspondiente del grupo de tipo de mapa
+  switch (type) {
+    case "satellite":
+      highlightActiveMapTypeButton(btnSatellite);
+      break;
+    case "terrain":
+      highlightActiveMapTypeButton(btnTerrain);
+      break;
+    case "roadmap":
+      highlightActiveMapTypeButton(btnNormal);
+      break;
+    default:
+      // Si no se reconoce, se desmarcan todos del grupo map type
+      highlightActiveMapTypeButton(null);
+  }
 }
 
-// Muestra información de hoteles en el panel lateral
+/**
+ * Marca un botón del grupo MapType como activo (y desmarca los demás)
+ * Si se pasa null, se desmarcan todos.
+ */
+function highlightActiveMapTypeButton(buttonElement) {
+  mapTypeButtons.forEach(btn => {
+    if (!btn) return;
+    btn.classList.remove("active");
+  });
+  if (buttonElement) {
+    buttonElement.classList.add("active");
+  }
+}
+
+/* --------------------------------------
+   Funciones del panel lateral (sidebar)
+---------------------------------------*/
+
+/**
+ * Muestra información de hoteles en el panel lateral
+ */
 function mostrarHoteles() {
   document.getElementById("infoSection").innerHTML = `
     <h3>Hoteles</h3>
@@ -152,7 +227,9 @@ function mostrarHoteles() {
   showSidebar();
 }
 
-// Muestra información de rutas turísticas en el panel lateral
+/**
+ * Muestra información de rutas turísticas en el panel lateral
+ */
 function mostrarRutas() {
   document.getElementById("infoSection").innerHTML = `
     <h3>Rutas Turísticas</h3>
@@ -161,7 +238,9 @@ function mostrarRutas() {
   showSidebar();
 }
 
-// Muestra información de sitios de interés en el panel lateral
+/**
+ * Muestra información de sitios de interés en el panel lateral
+ */
 function mostrarSitios() {
   document.getElementById("infoSection").innerHTML = `
     <h3>Sitios de Interés</h3>
@@ -170,13 +249,17 @@ function mostrarSitios() {
   showSidebar();
 }
 
-// Abre o cierra el sidebar
+/**
+ * Abre o cierra el sidebar
+ */
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
   sidebar.classList.toggle("open");
 }
 
-// Fuerza la apertura del sidebar
+/**
+ * Fuerza la apertura del sidebar
+ */
 function showSidebar() {
   const sidebar = document.getElementById("sidebar");
   if (!sidebar.classList.contains("open")) {
@@ -184,7 +267,9 @@ function showSidebar() {
   }
 }
 
-// Función para enviar mensajes al chatbot
+/* --------------------------------------
+   Función para enviar mensajes al chatbot
+---------------------------------------*/
 function sendMessage() {
   const userMessage = document.getElementById("user-input").value;
 
