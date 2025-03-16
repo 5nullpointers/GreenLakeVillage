@@ -159,6 +159,47 @@ def users():
     usuarios = UserDAO.obtener_todos()
     return jsonify(usuarios), 200
 
+# Metodo para bloquear al usuario
+@app.route('/admin/blockUser', methods=['POST'])
+def block_user():
+    data = request.get_json()
+    user_id = data.get("id")
+    if not user_id:
+        return jsonify({"error": "ID de usuario no proporcionado."}), 400
+    try:
+        from bson import ObjectId
+        # Actualizar directamente en la colección "users"
+        result = mongo_agent.db['usuarios'].update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"blocked": True}}
+        )
+        if result.modified_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "No se pudo actualizar el usuario."}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Metodo para desbloquear al usuario
+@app.route('/admin/unblockUser', methods=['POST'])
+def unblock_user():
+    data = request.get_json()
+    user_id = data.get("id")
+    if not user_id:
+        return jsonify({"error": "ID de usuario no proporcionado."}), 400
+    try:
+        from bson import ObjectId
+        result = mongo_agent.db['usuarios'].update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"blocked": False}}
+        )
+        if result.modified_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "No se pudo actualizar el usuario."}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/map')
 def map():
     google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
@@ -174,14 +215,23 @@ def login_page():
 def MapaAdmin():
     return render_template('MapaAdmin.html')
 
+@app.route('/admin/UsuariosAdmin')
+def UsuariosAdmin():
+    return render_template('UsuariosAdmin.html')
+
 @app.route('/admin')
 def admin():
     return render_template('Admin.html')
+
+@app.route('/UserBlock')
+def UserBlock():
+    return render_template('UserBlocked.html')
 
 @app.route('/login', methods=['POST'])
 def login():
     email = request.form.get('email')
     password = request.form.get('password')
+    # blocked = request.form.get('blocked')
 
     if not email or not password:
         flash("Por favor, completa ambos campos.")
@@ -189,15 +239,29 @@ def login():
 
     usuario = UserDAO.obtener_dato({"email": email})
     if usuario:
-        # Si ya se almacena la contraseña hasheada, usamos check_password_hash
-        if check_password_hash(usuario.get("pass"), password):
-            session['user_id'] = str(usuario["_id"])
-            session['user_name'] = usuario.get("name")
-            flash("Inicio de sesión exitoso!")
-            return redirect(url_for('index'))
+        if usuario.get("blocked") == True:
+            return redirect(url_for('UserBlock'))
+
+        if usuario.get("type") != "Admin":
+            # Si ya se almacena la contraseña hasheada, usamos check_password_hash
+            if check_password_hash(usuario.get("pass"), password):
+                session['user_id'] = str(usuario["_id"])
+                session['user_name'] = usuario.get("name")
+                flash("Inicio de sesión exitoso!")
+                return redirect(url_for('index'))
+            else:
+                flash("Contraseña incorrecta.")
+                return redirect(url_for('login_page'))
         else:
-            flash("Contraseña incorrecta.")
-            return redirect(url_for('login_page'))
+             # Si ya se almacena la contraseña hasheada, usamos check_password_hash
+            if check_password_hash(usuario.get("pass"), password):
+                session['user_id'] = str(usuario["_id"])
+                session['user_name'] = usuario.get("name")
+                flash("Inicio de sesión exitoso!")
+                return redirect(url_for('admin'))
+            else:
+                flash("Contraseña incorrecta.")
+                return redirect(url_for('login_page'))
     else:
         flash("Usuario no encontrado.")
         return redirect(url_for('login_page'))
@@ -208,6 +272,7 @@ def register():
     name = request.form.get('name')
     email = request.form.get('email')
     password = request.form.get('password')
+    blocked = False
 
     if not name or not email or not password:
         flash("Todos los campos son obligatorios.")
@@ -224,7 +289,8 @@ def register():
         "name": name,
         "email": email,
         "pass": hashed_password,
-        "type": "Tourist"  # o asignar otro tipo según corresponda
+        "type": "Tourist",  # o asignar otro tipo según corresponda
+        "blocked": blocked
     }
 
     UserDAO.insertar_dato(nuevo_usuario)
