@@ -67,9 +67,20 @@ function updateTable() {
         });
         // Asignar listener al botón de eliminar
         row.querySelector('.btn-delete').addEventListener('click', function() {
-            if (confirm("¿Está seguro de eliminar el usuario?")) {
-                deleteUser(user._id);
-            }
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esta acción eliminará completamente al usuario.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteUser(user._id);
+                }
+            });
         });
 
         tbody.appendChild(row);
