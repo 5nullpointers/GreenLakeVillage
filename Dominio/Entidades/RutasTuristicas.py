@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 @dataclass
 class RutasTuristicas:
@@ -7,3 +8,4 @@ class RutasTuristicas:
     longitud_km: float
     duracion_hr: float
     popularidad: float
+    coordenadas: List[float]
