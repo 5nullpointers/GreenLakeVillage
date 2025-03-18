@@ -12,7 +12,7 @@
   <nav class="superiorAdmin">
     <div class="logo">Mi Admin - Green Lake Village</div>
     <div class="user-profile">
-      <img src="/static/images/profile.png" alt="Imagen de perfil" class="profile-img" />
+      <img src="/static/images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
       <span class="user-name">{{ session.user_name or 'Nombre de Usuario' }}</span>
       <div class="user-dropdown" id="userDropdown">
         <ul>
@@ -32,7 +32,7 @@
             <img src="/static/images/inicio.png" alt="Inicio" class="option-icon" />
             <a href="/admin">Inicio</a>
           </li>
-          <li class="activeMenu">
+          <li class="active">
             <img src="/static/images/profile.png" alt="Usuarios" class="option-icon" />
             <a href="/admin/UsuariosAdmin">Usuarios</a>
           </li>

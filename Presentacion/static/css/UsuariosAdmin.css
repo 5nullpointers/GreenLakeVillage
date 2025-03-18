@@ -193,9 +193,10 @@ label {
 }
 
 .superiorAdmin .logo {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   color: #fff;
+  margin-left: 1rem;
 }
 
 .user-profile {
@@ -288,42 +289,50 @@ label {
     margin: 10px; /* se reduce el margen para disminuir la separación */
     border-radius: 12px;
     height: 670px;         /* altura fija */
+    margin-right: 20px;
 }
 
 .panelBlancoMenu {
     background-color: #fff;
     text-align: left;
-    padding: 20px;
+    padding: 10px;
     margin: 10px; /* se reduce el margen para disminuir la separación */
     width: 200px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    transition: width 0.3s ease;
+    overflow: hidden;
     border-radius: 12px;
     height: 670px;         /* altura fija */
+    margin-left: 20px;
 }
 
 /* Estilos para la lista en la barra lateral */
 .panelBlancoMenu ul {
-  list-style: none;
   margin-top: 10px;
-  padding: 0;
 }
 
 .panelBlancoMenu li {
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.3s, color 0.3s, transform 0.3s;
   padding: 10px;
   cursor: pointer;
   border-radius: 12px;
-  color: #000;
-  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
 }
 
 .panelBlancoMenu li:hover {
   background-color: #009688;
   color: #fff;
+  transform: translateX(5px);
 }
 
 .panelBlancoMenu li a {
   color: inherit;
   text-decoration: none;
+  margin-left: 8px;
 }
 
 .containerPrincipal h1 {
@@ -332,4 +341,10 @@ label {
 
 .user-name {
   margin-right: 20px;
+}
+
+/* Sección activa */
+.menuPanel li.active {
+  background-color: #009688;
+  color: #fff;
 }
