@@ -197,73 +197,100 @@ nav a:hover {
   }
 }
 
-/* Tarjeta desplegable para el panel lateral (grande) */
+/* Tarjeta desplegable mejorada para el panel lateral */
 .dropdown-container {
   width: 100%;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  padding: 15px;
-  font-family: Arial, sans-serif;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  font-family: inherit; /* Usa la fuente principal definida en el sitio */
+  transition: box-shadow 0.3s ease;
 }
 
+.dropdown-container:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para las tarjetas de hotel dentro del desplegable */
 .hotel-card {
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.hotel-card:hover {
+  transform: translateY(-5px);
 }
 
 .hotel-image {
   width: 100%;
-  border-radius: 8px;
-  max-height: 200px;
+  border-radius: 10px;
+  max-height: 220px;
   object-fit: cover;
 }
 
+/* Información del hotel */
 .hotel-info h2 {
-  margin: 10px 0;
-  font-size: 18px;
+  margin: 15px 0 10px;
+  font-size: 20px;
+  color: #333;
 }
 
 .rating {
   font-size: 14px;
   color: #f4b400;
+  margin-bottom: 5px;
 }
 
 .description {
-  font-size: 14px;
-  margin: 5px 0;
+  font-size: 15px;
+  margin: 10px 0;
+  color: #555;
 }
 
+/* Lista de servicios */
 .services {
   list-style: none;
   padding: 0;
   font-size: 14px;
+  color: #666;
 }
 
 .services li {
-  margin: 3px 0;
+  margin-bottom: 5px;
 }
 
+/* Precio destacado */
 .price {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
-  margin-top: 10px;
+  margin-top: 15px;
+  color: #000;
 }
 
+/* Botones de acción */
 .buttons {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 15px;
 }
 
 .btn {
+  flex: 1;
   text-align: center;
-  padding: 8px;
-  margin-top: 5px;
+  padding: 10px;
   border-radius: 5px;
   text-decoration: none;
-  color: white;
-  font-size: 14px;
+  color: #fff;
+  font-size: 15px;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.btn:hover {
+  transform: scale(1.03);
 }
 
 .reserve {
@@ -278,17 +305,20 @@ nav a:hover {
   background: #FF9800;
 }
 
+/* Sección de información cercana */
 .nearby-info {
-  margin-top: 15px;
+  margin-top: 20px;
 }
 
 .nearby-info h3 {
-  font-size: 16px;
-  margin: 10px 0 5px 0;
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
 }
 
 .nearby-info ul {
   list-style: none;
   padding: 0;
   font-size: 14px;
+  color: #555;
 }

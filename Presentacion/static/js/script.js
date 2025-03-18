@@ -263,7 +263,13 @@ function closeAll() {
     currentInfoWindow.close();
     currentInfoWindow = null;
   }
+  // Ocultar ruta si existe
+  if (currentRoutePolyline) {
+    currentRoutePolyline.setMap(null);
+    currentRoutePolyline = null;
+  }
 }
+
 
 function showSidebar() {
   const sidebar = document.getElementById("sidebar");
@@ -292,6 +298,7 @@ function toggleSidebar() {
 // 5) Botón "Hoteles" (lista en panel lateral)
 // =======================
 function mostrarHoteles() {
+  closeAll()
   let content = '<h3>Listado de Hoteles</h3><ul>';
   hotels.forEach((hotel, index) => {
     content += `<li class="hotel-item" data-index="${index}" style="cursor:pointer;">${hotel.nombre}</li>`;
@@ -326,6 +333,7 @@ function mostrarHoteles() {
 // 6) Mostrar listado de Rutas y dibujar la seleccionada
 // =======================
 function mostrarRutas() {
+  closeAll()
   let content = '<h3>Rutas Turísticas</h3><ul>';
   routes.forEach((route, index) => {
     const formattedName = route.ruta_nombre.replace(/ - \d+(\.\d+)?$/, '');
@@ -355,6 +363,7 @@ function mostrarRutas() {
 }
 
 function mostrarSitios() {
+  closeAll()
   document.getElementById("infoSection").innerHTML = "<h3>Sitios de Interés</h3><p>Próximamente...</p>";
   showSidebar();
 }
@@ -387,27 +396,67 @@ function sendMessage() {
     .catch(error => console.error("Error:", error));
 }
 
+function catmullRom(t, p0, p1, p2, p3) {
+  return 0.5 * ((2 * p1) +
+                (-p0 + p2) * t +
+                (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t +
+                (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t);
+}
+
+function getCurvePoints(path, numOfSegments = 20) {
+  if (path.length < 2) {
+    return path;
+  }
+  
+  // Convertir cada objeto {lat, lng} en un objeto google.maps.LatLng
+  let pts = path.map(coord => new google.maps.LatLng(coord.lat, coord.lng));
+  
+  // Agregar duplicados al inicio y al final para que la fórmula tenga suficientes puntos
+  pts.unshift(pts[0]);
+  pts.push(pts[pts.length - 1]);
+  
+  let curvePoints = [];
+  // Iterar entre los puntos, creando segmentos curvos para cada "cuarteto"
+  for (let i = 1; i < pts.length - 2; i++) {
+    for (let j = 0; j <= numOfSegments; j++) {
+      let t = j / numOfSegments;
+      let lng = catmullRom(t, pts[i - 1].lng(), pts[i].lng(), pts[i + 1].lng(), pts[i + 2].lng());
+      let lat = catmullRom(t, pts[i - 1].lat(), pts[i].lat(), pts[i + 1].lat(), pts[i + 2].lat());
+      curvePoints.push(new google.maps.LatLng(lat, lng));
+    }
+  }
+  return curvePoints;
+}
+
+
 // =======================
 // Función para dibujar la ruta seleccionada
 // =======================
 function dibujarRuta(route) {
   const rutaPath = route.coordenadas; 
+  
+  // Generar puntos curvos a partir de la ruta original
+  const curvedPath = getCurvePoints(rutaPath, 20); // Puedes ajustar 20 (número de segmentos) según el detalle deseado
+  
   if (currentRoutePolyline) {
     currentRoutePolyline.setMap(null);
   }
+  
   currentRoutePolyline = new google.maps.Polyline({
-    path: rutaPath,
-    geodesic: true,
-    strokeColor: "#FF0000",
+    path: curvedPath,
+    geodesic: true, // Si bien esto traza la línea sobre la superficie terrestre, la suavización se logra con la interpolación
+    strokeColor: "#39FF14",
     strokeOpacity: 1.0,
     strokeWeight: 2
   });
+  
   currentRoutePolyline.setMap(map);
-  if (rutaPath.length > 0) {
-    map.setCenter(rutaPath[0]);
+  if (curvedPath.length > 0) {
+    map.setCenter(curvedPath[0]);
   }
   return currentRoutePolyline;
 }
+
 
 // Inicializa el mapa al cargar la ventana
 window.onload = initMap;
