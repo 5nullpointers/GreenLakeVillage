@@ -181,6 +181,10 @@ label {
   border-color: #009688;
 }
 
+.swal2-popup {
+  border-radius: 30px !important;
+}
+
 /* Menú Superior */
 .superiorAdmin {
   height: 70px;
