@@ -195,11 +195,21 @@ opciones.forEach((opcion, index) => {
         }
     });
     
-    // Al quitar el ratón, restaura la imagen original
+    // Al quitar el ratón, restaura la imagen original solo si no es el elemento activo
     opcion.addEventListener('mouseleave', function() {
+        if(opcion.classList.contains('active')) return; // Mantiene la imagen si está activo
         const img = opcion.querySelector('img');
         if (img && img.dataset.original) {
             img.src = img.dataset.original;
         }
     });
+});
+
+// Asegura que los elementos con clase activa muestren la imagen profileBlanco
+document.querySelectorAll('.menuPanel li.active').forEach((opcion, index) => {
+    const img = opcion.querySelector('img');
+    if (img) {
+        img.src = "/static/images/profileBlanco.png";
+        img.dataset.original = "/static/images/profileBlanco.png";
+    }
 });
