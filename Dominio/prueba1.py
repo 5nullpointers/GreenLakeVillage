@@ -200,6 +200,23 @@ def unblock_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Nuevo endpoint para eliminar un usuario
+@app.route('/admin/deleteUser', methods=['POST'])
+def delete_user():
+    data = request.get_json()
+    user_id = data.get("id")
+    if not user_id:
+        return jsonify({"error": "ID de usuario no proporcionado."}), 400
+    try:
+        from bson import ObjectId
+        result = UserDAO.borrar_dato({"_id": ObjectId(user_id)})
+        if result.deleted_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "No se pudo eliminar el usuario."}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/map')
 def map():
     google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')

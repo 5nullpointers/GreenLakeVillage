@@ -65,6 +65,12 @@ function updateTable() {
                 unblockUser(user._id);
             }
         });
+        // Asignar listener al botón de eliminar
+        row.querySelector('.btn-delete').addEventListener('click', function() {
+            if (confirm("¿Está seguro de eliminar el usuario?")) {
+                deleteUser(user._id);
+            }
+        });
 
         tbody.appendChild(row);
     });
@@ -110,6 +116,25 @@ function unblockUser(userId) {
         updateTable();
     })
     .catch(error => console.error("Error al desbloquear el usuario:", error));
+}
+
+// Nueva función para eliminar usuario
+function deleteUser(userId) {
+    fetch('/admin/deleteUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: userId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            userData = userData.filter(u => u._id !== userId);
+            updateTable();
+        } else {
+            console.error("Error al eliminar el usuario:", data.error);
+        }
+    })
+    .catch(error => console.error("Error al eliminar el usuario:", error));
 }
 
 function renderPagination() {
