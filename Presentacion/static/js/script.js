@@ -709,66 +709,64 @@ function sendMessage() {
     .catch(error => console.error("Error:", error));
 }
 
-function catmullRom(t, p0, p1, p2, p3) {
-  return 0.5 * ((2 * p1) +
-                (-p0 + p2) * t +
-                (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t +
-                (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t);
-}
-
-function getCurvePoints(path, numOfSegments = 20) {
-  if (path.length < 2) {
-    return path;
-  }
-  
-  // Convertir cada objeto {lat, lng} en un objeto google.maps.LatLng
-  let pts = path.map(coord => new google.maps.LatLng(coord.lat, coord.lng));
-  
-  // Agregar duplicados al inicio y al final para que la fórmula tenga suficientes puntos
-  pts.unshift(pts[0]);
-  pts.push(pts[pts.length - 1]);
-  
-  let curvePoints = [];
-  // Iterar entre los puntos, creando segmentos curvos para cada "cuarteto"
-  for (let i = 1; i < pts.length - 2; i++) {
-    for (let j = 0; j <= numOfSegments; j++) {
-      let t = j / numOfSegments;
-      let lng = catmullRom(t, pts[i - 1].lng(), pts[i].lng(), pts[i + 1].lng(), pts[i + 2].lng());
-      let lat = catmullRom(t, pts[i - 1].lat(), pts[i].lat(), pts[i + 1].lat(), pts[i + 2].lat());
-      curvePoints.push(new google.maps.LatLng(lat, lng));
-    }
-  }
-  return curvePoints;
-}
 
 
 // =======================
 // Función para dibujar la ruta seleccionada
 // =======================
 function dibujarRuta(route) {
-  const rutaPath = route.coordenadas; 
-  
-  // Generar puntos curvos a partir de la ruta original
-  const curvedPath = getCurvePoints(rutaPath, 20); // Puedes ajustar 20 (número de segmentos) según el detalle deseado
-  
+  // 1) Eliminar la polilínea anterior si existe
   if (currentRoutePolyline) {
     currentRoutePolyline.setMap(null);
   }
-  
-  currentRoutePolyline = new google.maps.Polyline({
-    path: curvedPath,
-    geodesic: true, // Si bien esto traza la línea sobre la superficie terrestre, la suavización se logra con la interpolación
-    strokeColor: "#39FF14",
-    strokeOpacity: 1.0,
-    strokeWeight: 2
-  });
-  
-  currentRoutePolyline.setMap(map);
-  if (curvedPath.length > 0) {
-    map.setCenter(curvedPath[0]);
+
+  // 2) Crear el servicio de rutas
+  const directionsService = new google.maps.DirectionsService();
+
+  // 3) Construir la petición con origen, destino y waypoints
+  const request = {
+    origin: { lat: route.origen[0], lng: route.origen[1] },
+    destination: { lat: route.destino[0], lng: route.destino[1] },
+    travelMode: google.maps.TravelMode.WALKING, // O DRIVING, BICYCLING, etc.
+  };
+
+  // Si hay puntos intermedios, los añadimos como waypoints
+  if (route.punto_intermedio && route.punto_intermedio.length > 0) {
+    request.waypoints = route.punto_intermedio.map(coords => ({
+      location: { lat: coords[0], lng: coords[1] },
+      stopover: false // true si quieres que Google los trate como paradas obligatorias
+    }));
   }
-  return currentRoutePolyline;
+
+  // 4) Llamar a la Directions API
+  directionsService.route(request, (result, status) => {
+    if (status === "OK") {
+      // 5) Tomar la polilínea resultante (overview_path)
+      const ruta = result.routes[0];
+      const overviewPath = ruta.overview_path;
+
+      // 6) Crear la Polyline con esos puntos
+      currentRoutePolyline = new google.maps.Polyline({
+        path: overviewPath,
+        geodesic: true,
+        strokeColor: "#39FF14",
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+      });
+
+      // 7) Añadirla al mapa
+      currentRoutePolyline.setMap(map);
+
+      // 8) Centrar el mapa en el primer punto (o en el bounding box de la ruta)
+      if (overviewPath.length > 0) {
+        map.setCenter(overviewPath[0]);
+      }
+    } else {
+      console.error("Error al obtener ruta:", status);
+    }
+  });
 }
+
 
 
 // Inicializa el mapa al cargar la ventana

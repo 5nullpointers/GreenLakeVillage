@@ -156,12 +156,12 @@ def api_hoteles():
 def api_rutas():
     """
     Retorna un JSON con todas las rutas turísticas guardadas en MongoDB.
-    Se asume que se utiliza la colección "rutas_turisticas".
     """
     rutas = list(mongo_agent.db["rutas_turisticas"].find({}))
     for r in rutas:
-        r["_id"] = str(r["_id"])
+        r["_id"] = str(r["_id"])  # Convertir ObjectId a string
     return jsonify(rutas)
+
 
 @app.route('/api/restaurantes')
 def api_restaurantes():
