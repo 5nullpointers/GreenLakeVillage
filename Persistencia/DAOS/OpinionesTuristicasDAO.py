@@ -104,6 +104,9 @@ class OpinionesTuristicasDAO:
                             "Suministros Pujol y asociados S.A.T. Restaurante",
                             "Tecnologías Española S.Coop. Restaurante",
                             "Transportes Bou S.L. Restaurante"
+                            "Restauración SL S.L.L. Atracción",
+                            "Restauración XRI S.Com. Transporte",
+                            "Restauración del Sur S.Com. Tour Guiado"
                         ]
                     }
                 }
