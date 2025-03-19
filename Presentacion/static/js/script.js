@@ -5,6 +5,13 @@ let currentInfoWindow = null; // Para saber cuál InfoWindow está abierto
 let hotels = [];
 let routes = [];
 let restaurants = [];
+let farmacias = [];
+let tiendas = [];
+let parque = [];
+let atracciones = [];
+let museos = [];
+let transporte = [];
+
 
 // Variable global para almacenar la información de ratings
 let ratingsInfo = {};
@@ -32,7 +39,6 @@ function initMap() {
     zoom: 16,
     tilt: 60,
     heading: 20,
-    mapId: "TU_MAP_ID", // Reemplaza con tu MAP ID
     disableDefaultUI: true,
     restriction: {
       latLngBounds: allowedBounds,
@@ -94,6 +100,60 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar rutas:", error));
 }
+  // ==============  FARMACIAS  ==============
+  fetch('/api/farmacias')
+  .then(response => response.json())
+  .then(data => {
+    farmacias = data;
+    crearMarcadoresFarmacias();
+  })
+  .catch(error => console.error("Error al cargar farmacias:", error));
+
+  // ==============  TIENDAS  ==============
+  fetch('/api/tiendas')
+  .then(response => response.json())
+  .then(data => {
+    tiendas = data;
+    crearMarcadoresTiendas();
+  })
+  .catch(error => console.error("Error al cargar tiendas:", error));
+
+  // ==============  PARQUES  ==============
+  fetch('/api/parques')
+  .then(response => response.json())
+  .then(data => {
+    parques = data;
+    crearMarcadoresParques();
+  })
+  .catch(error => console.error("Error al cargar parques:", error));
+
+  // ==============  ATRACCIONES  ==============
+  fetch('/api/atracciones')
+  .then(response => response.json())
+  .then(data => {
+    atracciones = data;
+    crearMarcadoresAtracciones();
+  })
+  .catch(error => console.error("Error al cargar atracciones:", error));
+
+  // ==============  MUSEOS  ==============
+  fetch('/api/museos')
+  .then(response => response.json())
+  .then(data => {
+    museos = data;
+    crearMarcadoresMuseos();
+  })
+  .catch(error => console.error("Error al cargar museos:", error));
+
+  // ==============  TRANSPORTE  ==============
+  fetch('/api/transporte')
+  .then(response => response.json())
+  .then(data => {
+    transporte = data;
+    crearMarcadoresTransporte();
+  })
+  .catch(error => console.error("Error al cargar transporte:", error));
+
 
 // =======================
 // 2) Crear Marcadores
@@ -172,6 +232,259 @@ function crearMarcadoresHoteles() {
       infoWindow.open(map, marker);
 
       const sidePanelHTML = getSidePanelHTML(restaurant, ratingData);
+      openMarkerInfo(marker, infoWindow, sidePanelHTML);
+    });
+  });
+}
+
+function crearMarcadoresFarmacias() {
+  farmacias.forEach(farmacia => {
+    const marker = new google.maps.Marker({
+      position: { lat: farmacia.lat, lng: farmacia.lng },
+      map: map,
+      title: farmacia.nombre,
+      icon: {
+        url: "/static/Images/farmacia.png", // Ajusta la ruta de tu icono
+        scaledSize: new google.maps.Size(80, 80)
+      }
+    });
+
+    farmacia.marker = marker;
+    const infoWindow = new google.maps.InfoWindow();
+
+    marker.addListener("click", () => {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(() => marker.setAnimation(null), 1500);
+
+      // Si existiera un rating
+      const ratingData = ratingsInfo[farmacia.nombre] || null;
+      let ratingContent = "<p>Sin opiniones</p>";
+      if (ratingData) {
+        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)} (${ratingData.numero_comentarios} opiniones)</p>`;
+      }
+
+      infoWindow.setContent(`
+        <div style="min-width:250px">
+          <img src="/static/Images/Farmacias/${farmacia.imagen || "default.jpg"}"
+               alt="${farmacia.nombre}"
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <h3>${farmacia.nombre}</h3>
+          ${ratingContent}
+        </div>
+      `);
+      infoWindow.open(map, marker);
+
+      const sidePanelHTML = getSidePanelHTML(farmacia, ratingData);
+      openMarkerInfo(marker, infoWindow, sidePanelHTML);
+    });
+  });
+}
+
+function crearMarcadoresTiendas() {
+  tiendas.forEach(tienda => {
+    const marker = new google.maps.Marker({
+      position: { lat: tienda.lat, lng: tienda.lng },
+      map: map,
+      title: tienda.nombre,
+      icon: {
+        url: "/static/Images/tienda.png", // Ajusta la ruta de tu icono
+        scaledSize: new google.maps.Size(80, 80)
+      }
+    });
+
+    tienda.marker = marker;
+    const infoWindow = new google.maps.InfoWindow();
+
+    marker.addListener("click", () => {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(() => marker.setAnimation(null), 1500);
+
+      const ratingData = ratingsInfo[tienda.nombre] || null;
+      let ratingContent = "<p>Sin opiniones</p>";
+      if (ratingData) {
+        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)} (${ratingData.numero_comentarios} opiniones)</p>`;
+      }
+
+      infoWindow.setContent(`
+        <div style="min-width:250px">
+          <img src="/static/Images/Tiendas/${tienda.imagen || "default.jpg"}"
+               alt="${tienda.nombre}"
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <h3>${tienda.nombre}</h3>
+          ${ratingContent}
+        </div>
+      `);
+      infoWindow.open(map, marker);
+
+      const sidePanelHTML = getSidePanelHTML(tienda, ratingData);
+      openMarkerInfo(marker, infoWindow, sidePanelHTML);
+    });
+  });
+}
+
+function crearMarcadoresParques() {
+  parques.forEach(parque => {
+    const marker = new google.maps.Marker({
+      position: { lat: parque.lat, lng: parque.lng },
+      map: map,
+      title: parque.nombre,
+      icon: {
+        url: "/static/Images/parque.png", // Ajusta la ruta de tu icono
+        scaledSize: new google.maps.Size(80, 80)
+      }
+    });
+
+    parque.marker = marker;
+    const infoWindow = new google.maps.InfoWindow();
+
+    marker.addListener("click", () => {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(() => marker.setAnimation(null), 1500);
+
+      const ratingData = ratingsInfo[parque.nombre] || null;
+      let ratingContent = "<p>Sin opiniones</p>";
+      if (ratingData) {
+        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)} (${ratingData.numero_comentarios} opiniones)</p>`;
+      }
+
+      infoWindow.setContent(`
+        <div style="min-width:250px">
+          <img src="/static/Images/Parques/${parque.imagen || "default.jpg"}"
+               alt="${parque.nombre}"
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <h3>${parque.nombre}</h3>
+          ${ratingContent}
+        </div>
+      `);
+      infoWindow.open(map, marker);
+
+      const sidePanelHTML = getSidePanelHTML(parque, ratingData);
+      openMarkerInfo(marker, infoWindow, sidePanelHTML);
+    });
+  });
+}
+
+function crearMarcadoresAtracciones() {
+  atracciones.forEach(atraccion => {
+    const marker = new google.maps.Marker({
+      position: { lat: atraccion.lat, lng: atraccion.lng },
+      map: map,
+      title: atraccion.nombre,
+      icon: {
+        url: "/static/Images/atraccion.png", // Ajusta la ruta de tu icono
+        scaledSize: new google.maps.Size(80, 80)
+      }
+    });
+
+    atraccion.marker = marker;
+    const infoWindow = new google.maps.InfoWindow();
+
+    marker.addListener("click", () => {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(() => marker.setAnimation(null), 1500);
+
+      const ratingData = ratingsInfo[atraccion.nombre] || null;
+      let ratingContent = "<p>Sin opiniones</p>";
+      if (ratingData) {
+        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)} (${ratingData.numero_comentarios} opiniones)</p>`;
+      }
+
+      infoWindow.setContent(`
+        <div style="min-width:250px">
+          <img src="/static/Images/Atracciones/${atraccion.imagen || "default.jpg"}"
+               alt="${atraccion.nombre}"
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <h3>${atraccion.nombre}</h3>
+          ${ratingContent}
+        </div>
+      `);
+      infoWindow.open(map, marker);
+
+      const sidePanelHTML = getSidePanelHTML(atraccion, ratingData);
+      openMarkerInfo(marker, infoWindow, sidePanelHTML);
+    });
+  });
+}
+
+function crearMarcadoresMuseos() {
+  museos.forEach(museo => {
+    const marker = new google.maps.Marker({
+      position: { lat: museo.lat, lng: museo.lng },
+      map: map,
+      title: museo.nombre,
+      icon: {
+        url: "/static/Images/museo.png", // Ajusta la ruta de tu icono
+        scaledSize: new google.maps.Size(80, 80)
+      }
+    });
+
+    museo.marker = marker;
+    const infoWindow = new google.maps.InfoWindow();
+
+    marker.addListener("click", () => {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(() => marker.setAnimation(null), 1500);
+
+      const ratingData = ratingsInfo[museo.nombre] || null;
+      let ratingContent = "<p>Sin opiniones</p>";
+      if (ratingData) {
+        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)} (${ratingData.numero_comentarios} opiniones)</p>`;
+      }
+
+      infoWindow.setContent(`
+        <div style="min-width:250px">
+          <img src="/static/Images/Museos/${museo.imagen || "default.jpg"}"
+               alt="${museo.nombre}"
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <h3>${museo.nombre}</h3>
+          ${ratingContent}
+        </div>
+      `);
+      infoWindow.open(map, marker);
+
+      const sidePanelHTML = getSidePanelHTML(museo, ratingData);
+      openMarkerInfo(marker, infoWindow, sidePanelHTML);
+    });
+  });
+}
+
+function crearMarcadoresTransporte() {
+  transporte.forEach(trans => {
+    const marker = new google.maps.Marker({
+      position: { lat: trans.lat, lng: trans.lng },
+      map: map,
+      title: trans.nombre,
+      icon: {
+        url: "/static/Images/transporte.png", // Ajusta la ruta de tu icono
+        scaledSize: new google.maps.Size(80, 80)
+      }
+    });
+
+    trans.marker = marker;
+    const infoWindow = new google.maps.InfoWindow();
+
+    marker.addListener("click", () => {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(() => marker.setAnimation(null), 1500);
+
+      const ratingData = ratingsInfo[trans.nombre] || null;
+      let ratingContent = "<p>Sin opiniones</p>";
+      if (ratingData) {
+        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)} (${ratingData.numero_comentarios} opiniones)</p>`;
+      }
+
+      infoWindow.setContent(`
+        <div style="min-width:250px">
+          <img src="/static/Images/Transporte/${trans.imagen || "default.jpg"}"
+               alt="${trans.nombre}"
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <h3>${trans.nombre}</h3>
+          ${ratingContent}
+        </div>
+      `);
+      infoWindow.open(map, marker);
+
+      const sidePanelHTML = getSidePanelHTML(trans, ratingData);
       openMarkerInfo(marker, infoWindow, sidePanelHTML);
     });
   });
