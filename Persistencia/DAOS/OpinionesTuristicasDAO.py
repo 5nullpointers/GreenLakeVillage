@@ -107,6 +107,12 @@ class OpinionesTuristicasDAO:
                             "Restauración SL S.L.L. Atracción",
                             "Restauración XRI S.Com. Transporte",
                             "Restauración del Sur S.Com. Tour Guiado"
+                            # Farmacias
+                            # Tiendas
+                            # Parque
+                            # Atracciones
+                            # Museos
+                            # Transporte
                         ]
                     }
                 }
