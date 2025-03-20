@@ -63,9 +63,19 @@
         </p>
     </footer>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}"></script>    
+    <!-- index.html (al final) -->
+    <script
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&libraries=geometry"
+    async
+    defer>
+    </script>
+
+    <!-- Tu JS de contacto (opcional) -->
     <script src="../static/js/index.js"></script>
+
+    <!-- Tu script principal con initMap() y toda la lógica de marcadores/rutas -->
     <script src="../static/js/script.js"></script>
+
 </body>
 
 </html>
