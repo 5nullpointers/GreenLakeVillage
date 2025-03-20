@@ -23,7 +23,8 @@ class UserDAO:
 
     @staticmethod
     def actualizar_dato(filtro, nuevo_valor):
-        return mongoDBAgent.update_one(UserDAO.COLLECTION, filtro, nuevo_valor)
+        # Usar pipeline de actualización para aplicar el $set
+        return mongoDBAgent.update_one(UserDAO.COLLECTION, filtro, [ { "$set": nuevo_valor } ])
 
     @staticmethod
     def borrar_dato(filtro):
