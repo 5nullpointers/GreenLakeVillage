@@ -24,9 +24,14 @@ class CustomJSONProvider(DefaultJSONProvider):
         return super().default(o)
 # ------------------------------------
 
+# Calcula la ruta absoluta a /Presentacion/templates
+BASE_DIR = os.path.dirname(__file__)         # => Dominio/
+TEMPLATE_DIR = os.path.join(BASE_DIR, '..', 'Presentacion', 'templates')
+STATIC_DIR = os.path.join(BASE_DIR, '..', 'Presentacion', 'static')
+
 app = Flask(__name__,
-            static_folder='../Presentacion/static',
-            template_folder='../Presentacion/templates')
+            template_folder=TEMPLATE_DIR,
+            static_folder=STATIC_DIR)
 app.json_provider_class = CustomJSONProvider
 app.json = app.json_provider_class(app)
 
@@ -56,6 +61,61 @@ else:
     # print("✅ Conexión a MongoDB establecida correctamente")
     pass
 
+# prueba1.py (fragmento)
+
+import os
+import requests
+from flask import Flask, request, jsonify, render_template
+
+
+# Clave de servidor para la Routes API v2
+# (¡No la expongas en el frontend!)
+ROUTES_API_KEY = os.getenv("ROUTES_API_KEY", "AIzaSyDwmYs4OgbbUyu2IG7Qvn213y9-wRiAF2E")
+
+@app.route("/get-route", methods=["POST"])
+def get_route():
+    """
+    Recibe { origin: {latitude, longitude}, destination: {latitude, longitude} }
+    Llama a la Routes API v2 y devuelve la polyline
+    """
+    data = request.json
+    origin = data.get("origin")
+    destination = data.get("destination")
+
+    if not origin or not destination:
+        return jsonify({"error": "Origin/destination missing"}), 400
+
+    # Construir el payload para la nueva Routes API v2
+    payload = {
+        "origin": {"location": {"latLng": origin}},
+        "destination": {"location": {"latLng": destination}},
+        "travelMode": "DRIVE"
+    }
+
+    # Llamar a la Routes API
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": ROUTES_API_KEY,
+        "X-Goog-FieldMask": "routes.polyline.encodedPolyline"
+    }
+    url = "https://routes.googleapis.com/directions/v2:computeRoutes"
+
+    try:
+        resp = requests.post(url, json=payload, headers=headers)
+        resp_data = resp.json()
+        return jsonify(resp_data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/map")
+def map_page():
+    # Renderizamos la plantilla con el mapa
+    # Podrías pasar una clave "pública" para la parte de Maps JavaScript
+    google_maps_api_key = os.getenv("MAPS_JS_KEY", "AIzaSyDwmYs4OgbbUyu2IG7Qvn213y9-wRiAF2E")
+    return render_template("map.html", google_maps_api_key=google_maps_api_key)
+
+
 @app.route('/')
 def index():
     # Ahora este es el index principal
@@ -65,11 +125,6 @@ def index():
 def users():
     usuarios = UserDAO.obtener_todos()
     return jsonify(usuarios), 200
-
-@app.route('/map')
-def map():
-    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
-    return render_template('map.html', google_maps_api_key=google_maps_api_key)
 
 
 @app.route('/login')
