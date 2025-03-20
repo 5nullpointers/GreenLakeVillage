@@ -57,6 +57,10 @@ function updateTable() {
         `;
         row.appendChild(tdActions);
 
+        // Agregar listener para el botón editar
+        row.querySelector('.btn-edit').addEventListener('click', function() {
+            openEditModal(user);
+        });
         // Asignar listener al botón: bloquea si no está bloqueado, desbloquea si ya lo está
         row.querySelector('.btn-block').addEventListener('click', function() {
             if (!user.blocked) {
@@ -146,6 +150,75 @@ function deleteUser(userId) {
         }
     })
     .catch(error => console.error("Error al eliminar el usuario:", error));
+}
+
+// Nueva función para mostrar la ventana de edición
+function openEditModal(user) {
+    Swal.fire({
+        title: 'Editar Usuario',
+        html: `
+            <label for="swal-input1" style="text-align:left; display:block;">Nombre:</label>
+            <input id="swal-input1" class="swal2-input" placeholder="Nombre" value="${user.name}">
+            <label for="swal-input2" style="text-align:left; display:block;">Email:</label>
+            <input id="swal-input2" class="swal2-input" placeholder="Email" value="${user.email}">
+            <label for="swal-input3" style="text-align:left; display:block;">Rol:</label>
+            <select id="swal-input3" class="swal2-input swal2-select" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                <option value="admin" ${user.type === 'admin' ? 'selected' : ''}>admin</option>
+                <option value="tourist" ${user.type === 'tourist' ? 'selected' : ''}>tourist</option>
+                <option value="businessOwner" ${user.type === 'businessOwner' ? 'selected' : ''}>businessOwner</option>
+            </select>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#009688', // Botón guardar en verde
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+        },
+        preConfirm: () => {
+            return {
+                name: document.getElementById('swal-input1').value,
+                email: document.getElementById('swal-input2').value,
+                type: document.getElementById('swal-input3').value
+            };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            updateUser(user._id, result.value);
+        }
+    });
+}
+
+// Nueva función para actualizar el usuario
+function updateUser(userId, updatedData) {
+    fetch('/admin/editUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ _id: userId, ...updatedData })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+            // Actualizar el objeto en userData
+            const user = userData.find(u => u._id === userId);
+            if(user){
+                user.name = updatedData.name;
+                user.email = updatedData.email;
+                user.type = updatedData.type;
+            }
+            updateTable();
+            Swal.fire('Actualizado', 'El usuario fue actualizado correctamente.', 'success');
+        } else {
+            Swal.fire('Error', data.error || 'No se pudo actualizar el usuario.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error("Error al editar usuario:", error);
+        Swal.fire('Error', 'Hubo un error al actualizar el usuario.', 'error');
+    });
 }
 
 function renderPagination() {

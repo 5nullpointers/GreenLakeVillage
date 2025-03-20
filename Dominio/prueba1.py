@@ -244,6 +244,27 @@ def admin():
 def UserBlock():
     return render_template('UserBlocked.html')
 
+@app.route('/admin/editUser', methods=['POST'])
+def edit_user():
+    data = request.get_json()
+    try:
+        user_id = data.get("_id")
+        if not user_id:
+            return jsonify({"success": False, "error": "Missing user _id"})
+        filtro = {"_id": ObjectId(user_id)}
+        update_data = {
+            "name": data.get("name"),
+            "email": data.get("email"),
+            "type": data.get("type")
+        }
+        result = UserDAO.actualizar_dato(filtro, update_data)
+        if result.modified_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"success": False, "error": "No se actualizó ningún registro"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
 @app.route('/login', methods=['POST'])
 def login():
     email = request.form.get('email')

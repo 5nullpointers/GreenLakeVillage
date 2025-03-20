@@ -43,9 +43,9 @@ class MongoDBAgent:
         """Busca múltiples documentos en una colección."""
         return list(self.db[collection].find(query))
 
-    def update_one(self, collection: str, query: dict, update: dict):
+    def update_one(self, collection, filtro, update_doc):
         """Actualiza un documento en una colección."""
-        return self.db[collection].update_one(query, {'$set': update})
+        return self.db[collection].update_one(filtro, update_doc)
 
     def delete_one(self, collection: str, query: dict):
         """Elimina un documento de una colección."""
@@ -56,4 +56,3 @@ class MongoDBAgent:
         if self.client:
             self.client.close()
             print("🔒 Conexión cerrada")
-            
