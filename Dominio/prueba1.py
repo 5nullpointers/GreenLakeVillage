@@ -70,7 +70,7 @@ from flask import Flask, request, jsonify, render_template
 
 # Clave de servidor para la Routes API v2
 # (¡No la expongas en el frontend!)
-ROUTES_API_KEY = os.getenv("ROUTES_API_KEY", "AIzaSyDwmYs4OgbbUyu2IG7Qvn213y9-wRiAF2E")
+ROUTES_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
 @app.route("/get-route", methods=["POST"])
 def get_route():
@@ -110,16 +110,17 @@ def get_route():
 
 @app.route("/map")
 def map_page():
-    # Renderizamos la plantilla con el mapa
-    # Podrías pasar una clave "pública" para la parte de Maps JavaScript
-    google_maps_api_key = os.getenv("MAPS_JS_KEY", "AIzaSyDwmYs4OgbbUyu2IG7Qvn213y9-wRiAF2E")
+    # En lugar de usar un valor por defecto, tomamos la clave de .env
+    google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
     return render_template("map.html", google_maps_api_key=google_maps_api_key)
 
 
 @app.route('/')
 def index():
-    # Ahora este es el index principal
-    return render_template('index.html')
+    # Lo mismo para el index
+    google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+    return render_template('index.html', google_maps_api_key=google_maps_api_key)
+
 
 @app.route('/users', methods=['GET'])
 def users():
