@@ -29,7 +29,7 @@ function initMap() {
     east: 13.72
   };
 
-  // Crear el mapa
+  // Crear el mapa con estilo satélite y sin labels/roads
   map = new google.maps.Map(document.getElementById("map"), {
     center: centerCoords,
     zoom: 16,
@@ -61,7 +61,7 @@ function initMap() {
   });
 
   // =======================
-  // (NUEVO) Cargar rutas de la API
+  // 1. Cargar rutas de la API (para mostrarlas en el panel)
   // =======================
   fetch('/api/rutas')
     .then(response => response.json())
@@ -70,7 +70,7 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar rutas:", error));
 
-  // Obtener datos de hoteles y ratings
+  // 2. Cargar hoteles y sus ratings
   fetch('/api/hoteles')
     .then(response => response.json())
     .then(data => {
@@ -80,11 +80,11 @@ function initMap() {
     .then(response => response.json())
     .then(ratingsData => {
       ratingsInfo = ratingsData;
-      crearMarcadores();
+      crearMarcadores(); // Marcadores de hoteles
     })
     .catch(error => console.error("Error al cargar hoteles:", error));
 
-  // Obtener datos de restaurantes y ratings
+  // 3. Cargar restaurantes y sus ratings
   fetch('/api/restaurantes')
     .then(response => response.json())
     .then(data => {
@@ -94,11 +94,11 @@ function initMap() {
     .then(response => response.json())
     .then(ratingsData => {
       ratingsInfo = ratingsData;
-      crearMarcadoresHoteles(); // (el nombre de la función sugiere "Hoteles", pero es para restaurantes)
+      crearMarcadoresHoteles(); // Marcadores de restaurantes (el nombre "Hoteles" es herencia)
     })
     .catch(error => console.error("Error al cargar restaurantes:", error));
 
-  // ==============  FARMACIAS  ==============
+  // 4. Cargar farmacias
   fetch('/api/farmacias')
     .then(response => response.json())
     .then(data => {
@@ -107,7 +107,7 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar farmacias:", error));
 
-  // ==============  TIENDAS  ==============
+  // 5. Cargar tiendas
   fetch('/api/tiendas')
     .then(response => response.json())
     .then(data => {
@@ -116,7 +116,7 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar tiendas:", error));
 
-  // ==============  PARQUES  ==============
+  // 6. Cargar parques
   fetch('/api/parques')
     .then(response => response.json())
     .then(data => {
@@ -125,7 +125,7 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar parques:", error));
 
-  // ==============  ATRACCIONES  ==============
+  // 7. Cargar atracciones
   fetch('/api/atracciones')
     .then(response => response.json())
     .then(data => {
@@ -134,7 +134,7 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar atracciones:", error));
 
-  // ==============  MUSEOS  ==============
+  // 8. Cargar museos
   fetch('/api/museos')
     .then(response => response.json())
     .then(data => {
@@ -143,7 +143,7 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar museos:", error));
 
-  // ==============  TRANSPORTE  ==============
+  // 9. Cargar transporte
   fetch('/api/transporte')
     .then(response => response.json())
     .then(data => {
@@ -183,7 +183,9 @@ function crearMarcadores() {
 
       infoWindow.setContent(`
         <div style="min-width:250px">
-          <img src="/static/Images/Hoteles/${hotel.imagen || "default.jpg"}" alt="${hotel.nombre}" style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <img src="/static/Images/Hoteles/${hotel.imagen || "default.jpg"}" 
+               alt="${hotel.nombre}" 
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
           <h3>${hotel.nombre}</h3>
           ${ratingContent}
         </div>
@@ -197,6 +199,7 @@ function crearMarcadores() {
 }
 
 function crearMarcadoresHoteles() {
+  // A pesar del nombre, esto crea marcadores de "restaurants"
   restaurants.forEach(restaurant => {
     const marker = new google.maps.Marker({
       position: { lat: restaurant.lat, lng: restaurant.lng },
@@ -222,7 +225,9 @@ function crearMarcadoresHoteles() {
 
       infoWindow.setContent(`
         <div style="min-width:250px">
-          <img src="/static/Images/Restaurantes/${restaurant.imagen || "default.jpg"}" alt="${restaurant.nombre}" style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <img src="/static/Images/Restaurantes/${restaurant.imagen || "default.jpg"}"
+               alt="${restaurant.nombre}"
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
           <h3>${restaurant.nombre}</h3>
           ${ratingContent}
         </div>
@@ -235,7 +240,7 @@ function crearMarcadoresHoteles() {
   });
 }
 
-// ... (resto de crearMarcadoresFarmacias, crearMarcadoresTiendas, etc.) ...
+// Crea marcadores para farmacias, tiendas, parques, etc. (lógica similar)
 function crearMarcadoresFarmacias() { /* ... */ }
 function crearMarcadoresTiendas() { /* ... */ }
 function crearMarcadoresParques() { /* ... */ }
@@ -260,7 +265,9 @@ function getSidePanelHTML(item, rating) {
   return `
     <div class="dropdown-container">
       <div class="hotel-card">
-        <img src="/static/Images/Hoteles/${item.imagen || "default.jpg"}" alt="${item.nombre}" class="hotel-image">
+        <img src="/static/Images/Hoteles/${item.imagen || "default.jpg"}" 
+             alt="${item.nombre}" 
+             class="hotel-image">
         <div class="hotel-info">
           <h2>${item.nombre}</h2>
           <p class="rating">${ratingText}</p>
@@ -284,7 +291,7 @@ function openMarkerInfo(marker, infoWindow, panelContent) {
   const sidebar = document.getElementById("sidebar");
   sidebar.classList.remove("left", "right");
 
-  const referenceLng = 13.66395; // para decidir el lado del panel
+  const referenceLng = 13.66395; // Para decidir el lado del panel
   const markerLng = marker.getPosition().lng();
   if (markerLng < referenceLng) {
     sidebar.classList.add("right");
@@ -308,7 +315,7 @@ function closeAll() {
     currentInfoWindow.close();
     currentInfoWindow = null;
   }
-  // Ocultar ruta si existe
+  // Si hay una ruta dibujada, la quitamos
   if (currentRoutePolyline) {
     currentRoutePolyline.setMap(null);
     currentRoutePolyline = null;
@@ -339,7 +346,7 @@ function toggleSidebar() {
 }
 
 // =======================
-// Botón "Hoteles", "Rutas", "Sitios", etc.
+// Botones del menú: "Hoteles", "Rutas", "Sitios", etc.
 // =======================
 function mostrarHoteles() {
   closeAll();
@@ -369,13 +376,14 @@ function mostrarSitios() {
 }
 
 // =======================
-// (NUEVO) Mostrar listado de Rutas y dibujar la seleccionada
+// Mostrar listado de Rutas y dibujar la seleccionada
+// (versión “al estilo Node”: llamamos a /get-route, decodificamos polyline)
 // =======================
 function mostrarRutas() {
   closeAll();
   let content = '<h3>Rutas Turísticas</h3><ul>';
   routes.forEach((route, index) => {
-    // Por ejemplo, quitarle la parte " - 6.1"
+    // Quitar la parte " - 6.1" si existe
     const formattedName = route.ruta_nombre.replace(/ - \d+(\.\d+)?$/, '');
     content += `<li class="route-item" data-index="${index}" style="cursor:pointer;">${formattedName}</li>`;
   });
@@ -390,8 +398,10 @@ function mostrarRutas() {
       const index = this.getAttribute('data-index');
       const route = routes[index];
       if (route) {
+        // Llamar a /get-route en Flask y dibujar la polyline
         dibujarRuta(route);
 
+        // Mostrar info de la ruta en el panel
         let infoRouteHTML = `
           <h3>${route.ruta_nombre}</h3>
           <p><strong>Tipo de ruta:</strong> ${route.tipo_ruta}</p>
@@ -406,57 +416,53 @@ function mostrarRutas() {
 }
 
 // =======================
-// (NUEVO) Función para dibujar la ruta en el mapa con DirectionsService
+// Función para dibujar la ruta en el mapa con la “Routes API v2” vía Flask
+// (al estilo Node: pedimos la polyline a /get-route, luego decodificamos)
 // =======================
-function dibujarRuta(route) {
-  // 1) Eliminar la polilínea anterior si existe
+async function dibujarRuta(route) {
+  // Quitar la polilínea anterior si existe
   if (currentRoutePolyline) {
     currentRoutePolyline.setMap(null);
   }
 
-  // 2) Crear el servicio de rutas
-  const directionsService = new google.maps.DirectionsService();
+  // Construir el objeto origin/destination
+  const origin = { latitude: route.origen[0], longitude: route.origen[1] };
+  const destination = { latitude: route.destino[0], longitude: route.destino[1] };
 
-  // 3) Construir la petición con origen, destino y waypoints
-  const request = {
-    origin: { lat: route.origen[0], lng: route.origen[1] },
-    destination: { lat: route.destino[0], lng: route.destino[1] },
-    travelMode: google.maps.TravelMode.WALKING, // O DRIVING, BICYCLING, etc.
-  };
+  try {
+    // 1) Llamar a nuestro backend Flask
+    const resp = await fetch("/get-route", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ origin, destination }),
+    });
+    const data = await resp.json();
 
-  // Si hay puntos intermedios
-  if (route.punto_intermedio && route.punto_intermedio.length > 0) {
-    request.waypoints = route.punto_intermedio.map(coords => ({
-      location: { lat: coords[0], lng: coords[1] },
-      stopover: false
-    }));
-  }
-
-  // 4) Llamar a la Directions API
-  directionsService.route(request, (result, status) => {
-    if (status === "OK") {
-      // 5) Tomar la polilínea resultante (overview_path)
-      const ruta = result.routes[0];
-      const overviewPath = ruta.overview_path;
-
-      // 6) Crear la Polyline con esos puntos
-      currentRoutePolyline = new google.maps.Polyline({
-        path: overviewPath,
-        geodesic: true,
-        strokeColor: "#39FF14",
-        strokeOpacity: 1.0,
-        strokeWeight: 2
-      });
-
-      // 7) Añadirla al mapa
-      currentRoutePolyline.setMap(map);
-
-      // 8) Centrar el mapa en el primer punto
-      if (overviewPath.length > 0) {
-        map.setCenter(overviewPath[0]);
-      }
-    } else {
-      console.error("Error al obtener ruta:", status);
+    // 2) Verificar que haya una ruta
+    if (!data.routes || !data.routes[0]) {
+      console.error("No se encontró una ruta válida en la respuesta:", data);
+      return;
     }
-  });
+
+    // 3) Decodificar la polyline
+    const encoded = data.routes[0].polyline.encodedPolyline;
+    const path = google.maps.geometry.encoding.decodePath(encoded);
+
+    // 4) Dibujar la polyline en el mapa
+    currentRoutePolyline = new google.maps.Polyline({
+      path,
+      geodesic: true,
+      strokeColor: "#FF0000",
+      strokeOpacity: 1.0,
+      strokeWeight: 4,
+      map: map,
+    });
+
+    // 5) Centrar el mapa en el primer punto (opcional)
+    if (path.length > 0) {
+      map.setCenter(path[0]);
+    }
+  } catch (error) {
+    console.error("Error llamando a /get-route:", error);
+  }
 }

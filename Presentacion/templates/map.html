@@ -1,73 +1,42 @@
-<!-- templates/map.html -->
+<!-- Presentacion/templates/map.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Mapa con Rutas (Flask + Routes API v2)</title>
-  <style>
-    #map {
-      width: 100%;
-      height: 500px;
-    }
-  </style>
-  <!-- Carga la librería de Google Maps con una Browser Key
-       o la misma clave sin restricciones.
-       Importante: &libraries=geometry para decodePath -->
-       <script
-       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwmYs4OgbbUyu2IG7Qvn213y9-wRiAF2E&callback=initMap&libraries=geometry"
-       async
-       defer>
-     </script>
-     
+  <title>Mi Mapa Personalizado + Rutas</title>
+
+  <!-- IMPORTANTE: Carga la API de Google Maps con &callback=initMap y &libraries=geometry -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&libraries=geometry"
+    async
+    defer>
+  </script>
+
+  <!-- Tu CSS (opcional) -->
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-  <h1>Mapa con Rutas (Llamando a Flask /get-route)</h1>
+  <!-- Tu barra de navegación, overlay de carga, panel lateral, etc. -->
+  <nav>
+    <div class="nav-logo">Green Lake</div>
+    <ul>
+      <li><a onclick="mostrarHoteles()">Hoteles</a></li>
+      <li><a onclick="mostrarRutas()">Rutas</a></li>
+      <li><a onclick="mostrarSitios()">Sitios</a></li>
+    </ul>
+  </nav>
+
+  <div id="loadingOverlay"><div class="spinner"></div></div>
+
   <div id="map"></div>
 
-  <script>
-    async function initMap() {
-      // Crear el mapa
-      const map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 40.7128, lng: -74.0060 },
-        zoom: 12,
-      });
+  <div id="sidebar">
+    <button id="closeSidebar" onclick="toggleSidebar()">×</button>
+    <h2>Panel de Información</h2>
+    <div id="infoSection"></div>
+  </div>
 
-      // Definir origen y destino (ejemplo en Nueva York)
-      const origin = { latitude: 40.7128, longitude: -74.0060 };
-      const destination = { latitude: 40.73061, longitude: -73.935242 };
-
-      // Llamar a nuestro backend en Flask
-      try {
-        const resp = await fetch("/get-route", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ origin, destination })
-        });
-        const data = await resp.json();
-
-        // Verificamos que data.routes exista
-        if (!data.routes || !data.routes[0]) {
-          console.error("No se encontró una ruta válida en la respuesta:", data);
-          return;
-        }
-
-        // Obtener la polyline codificada
-        const encoded = data.routes[0].polyline.encodedPolyline;
-
-        // Decodificar con google.maps.geometry.encoding.decodePath
-        const path = google.maps.geometry.encoding.decodePath(encoded);
-
-        // Dibujar la polilínea en el mapa
-        new google.maps.Polyline({
-          path,
-          map,
-          strokeColor: "#FF0000",
-          strokeWeight: 4
-        });
-      } catch (error) {
-        console.error("Error llamando a /get-route:", error);
-      }
-    }
-  </script>
+  <!-- Carga tu script principal con la lógica del mapa -->
+  <script src="/static/js/script.js"></script>
 </body>
 </html>
