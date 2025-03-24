@@ -72,6 +72,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // Actualizar la tasa de ocupación dinámicamente
+    fetch('/api/tasa_ocupacion')
+      .then(response => response.json())
+      .then(data => {
+        // Actualiza el contenido del elemento con id "ocupacionRate"
+        const tasaElement = document.getElementById('ocupacionRate');
+        tasaElement.textContent = data.tasa_ocupacion + '%';
+        // Actualiza la anchura de la barra de progreso
+        const statBarFill = document.getElementById('ocupacionBarFill');
+        statBarFill.style.width = data.tasa_ocupacion + '%';
+      })
+      .catch(error => console.error('Error al obtener la tasa de ocupación:', error));
 });
-
-

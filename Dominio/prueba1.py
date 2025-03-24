@@ -454,6 +454,18 @@ def format_number(value):
     except Exception:
         return value
 
+@app.route('/api/tasa_ocupacion')
+def api_tasa_ocupacion():
+    # Recupera todos los registros de ocupación hotelera
+    ocupaciones = OcupacionHoteleraDAO.obtener_todos()
+    if ocupaciones:
+        # Calcula el promedio de la tasa de ocupación
+        total_tasa = sum(ocup["tasa_ocupacion"] for ocup in ocupaciones)
+        promedio = total_tasa / len(ocupaciones)
+        promedio = round(promedio, 3)  # Limita a 3 decimales
+    else:
+        promedio = 0
+    return jsonify({'tasa_ocupacion': promedio})
 
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
