@@ -248,7 +248,7 @@ def admin():
     ocupaciones = list(mongo_agent.db["ocupacion_hotelera"].find({}, {"hotel_nombre": 1, "reservas_confirmadas": 1}))
     
     # Depuración: ver qué se obtiene de ocupaciones
-    print("Datos de ocupaciones:", ocupaciones)
+    # print("Datos de ocupaciones:", ocupaciones)
     
     # Agrupar reservas por hotel y convertir reservas a número si es necesario
     ocup_dict = {}
@@ -261,7 +261,7 @@ def admin():
             except Exception:
                 reservas = 0
         ocup_dict[nombre_occ] = ocup_dict.get(nombre_occ, 0) + reservas
-    print("Diccionario de ocupaciones:", ocup_dict)
+    # print("Diccionario de ocupaciones:", ocup_dict)
     
     # Calcular ingresos totales: convertir precio a numérico si es cadena
     ingresos_totales = 0
@@ -274,7 +274,7 @@ def admin():
             except Exception:
                 precio = 0
         ingreso = precio * ocup_dict.get(hotel_nombre, 0)
-        print("Hotel:", hotel_nombre, "Precio:", precio, "Reservas:", ocup_dict.get(hotel_nombre, 0), "Ingreso:", ingreso)
+        # print("Hotel:", hotel_nombre, "Precio:", precio, "Reservas:", ocup_dict.get(hotel_nombre, 0), "Ingreso:", ingreso)
         ingresos_totales += ingreso
     return render_template('Admin.html', ingresosTotales=ingresos_totales, totalReservas=totalReservas, consumoTotal=consumo_total)
 
