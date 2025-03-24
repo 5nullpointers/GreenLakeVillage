@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+            /* Nueva fuente para el documento */
+            body { font-family:  "Poppins", sans-serif; }
+            
+            /* Nueva regla para el border-radius de la alerta */
+            .custom-swal-popup { border-radius: 30px !important; }
+        </style>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Cuenta bloqueada',
+                text: 'Tu cuenta ha sido bloqueada. Por favor, contacta a soporte para más información.',
+                confirmButtonText: 'Ok',
+                confirmButtonColor: '#009688',
+                customClass: { popup: 'custom-swal-popup' }
+            }).then((result) => {
+                window.location.href = '/login';
+            });
+        </script>
+    </body>
+</html>
