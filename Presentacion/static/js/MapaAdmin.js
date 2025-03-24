@@ -42,33 +42,6 @@ function initMap() {
     ]
   });
 
-  // Ejemplo de marcador
-  const markerHotel = new google.maps.Marker({
-    position: { lat: 47.5630, lng: 13.6498 },
-    map: map,
-    title: "Hotel Ficticio"
-  });
-
-  // Evento clic en el marcador (rebote y ventana de info)
-  markerHotel.addListener("click", () => {
-    markerHotel.setAnimation(google.maps.Animation.BOUNCE);
-    setTimeout(() => {
-      markerHotel.setAnimation(null);
-    }, 2000);
-
-    const infoWindow = new google.maps.InfoWindow({
-      content: "<h3>Hotel Ficticio</h3><p>Descripción...</p>"
-    });
-    infoWindow.open(map, markerHotel);
-
-    // Muestra info también en el panel lateral
-    document.getElementById("infoSection").innerHTML = `
-      <h3>Hotel Ficticio</h3>
-      <p>Este es un hotel imaginario...</p>
-    `;
-    showSidebar();
-  });
-
   // Datos de ejemplo para el Heatmap
   const heatmapData = [
     new google.maps.LatLng(47.5636, 13.6367),
@@ -95,7 +68,27 @@ function initMap() {
     new google.maps.LatLng(47.5563, 13.6969),
     new google.maps.LatLng(47.5559, 13.7027),
     new google.maps.LatLng(47.56025, 13.7074),
-    new google.maps.LatLng(47.55975, 13.70892)
+    new google.maps.LatLng(47.55975, 13.70892),
+    new google.maps.LatLng(47.565031, 13.650498),
+    new google.maps.LatLng(47.56146342536342, 13.64912786095419),
+    new google.maps.LatLng(47.55941409318808, 13.647381224363047),
+    new google.maps.LatLng(47.55767558745027, 13.646916811037736),
+    new google.maps.LatLng(47.55617197285254, 13.648361296993661),
+    new google.maps.LatLng(47.55266987965001, 13.639873248997294),
+    new google.maps.LatLng(47.55504797252521, 13.647081400005648),
+    new google.maps.LatLng(47.554385397048016, 13.64751009058232),
+    new google.maps.LatLng(47.55807990671645, 13.680125738669512),
+    new google.maps.LatLng(47.56046451399855, 13.681596407723651),
+    new google.maps.LatLng(47.55270155876806, 13.683163050925586),
+    new google.maps.LatLng(47.55761149439396, 13.686290614916249),
+    new google.maps.LatLng(47.550875628439535, 13.68224770815671),
+    new google.maps.LatLng(47.55698830579562, 13.68842483428816),
+    new google.maps.LatLng(47.555677262407414, 13.690102801896058),
+    new google.maps.LatLng(47.555375535154276, 13.691831825933553),
+    new google.maps.LatLng(47.559284575864936, 13.704983415273881),
+    new google.maps.LatLng(47.555397905503426, 13.70075737238921),
+    new google.maps.LatLng(47.559330761364734, 13.710190107710702),
+    new google.maps.LatLng(47.55294278064778, 13.697053388627626),
   ];
 
   // Crea la capa de heatmap, inicialmente apagada (map: null)
