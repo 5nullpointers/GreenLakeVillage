@@ -127,16 +127,155 @@ def users():
     usuarios = UserDAO.obtener_todos()
     return jsonify(usuarios), 200
 
+# Metodo para bloquear al usuario
+@app.route('/admin/blockUser', methods=['POST'])
+def block_user():
+    data = request.get_json()
+    user_id = data.get("id")
+    if not user_id:
+        return jsonify({"error": "ID de usuario no proporcionado."}), 400
+    try:
+        from bson import ObjectId
+        # Actualizar directamente en la colección "users"
+        result = mongo_agent.db['usuarios'].update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"blocked": True}}
+        )
+        if result.modified_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "No se pudo actualizar el usuario."}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Metodo para desbloquear al usuario
+@app.route('/admin/unblockUser', methods=['POST'])
+def unblock_user():
+    data = request.get_json()
+    user_id = data.get("id")
+    if not user_id:
+        return jsonify({"error": "ID de usuario no proporcionado."}), 400
+    try:
+        from bson import ObjectId
+        result = mongo_agent.db['usuarios'].update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"blocked": False}}
+        )
+        if result.modified_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "No se pudo actualizar el usuario."}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Nuevo endpoint para eliminar un usuario
+@app.route('/admin/deleteUser', methods=['POST'])
+def delete_user():
+    data = request.get_json()
+    user_id = data.get("id")
+    if not user_id:
+        return jsonify({"error": "ID de usuario no proporcionado."}), 400
+    try:
+        from bson import ObjectId
+        result = UserDAO.borrar_dato({"_id": ObjectId(user_id)})
+        if result.deleted_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "No se pudo eliminar el usuario."}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/map')
+def map():
+    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+    return render_template('map.html', google_maps_api_key=google_maps_api_key)
+
 
 @app.route('/login')
 def login_page():
     # Ahora la ruta '/login' redirige a loginRegister.html
     return render_template('loginRegister.html')
 
+@app.route('/MapaAdmin')
+def MapaAdmin():
+    return render_template('MapaAdmin.html')
+
+@app.route('/admin/UsuariosAdmin')
+def UsuariosAdmin():
+    return render_template('UsuariosAdmin.html')
+
+@app.route('/admin')
+def admin():
+    from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
+    from Persistencia.DAOS.HotelesDAO import HotelesDAO
+    from Persistencia.DAOS.SostenibilidadDAO import SostenibilidadDAO
+
+    consumo_total = SostenibilidadDAO.obtener_Consumo()
+    totalReservas = OcupacionHoteleraDAO.UsuariosTotales()
+    hoteles = HotelesDAO.obtener_precios()
+    ocupaciones = list(mongo_agent.db["ocupacion_hotelera"].find({}, {"hotel_nombre": 1, "reservas_confirmadas": 1}))
+    
+    # Depuración: ver qué se obtiene de ocupaciones
+    # print("Datos de ocupaciones:", ocupaciones)
+    
+    # Agrupar reservas por hotel y convertir reservas a número si es necesario
+    ocup_dict = {}
+    for o in ocupaciones:
+        nombre_occ = o.get("hotel_nombre")
+        reservas = o.get("reservas_confirmadas", 0)
+        if isinstance(reservas, str):
+            try:
+                reservas = int(reservas)
+            except Exception:
+                reservas = 0
+        ocup_dict[nombre_occ] = ocup_dict.get(nombre_occ, 0) + reservas
+    # print("Diccionario de ocupaciones:", ocup_dict)
+    
+    # Calcular ingresos totales: convertir precio a numérico si es cadena
+    ingresos_totales = 0
+    for h in hoteles:
+        hotel_nombre = h.get("nombre")
+        precio = h.get("precio", 0)
+        if isinstance(precio, str):
+            try:
+                precio = float(precio)
+            except Exception:
+                precio = 0
+        ingreso = precio * ocup_dict.get(hotel_nombre, 0)
+        # print("Hotel:", hotel_nombre, "Precio:", precio, "Reservas:", ocup_dict.get(hotel_nombre, 0), "Ingreso:", ingreso)
+        ingresos_totales += ingreso
+    return render_template('Admin.html', ingresosTotales=ingresos_totales, totalReservas=totalReservas, consumoTotal=consumo_total)
+
+@app.route('/UserBlock')
+def UserBlock():
+    return render_template('UserBlocked.html')
+
+@app.route('/admin/editUser', methods=['POST'])
+def edit_user():
+    data = request.get_json()
+    try:
+        user_id = data.get("_id")
+        if not user_id:
+            return jsonify({"success": False, "error": "Missing user _id"})
+        filtro = {"_id": ObjectId(user_id)}
+        update_data = {
+            "name": data.get("name"),
+            "email": data.get("email"),
+            "type": data.get("type")
+        }
+        result = UserDAO.actualizar_dato(filtro, update_data)
+        if result.modified_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"success": False, "error": "No se actualizó ningún registro"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
 @app.route('/login', methods=['POST'])
 def login():
     email = request.form.get('email')
     password = request.form.get('password')
+    # blocked = request.form.get('blocked')
 
     if not email or not password:
         flash("Por favor, completa ambos campos.")
@@ -144,15 +283,29 @@ def login():
 
     usuario = UserDAO.obtener_dato({"email": email})
     if usuario:
-        # Si ya se almacena la contraseña hasheada, usamos check_password_hash
-        if check_password_hash(usuario.get("pass"), password):
-            session['user_id'] = str(usuario["_id"])
-            session['user_name'] = usuario.get("name")
-            flash("Inicio de sesión exitoso!")
-            return redirect(url_for('index'))
+        if usuario.get("blocked") == True:
+            return redirect(url_for('UserBlock'))
+
+        if usuario.get("type") != "Admin":
+            # Si ya se almacena la contraseña hasheada, usamos check_password_hash
+            if check_password_hash(usuario.get("pass"), password):
+                session['user_id'] = str(usuario["_id"])
+                session['user_name'] = usuario.get("name")
+                flash("Inicio de sesión exitoso!")
+                return redirect(url_for('index'))
+            else:
+                flash("Contraseña incorrecta.")
+                return redirect(url_for('login_page'))
         else:
-            flash("Contraseña incorrecta.")
-            return redirect(url_for('login_page'))
+             # Si ya se almacena la contraseña hasheada, usamos check_password_hash
+            if check_password_hash(usuario.get("pass"), password):
+                session['user_id'] = str(usuario["_id"])
+                session['user_name'] = usuario.get("name")
+                flash("Inicio de sesión exitoso!")
+                return redirect(url_for('admin'))
+            else:
+                flash("Contraseña incorrecta.")
+                return redirect(url_for('login_page'))
     else:
         flash("Usuario no encontrado.")
         return redirect(url_for('login_page'))
@@ -163,6 +316,7 @@ def register():
     name = request.form.get('name')
     email = request.form.get('email')
     password = request.form.get('password')
+    blocked = False
 
     if not name or not email or not password:
         flash("Todos los campos son obligatorios.")
@@ -179,7 +333,8 @@ def register():
         "name": name,
         "email": email,
         "pass": hashed_password,
-        "type": "Tourist"  # o asignar otro tipo según corresponda
+        "type": "Tourist",  # o asignar otro tipo según corresponda
+        "blocked": blocked
     }
 
     UserDAO.insertar_dato(nuevo_usuario)
@@ -314,6 +469,66 @@ def hotel_detalle(hotel_id):
 
     return render_template('hotel_detalles.html', hotel=hotel, opiniones=opiniones, avg_rating=avg_rating)
 
+@app.template_filter('format_number')
+def format_number(value):
+    try:
+        value = float(value)
+        if value >= 1000000:
+            # Divide entre 1.000.000 y muestra dos decimales seguidos de "M"
+            return f"{value/1000000:.2f}Millones de"
+        else:
+            # Muestra el número con separadores de miles (puntos)
+            return f"{value:,.0f}".replace(",", ".")
+    except Exception:
+        return value
+
+@app.route('/api/estadisticas_ocupacion')
+def api_estadisticas_ocupacion():
+    ocupaciones = OcupacionHoteleraDAO.obtener_todos()
+    if not ocupaciones:
+        # Si no hay datos, devolvemos ceros
+        return jsonify({
+            "tasa_ocupacion_users": 0,
+            "tasa_ocupacion_percent": 0,
+            "reservas_confirmadas": 0,
+            "reservas_percent": 0,
+            "cancelaciones": 0,
+            "cancelaciones_percent": 0
+        })
+
+    # 1) Calcular totales
+    total_reservas = sum(o["reservas_confirmadas"] for o in ocupaciones)
+    total_cancelaciones = sum(o["cancelaciones"] for o in ocupaciones)
+    total_usuarios = total_reservas + total_cancelaciones
+
+    # 2) Calcular promedios
+    total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)  # suma de % ocupacion
+    promedio_tasa = round(total_tasa / len(ocupaciones), 3)     # promedio de % ocupacion
+
+    # 3) Convertir “tasa de ocupación” (porcentaje) a número de usuarios
+    #    Ej.: 50% de 200 usuarios => 100 usuarios
+    if total_usuarios > 0:
+        ocupacion_users = round((promedio_tasa / 100) * total_usuarios)
+    else:
+        ocupacion_users = 0
+
+    # 4) Calcular porcentajes de reservas y cancelaciones sobre el total
+    #    (si total_usuarios=0, evitamos división por cero)
+    if total_usuarios > 0:
+        reservas_percent = round((total_reservas / total_usuarios) * 100, 3)
+        cancelaciones_percent = round((total_cancelaciones / total_usuarios) * 100, 3)
+    else:
+        reservas_percent = 0
+        cancelaciones_percent = 0
+
+    return jsonify({
+        "tasa_ocupacion_users": ocupacion_users,
+        "tasa_ocupacion_percent": promedio_tasa,        # ← con 3 decimales
+        "reservas_confirmadas": total_reservas,
+        "reservas_percent": reservas_percent,           # ← con 3 decimales
+        "cancelaciones": total_cancelaciones,
+        "cancelaciones_percent": cancelaciones_percent  # ← con 3 decimales
+    })
 
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
