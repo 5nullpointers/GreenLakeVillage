@@ -490,18 +490,53 @@ def format_number(value):
     except Exception:
         return value
 
-@app.route('/api/tasa_ocupacion')
-def api_tasa_ocupacion():
-    # Recupera todos los registros de ocupación hotelera
+@app.route('/api/estadisticas_ocupacion')
+def api_estadisticas_ocupacion():
     ocupaciones = OcupacionHoteleraDAO.obtener_todos()
-    if ocupaciones:
-        # Calcula el promedio de la tasa de ocupación
-        total_tasa = sum(ocup["tasa_ocupacion"] for ocup in ocupaciones)
-        promedio = total_tasa / len(ocupaciones)
-        promedio = round(promedio, 3)  # Limita a 3 decimales
+    if not ocupaciones:
+        # Si no hay datos, devolvemos ceros
+        return jsonify({
+            "tasa_ocupacion_users": 0,
+            "tasa_ocupacion_percent": 0,
+            "reservas_confirmadas": 0,
+            "reservas_percent": 0,
+            "cancelaciones": 0,
+            "cancelaciones_percent": 0
+        })
+
+    # 1) Calcular totales
+    total_reservas = sum(o["reservas_confirmadas"] for o in ocupaciones)
+    total_cancelaciones = sum(o["cancelaciones"] for o in ocupaciones)
+    total_usuarios = total_reservas + total_cancelaciones
+
+    # 2) Calcular promedios
+    total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)  # suma de % ocupacion
+    promedio_tasa = round(total_tasa / len(ocupaciones), 3)     # promedio de % ocupacion
+
+    # 3) Convertir “tasa de ocupación” (porcentaje) a número de usuarios
+    #    Ej.: 50% de 200 usuarios => 100 usuarios
+    if total_usuarios > 0:
+        ocupacion_users = round((promedio_tasa / 100) * total_usuarios)
     else:
-        promedio = 0
-    return jsonify({'tasa_ocupacion': promedio})
+        ocupacion_users = 0
+
+    # 4) Calcular porcentajes de reservas y cancelaciones sobre el total
+    #    (si total_usuarios=0, evitamos división por cero)
+    if total_usuarios > 0:
+        reservas_percent = round((total_reservas / total_usuarios) * 100, 3)
+        cancelaciones_percent = round((total_cancelaciones / total_usuarios) * 100, 3)
+    else:
+        reservas_percent = 0
+        cancelaciones_percent = 0
+
+    return jsonify({
+        "tasa_ocupacion_users": ocupacion_users,
+        "tasa_ocupacion_percent": promedio_tasa,        # ← con 3 decimales
+        "reservas_confirmadas": total_reservas,
+        "reservas_percent": reservas_percent,           # ← con 3 decimales
+        "cancelaciones": total_cancelaciones,
+        "cancelaciones_percent": cancelaciones_percent  # ← con 3 decimales
+    })
 
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000

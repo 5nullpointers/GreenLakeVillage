@@ -73,16 +73,34 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Actualizar la tasa de ocupación dinámicamente
-    fetch('/api/tasa_ocupacion')
-      .then(response => response.json())
-      .then(data => {
-        // Actualiza el contenido del elemento con id "ocupacionRate"
-        const tasaElement = document.getElementById('ocupacionRate');
-        tasaElement.textContent = data.tasa_ocupacion + '%';
-        // Actualiza la anchura de la barra de progreso
-        const statBarFill = document.getElementById('ocupacionBarFill');
-        statBarFill.style.width = data.tasa_ocupacion + '%';
-      })
-      .catch(error => console.error('Error al obtener la tasa de ocupación:', error));
+    // Actualizar las estadísticas dinámicamente (tasa de ocupación, reservas y cancelaciones)
+    fetch('/api/estadisticas_ocupacion')
+    .then(response => response.json())
+    .then(data => {
+
+      // 1) Tasa de ocupación
+      const ocupacionElem = document.getElementById('ocupacionRate');
+      ocupacionElem.textContent = `${data.tasa_ocupacion_users} Usuarios (${data.tasa_ocupacion_percent}%)`;
+  
+      // Barra de ocupación → usas el porcentaje promedio
+      const ocupacionBar = document.getElementById('ocupacionBarFill');
+      ocupacionBar.style.width = data.tasa_ocupacion_percent + '%';
+  
+      // 2) Reservas confirmadas
+      const reservasElem = document.getElementById('reservasRate');
+      reservasElem.textContent = `${data.reservas_confirmadas} Usuarios (${data.reservas_percent}%)`;
+  
+      const reservasBar = document.getElementById('reservasBarFill');
+      reservasBar.style.width = data.reservas_percent + '%';
+  
+      // 3) Cancelaciones
+      const cancelElem = document.getElementById('cancelacionesRate');
+      cancelElem.textContent = `${data.cancelaciones} Usuarios (${data.cancelaciones_percent}%)`;
+
+      const cancelacionesBar = document.getElementById('cancelacionesBarFill');
+        cancelacionesBar.style.width = data.cancelaciones_percent + '%';
+      
+    })
+    .catch(error => console.error('Error al obtener las estadísticas:', error));
+  
 });
