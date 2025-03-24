@@ -6,25 +6,11 @@ class SostenibilidadDAO:
     mongoDBAgent = MongoDBAgent()
 
     @staticmethod
-    def insertar_dato(dato):
-        return mongoDBAgent.insert_one(SostenibilidadDAO.COLLECTION, dato)
-
-    @staticmethod
-    def insertar_varios(datos):
-        return mongoDBAgent.insert_many(SostenibilidadDAO.COLLECTION, datos)
-
-    @staticmethod
-    def obtener_dato(filtro):
-        return mongoDBAgent.find_one(SostenibilidadDAO.COLLECTION, filtro)
-
-    @staticmethod
-    def obtener_todos():
-        return mongoDBAgent.find(SostenibilidadDAO.COLLECTION)
-
-    @staticmethod
-    def actualizar_dato(filtro, nuevo_valor):
-        return mongoDBAgent.update_one(SostenibilidadDAO.COLLECTION, filtro, nuevo_valor)
-
-    @staticmethod
-    def borrar_dato(filtro):
-        return mongoDBAgent.delete_one(SostenibilidadDAO.COLLECTION, filtro)
+    def obtener_Consumo():
+        pipeline = [
+            {"$group": {"_id": None, "total_consumo": {"$sum": "$consumo_energia_kwh"}}}
+        ]
+        result = list(mongoDBAgent.db[SostenibilidadDAO.COLLECTION].aggregate(pipeline))
+        if result:
+            return result[0].get("total_consumo", 0)
+        return 0
