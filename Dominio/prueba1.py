@@ -240,11 +240,11 @@ def UsuariosAdmin():
 def admin():
     from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
     from Persistencia.DAOS.HotelesDAO import HotelesDAO
-    # Obtener el total de reservas
+    from Persistencia.DAOS.SostenibilidadDAO import SostenibilidadDAO
+
+    consumo_total = SostenibilidadDAO.obtener_Consumo()
     totalReservas = OcupacionHoteleraDAO.UsuariosTotales()
-    # Obtener hoteles con nombre y precio
     hoteles = HotelesDAO.obtener_precios()
-    # Obtener ocupaciones: se requiere hotel_nombre y reservas_confirmadas
     ocupaciones = list(mongo_agent.db["ocupacion_hotelera"].find({}, {"hotel_nombre": 1, "reservas_confirmadas": 1}))
     
     # Depuración: ver qué se obtiene de ocupaciones
@@ -276,7 +276,7 @@ def admin():
         ingreso = precio * ocup_dict.get(hotel_nombre, 0)
         print("Hotel:", hotel_nombre, "Precio:", precio, "Reservas:", ocup_dict.get(hotel_nombre, 0), "Ingreso:", ingreso)
         ingresos_totales += ingreso
-    return render_template('Admin.html', ingresosTotales=ingresos_totales , totalReservas=totalReservas)
+    return render_template('Admin.html', ingresosTotales=ingresos_totales, totalReservas=totalReservas, consumoTotal=consumo_total)
 
 @app.route('/UserBlock')
 def UserBlock():
