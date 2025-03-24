@@ -153,6 +153,15 @@ function initMap() {
     .catch(error => console.error("Error al cargar transporte:", error));
 }
 
+function cambiarImagenFallback(img, imagenNombre) {
+  // Intentar cargar desde la carpeta "Restaurantes"
+  img.onerror = function() {
+      // Si tampoco está en "Restaurantes", usar la imagen por defecto de Hoteles
+      img.src = "/static/Images/Hoteles/default.jpg";
+  };
+  img.src = "/static/Images/Restaurantes/" + imagenNombre;
+}
+
 // =======================
 // 2) Crear Marcadores (hoteles, restaurantes, etc.)
 // =======================
@@ -185,6 +194,7 @@ function crearMarcadores() {
         <div style="min-width:250px">
           <img src="/static/Images/Hoteles/${hotel.imagen || "default.jpg"}" 
                alt="${hotel.nombre}" 
+               onerror="cambiarImagenFallback(this, '${hotel.imagen}')"
                style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
           <h3>${hotel.nombre}</h3>
           ${ratingContent}
@@ -227,6 +237,7 @@ function crearMarcadoresHoteles() {
         <div style="min-width:250px">
           <img src="/static/Images/Restaurantes/${restaurant.imagen || "default.jpg"}"
                alt="${restaurant.nombre}"
+               onerror="cambiarImagenFallback(this, '${restaurant.imagen}')"
                style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
           <h3>${restaurant.nombre}</h3>
           ${ratingContent}
@@ -267,6 +278,7 @@ function getSidePanelHTML(item, rating) {
       <div class="hotel-card">
         <img src="/static/Images/Hoteles/${item.imagen || "default.jpg"}" 
              alt="${item.nombre}" 
+             onerror="cambiarImagenFallback(this, '${item.imagen}')"
              class="hotel-image">
         <div class="hotel-info">
           <h2>${item.nombre}</h2>
