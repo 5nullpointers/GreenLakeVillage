@@ -238,7 +238,9 @@ def UsuariosAdmin():
 
 @app.route('/admin')
 def admin():
-    return render_template('Admin.html')
+    from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
+    totalReservas = OcupacionHoteleraDAO.UsuariosTotales()
+    return render_template('Admin.html', totalReservas=totalReservas)
 
 @app.route('/UserBlock')
 def UserBlock():
@@ -439,7 +441,18 @@ def hotel_detalle(hotel_id):
 
     return render_template('hotel_detalles.html', hotel=hotel, opiniones=opiniones, avg_rating=avg_rating)
 
-
+@app.template_filter('format_number')
+def format_number(value):
+    try:
+        value = float(value)
+        if value >= 1000000:
+            # Divide entre 1.000.000 y muestra dos decimales seguidos de "M"
+            return f"{value/1000000:.2f}Millones de"
+        else:
+            # Muestra el número con separadores de miles (puntos)
+            return f"{value:,.0f}".replace(",", ".")
+    except Exception:
+        return value
 
 
 if __name__ == '__main__':
