@@ -292,7 +292,7 @@ def login():
                 session['user_id'] = str(usuario["_id"])
                 session['user_name'] = usuario.get("name")
                 flash("Inicio de sesión exitoso!")
-                return redirect(url_for('index'))
+                return redirect(url_for('map'))
             else:
                 flash("Contraseña incorrecta.")
                 return redirect(url_for('login_page'))
