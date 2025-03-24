@@ -57,7 +57,7 @@
         <!-- Sección de Bienvenida + Tarjetas -->
         <div class="Bienvenida">
           <div class="welcome-text">
-            <p>Hola, {{ session.user_name or 'Nombre de Usuario' }}</p>
+            <p>Hola, Pablo</p>
             <h2>Overview</h2>
           </div>
           <div class="cards-row">
@@ -72,7 +72,7 @@
               <img src="/static/images/Visitantes.png" alt="Visitantes icon" class="card-icon-left">
               <div class="card-text">
                 <h3>Visitantes totales</h3>
-                <p>{{ totalReservas|format_number }} visitantes</p>
+                <p>17,500 visitantes</p>
               </div>
             </div>
             <div class="info-card">
@@ -94,9 +94,10 @@
             <div class="stats-container">
               <div class="stat-item">
                 <p>Tasa de ocupación</p>
-                <span>98,250 Users (70%)</span>
+                <!-- Se quita el valor estático y se asigna un id para actualizarlo -->
+                <span id="ocupacionRate"></span>
                 <div class="stat-bar">
-                  <div class="stat-bar-fill" style="width: 70%;"></div>
+                  <div id="ocupacionBarFill" class="stat-bar-fill" style="width: 0%;"></div>
                 </div>
               </div>
               <div class="stat-item">
