@@ -294,25 +294,36 @@ def login():
         if usuario.get("blocked") == True:
             return redirect(url_for('UserBlock'))
 
-        if usuario.get("type") != "Admin":
-            # Si ya se almacena la contraseña hasheada, usamos check_password_hash
-            if check_password_hash(usuario.get("pass"), password):
-                session['user_id'] = str(usuario["_id"])
-                session['user_name'] = usuario.get("name")
-                flash("Inicio de sesión exitoso!")
-                return redirect(url_for('map'))
-            else:
-                flash("Contraseña incorrecta.")
-                return redirect(url_for('login_page'))
-        else:
-             # Si ya se almacena la contraseña hasheada, usamos check_password_hash
-            if check_password_hash(usuario.get("pass"), password):
-                session['user_id'] = str(usuario["_id"])
-                session['user_name'] = usuario.get("name")
-                flash("Inicio de sesión exitoso!")
-                return redirect(url_for('admin'))
-            else:
-                flash("Contraseña incorrecta.")
+        match usuario.get("type"):
+            case "Tourist":
+                if check_password_hash(usuario.get("pass"), password):
+                    session['user_id'] = str(usuario["_id"])
+                    session['user_name'] = usuario.get("name")
+                    flash("Inicio de sesión exitoso!")
+                    return redirect(url_for('map'))
+                else:
+                    flash("Contraseña incorrecta.")
+                    return redirect(url_for('login_page'))
+            case "Admin":
+                if check_password_hash(usuario.get("pass"), password):
+                    session['user_id'] = str(usuario["_id"])
+                    session['user_name'] = usuario.get("name")
+                    flash("Inicio de sesión exitoso!")
+                    return redirect(url_for('admin'))
+                else:
+                    flash("Contraseña incorrecta.")
+                    return redirect(url_for('login_page'))
+            case "BusinessOwner":
+                if check_password_hash(usuario.get("pass"), password):
+                    session['user_id'] = str(usuario["_id"])
+                    session['user_name'] = usuario.get("name")
+                    flash("Inicio de sesión exitoso!")
+                    return redirect(url_for('Propietarios'))
+                else:
+                    flash("Contraseña incorrecta.")
+                    return redirect(url_for('login_page'))
+            case _:
+                flash("Tipo de usuario desconocido.")
                 return redirect(url_for('login_page'))
     else:
         flash("Usuario no encontrado.")
