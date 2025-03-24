@@ -1,22 +1,22 @@
+<!-- Presentacion/templates/map.html -->
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Green Lake Village</title>
-  <!-- Fuente Poppins (Google Fonts) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <title>Mi Mapa Personalizado + Rutas</title>
 
-  <!-- Carga CSS -->
+  <!-- IMPORTANTE: Carga la API de Google Maps con &callback=initMap y &libraries=geometry -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&libraries=geometry"
+    async
+    defer>
+  </script>
+
+  <!-- Tu CSS (opcional) -->
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
-
 <body>
-
-  <!-- Barra de navegación -->
+  <!-- Tu barra de navegación, overlay de carga, panel lateral, etc. -->
   <nav>
     <div class="nav-logo">Green Lake</div>
     <ul>
@@ -26,27 +26,17 @@
     </ul>
   </nav>
 
-  <!-- Overlay de carga con un spinner -->
-  <div id="loadingOverlay">
-    <div class="spinner"></div>
-  </div>
+  <div id="loadingOverlay"><div class="spinner"></div></div>
 
-  <!-- Mapa a pantalla completa -->
   <div id="map"></div>
 
-  <!-- Panel lateral (deslizable) -->
   <div id="sidebar">
     <button id="closeSidebar" onclick="toggleSidebar()">×</button>
     <h2>Panel de Información</h2>
     <div id="infoSection"></div>
   </div>
 
-  <!-- Carga la API de Google Maps -->
-  <!-- Sustituye TU_API_KEY y TU_MAP_ID por los tuyos -->
-  <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&map_ids=TU_MAP_ID"></script>
-
-  <!-- Carga JS principal -->
+  <!-- Carga tu script principal con la lógica del mapa -->
   <script src="/static/js/script.js"></script>
 </body>
-
 </html>
