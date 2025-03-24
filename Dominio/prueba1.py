@@ -24,9 +24,14 @@ class CustomJSONProvider(DefaultJSONProvider):
         return super().default(o)
 # ------------------------------------
 
+# Calcula la ruta absoluta a /Presentacion/templates
+BASE_DIR = os.path.dirname(__file__)         # => Dominio/
+TEMPLATE_DIR = os.path.join(BASE_DIR, '..', 'Presentacion', 'templates')
+STATIC_DIR = os.path.join(BASE_DIR, '..', 'Presentacion', 'static')
+
 app = Flask(__name__,
-            static_folder='../Presentacion/static',
-            template_folder='../Presentacion/templates')
+            template_folder=TEMPLATE_DIR,
+            static_folder=STATIC_DIR)
 app.json_provider_class = CustomJSONProvider
 app.json = app.json_provider_class(app)
 
@@ -39,18 +44,6 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 from werkzeug.security import generate_password_hash, check_password_hash
-
-'''
-Manejador de señales para Ctrl+C
-'''
-def signal_handler(sig, frame):
-    print("\nSe ha presionado Ctrl+C. Saliendo de forma segura...")
-    # Detener la aplicación de Flask
-    app.do_teardown_appcontext()
-    sys.exit(0)
-
-# Asociar el manejador a la señal SIGINT (Ctrl+C)
-signal.signal(signal.SIGINT, signal_handler)
 
 # Conectar a MongoDB
 from Persistencia.AgenteBD import MongoDBAgent
@@ -68,91 +61,66 @@ else:
     # print("✅ Conexión a MongoDB establecida correctamente")
     pass
 
-global lista_rutas
-global lista_ocupaciones
-global lista_opiniones
-global lista_sostenibilidad
-global lista_transporte
-# Obtener los datos de la colección de rutas turísticas y guardarlos en un objeto RutasTuristicas
-try:
-    # Obtener rutas turísticas
-    rutas_turisticas = RutasTuristicasDAO.obtener_todos()
-    lista_rutas = [
-        RutasTuristicas(
-            ruta_nombre=ruta["ruta_nombre"],
-            tipo_ruta=ruta["tipo_ruta"],
-            longitud_km=ruta["longitud_km"],
-            duracion_hr=ruta["duracion_hr"],
-            popularidad=ruta["popularidad"]
-        ) for ruta in rutas_turisticas
-    ]
+# prueba1.py (fragmento)
 
-    # Obtener ocupación hotelera
-    ocupaciones = OcupacionHoteleraDAO.obtener_todos()
-    lista_ocupaciones = [
-        OcupacionHotelera(
-            hotel_nombre=ocup["hotel_nombre"],
-            fecha=ocup["fecha"],
-            tasa_ocupacion=ocup["tasa_ocupacion"],
-            reservas_confirmadas=ocup["reservas_confirmadas"],
-            cancelaciones=ocup["cancelaciones"],
-            precio_promedio_noche=ocup["precio_promedio_noche"]
-        ) for ocup in ocupaciones
-    ]
+import os
+import requests
+from flask import Flask, request, jsonify, render_template
 
-    # Obtener opiniones turísticas
-    opiniones = OpinionesTuristicasDAO.obtener_todos()
-    lista_opiniones = [
-        OpinionesTuristicas(
-            fecha=op["fecha"],
-            tipo_servicio=op["tipo_servicio"],
-            nombre_servicio=op["nombre_servicio"],
-            puntuacion=op["puntuacion"],
-            comentario=op["comentario"],
-            idioma=op.get("idioma", None)
-        ) for op in opiniones
-    ]
 
-    # Obtener datos de sostenibilidad
-    sostenibilidad = SostenibilidadDAO.obtener_todos()
-    lista_sostenibilidad = [
-        Sostenibilidad(
-            hotel_nombre=datos["hotel_nombre"],
-            consumo_energia_kwh=datos["consumo_energia_kwh"],
-            residuos_generados_kg=datos["residuos_generados_kg"],
-            porcentaje_reciclaje=datos["porcentaje_reciclaje"],
-            uso_agua_m3=datos["uso_agua_m3"],
-            fecha=datos["fecha"]
-        ) for datos in sostenibilidad
-    ]
+# Clave de servidor para la Routes API v2
+# (¡No la expongas en el frontend!)
+ROUTES_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
-    # Obtener datos de uso de transporte
-    uso_transporte = UsoTransporteDAO.obtener_todos()
-    lista_transporte = [
-        UsoTransporte(
-            fecha=trans["fecha"],
-            tipo_transporte=trans["tipo_transporte"],
-            num_usuarios=trans["num_usuarios"],
-            tiempo_viaje_promedio_min=trans["tiempo_viaje_promedio_min"],
-            ruta_popular=trans["ruta_popular"]
-        ) for trans in uso_transporte
-    ]
-    # print("✅ Datos obtenidos correctamente")
-    # # Imprimir la cantidad de datos obtenidos de cada colección
-    # print(f"📊 {len(lista_rutas)} rutas turísticas")
-    # print(f"🏨 {len(lista_ocupaciones)} datos de ocupación hotelera")
-    # print(f"🗣️ {len(lista_opiniones)} opiniones turísticas")
-    # print(f"🌱 {len(lista_sostenibilidad)} datos de sostenibilidad")
-    # print(f"🚗 {len(lista_transporte)} datos de uso de transporte")
+@app.route("/get-route", methods=["POST"])
+def get_route():
+    """
+    Recibe { origin: {latitude, longitude}, destination: {latitude, longitude} }
+    Llama a la Routes API v2 y devuelve la polyline
+    """
+    data = request.json
+    origin = data.get("origin")
+    destination = data.get("destination")
 
-except Exception as e:
-    print(f"❌ Error al obtener los datos: {str(e)}")
+    if not origin or not destination:
+        return jsonify({"error": "Origin/destination missing"}), 400
+
+    # Construir el payload para la nueva Routes API v2
+    payload = {
+        "origin": {"location": {"latLng": origin}},
+        "destination": {"location": {"latLng": destination}},
+        "travelMode": "DRIVE"
+    }
+
+    # Llamar a la Routes API
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": ROUTES_API_KEY,
+        "X-Goog-FieldMask": "routes.polyline.encodedPolyline"
+    }
+    url = "https://routes.googleapis.com/directions/v2:computeRoutes"
+
+    try:
+        resp = requests.post(url, json=payload, headers=headers)
+        resp_data = resp.json()
+        return jsonify(resp_data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/map")
+def map_page():
+    # En lugar de usar un valor por defecto, tomamos la clave de .env
+    google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+    return render_template("map.html", google_maps_api_key=google_maps_api_key)
 
 
 @app.route('/')
 def index():
-    # Ahora este es el index principal
-    return render_template('index.html')
+    # Lo mismo para el index
+    google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+    return render_template('index.html', google_maps_api_key=google_maps_api_key)
+
 
 @app.route('/users', methods=['GET'])
 def users():
@@ -394,6 +362,30 @@ def api_hoteles():
         h["_id"] = str(h["_id"])
     
     return jsonify(hoteles)
+
+@app.route('/api/rutas')
+def api_rutas():
+    """
+    Retorna un JSON con todas las rutas turísticas guardadas en MongoDB.
+    """
+    rutas = list(mongo_agent.db["rutas_turisticas"].find({}))
+    for r in rutas:
+        r["_id"] = str(r["_id"])  # Convertir ObjectId a string
+    return jsonify(rutas)
+
+
+@app.route('/api/restaurantes')
+def api_restaurantes():
+    """
+    Retorna un JSON con todos los restaurantes guardados en MongoDB.
+    """
+    restaurantes = list(mongo_agent.db["restaurantes"].find({}))
+
+    #Convertir ObjectId a string para no tener problemas al serializar
+    for r in restaurantes:
+        r["_id"] = str(r["_id"])
+
+    return jsonify(restaurantes)
 
 MAX_HISTORY = 5
 conversation_history = []

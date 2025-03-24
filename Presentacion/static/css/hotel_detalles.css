@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
+/* Variables de personalización */
+:root {
+    --primary-color: #009688;
+    --primary-hover: #007c73;
+    --bg-gradient-start: #8ACFC8;
+    --bg-gradient-end: #B7E1DD;
+    --container-bg: rgba(255, 255, 255, 0.8);
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --title-color: #ffffff;
+    --container-text: #333333;
+}
+
 /* Reset básico */
 * {
     margin: 0;
@@ -8,64 +20,105 @@
     font-family: "Poppins", sans-serif;
 }
 
-/* Fondo y estilo global del body */
+/* Estilos globales del body */
 body {
-    background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
-    color: #333;
+    background: linear-gradient(90deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    color: var(--container-text);
     padding: 2rem;
     line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
 }
 
-/* Título principal del hotel */
-h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+/* Título principal */
+body > h1 {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
     text-align: center;
+    color: var(--title-color);
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
 }
 
-/* Imagen del hotel */
+/* Contenedor para el layout principal */
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas */
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Columnas */
+.left-column, .right-column {
+    background: var(--container-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: var(--box-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.left-column:hover, .right-column:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Imagen con efecto hover */
 img {
     display: block;
     max-width: 100%;
     height: auto;
     margin: 0 auto 1.5rem;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
 }
 
-/* Descripción y Precio */
+img:hover {
+    transform: scale(1.02);
+}
+
+/* Textos */
+h2, h3 {
+    color: var(--container-text);
+    margin-bottom: 1rem;
+}
+
 p {
     font-size: 1.1rem;
     margin-bottom: 1rem;
+    color: var(--container-text);
 }
 
 strong {
     font-weight: 600;
 }
 
-/* Listas para Servicios y Atracciones */
 ul {
-    margin-left: 1rem;
+    margin-left: 1.5rem;
     margin-bottom: 1rem;
+    color: var(--container-text);
 }
 
 li {
     margin-bottom: 0.5rem;
 }
 
-/* Sección de Opiniones */
+/* Contenedor de Opiniones */
 #opiniones {
-    background-color: #fff;
+    background: var(--container-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 2rem;
+    box-shadow: var(--box-shadow);
+    color: var(--container-text);
 }
 
 #opiniones h2 {
     font-size: 1.8rem;
-    margin-bottom: 1rem;
     text-align: center;
+    margin-bottom: 1rem;
 }
 
 #opiniones p {
@@ -75,8 +128,9 @@ li {
 
 /* Opiniones individuales */
 .opinion {
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     padding: 0.75rem 0;
+    color: var(--container-text);
 }
 
 .opinion:last-child {
@@ -85,7 +139,7 @@ li {
 
 /* Botón "Mostrar más" */
 #mostrar-mas-btn {
-    background-color: #009688;
+    background-color: var(--primary-color);
     border: none;
     padding: 0.8rem 1.5rem;
     font-size: 1rem;
@@ -98,37 +152,54 @@ li {
 }
 
 #mostrar-mas-btn:hover {
-    background-color: #007c73;
+    background-color: var(--primary-hover);
 }
 
 /* Enlace "Volver al mapa" */
 a {
-    color: #009688;
+    color: var(--primary-color);
     font-weight: 600;
     text-align: center;
     display: block;
     margin-top: 2rem;
+    transition: color 0.3s;
 }
 
 a:hover {
     text-decoration: underline;
+    color: var(--primary-hover);
 }
 
 /* Responsividad */
+@media screen and (max-width: 900px) {
+    .main-layout {
+        grid-template-columns: 1fr; /* Colapsa a una columna en pantallas más pequeñas */
+    }
+}
+
 @media screen and (max-width: 600px) {
     body {
         padding: 1rem;
     }
-
-    h1 {
-        font-size: 2rem;
+    body > h1 {
+        font-size: 2.2rem;
     }
-
     p, li {
         font-size: 1rem;
     }
-
     #opiniones {
         padding: 1rem;
     }
+}
+
+/* Animaciones de carga */
+.hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.visible {
+    opacity: 1;
+    transform: translateY(0);
 }

@@ -1,34 +1,40 @@
+/* Presentacion/static/js/script.js */
+
+// Variables globales
 let map;
-let currentInfoWindow = null; // Para saber cuál InfoWindow está abierto
-
-// Almacenará la lista de hoteles que viene de MongoDB
+let currentInfoWindow = null;
 let hotels = [];
-
-// Variable global para almacenar la información de ratings
+let routes = [];
+let restaurants = [];
+let farmacias = [];
+let tiendas = [];
+let parques = [];
+let atracciones = [];
+let museos = [];
+let transporte = [];
 let ratingsInfo = {};
+let currentRoutePolyline = null;
 
 // =======================
-// 1) Cargar Mapa e Iniciar
+// 1) Se llama automáticamente cuando la API de Google Maps termina de cargar
 // =======================
 function initMap() {
-  // Centro del mapa
   const centerCoords = { lat: 47.5626, lng: 13.6493 };
 
   // Límites permitidos para el mapa
   const allowedBounds = {
     north: 47.58,
-    south: 47.55,
-    west: 13.63,
+    south: 47.544,
+    west: 13.612,
     east: 13.72
   };
 
-  // Creación del mapa
+  // Crear el mapa con estilo satélite y sin labels/roads
   map = new google.maps.Map(document.getElementById("map"), {
     center: centerCoords,
     zoom: 16,
     tilt: 60,
     heading: 20,
-    mapId: "TU_MAP_ID", // Reemplaza con tu MAP ID
     disableDefaultUI: true,
     restriction: {
       latLngBounds: allowedBounds,
@@ -54,66 +60,131 @@ function initMap() {
     }
   });
 
-  // 2) Primero obtenemos la lista de hoteles desde MongoDB
+  // =======================
+  // 1. Cargar rutas de la API (para mostrarlas en el panel)
+  // =======================
+  fetch('/api/rutas')
+    .then(response => response.json())
+    .then(data => {
+      routes = data; // Guardamos en variable global
+    })
+    .catch(error => console.error("Error al cargar rutas:", error));
+
+  // 2. Cargar hoteles y sus ratings
   fetch('/api/hoteles')
     .then(response => response.json())
     .then(data => {
-      hotels = data; // Guardamos la lista de hoteles
-      // 3) Luego obtenemos las puntuaciones desde /api/ratings (si lo deseas)
+      hotels = data;
       return fetch('/api/ratings');
     })
     .then(response => response.json())
     .then(ratingsData => {
-      ratingsInfo = ratingsData; // Guardamos el diccionario de ratings
-      // 4) Creamos los marcadores en el mapa
-      crearMarcadores();
+      ratingsInfo = ratingsData;
+      crearMarcadores(); // Marcadores de hoteles
     })
-    .catch(error => console.error("Error al cargar datos:", error));
+    .catch(error => console.error("Error al cargar hoteles:", error));
+
+  // 3. Cargar restaurantes y sus ratings
+  fetch('/api/restaurantes')
+    .then(response => response.json())
+    .then(data => {
+      restaurants = data;
+      return fetch('/api/ratings');
+    })
+    .then(response => response.json())
+    .then(ratingsData => {
+      ratingsInfo = ratingsData;
+      crearMarcadoresHoteles(); // Marcadores de restaurantes (el nombre "Hoteles" es herencia)
+    })
+    .catch(error => console.error("Error al cargar restaurantes:", error));
+
+  // 4. Cargar farmacias
+  fetch('/api/farmacias')
+    .then(response => response.json())
+    .then(data => {
+      farmacias = data;
+      crearMarcadoresFarmacias();
+    })
+    .catch(error => console.error("Error al cargar farmacias:", error));
+
+  // 5. Cargar tiendas
+  fetch('/api/tiendas')
+    .then(response => response.json())
+    .then(data => {
+      tiendas = data;
+      crearMarcadoresTiendas();
+    })
+    .catch(error => console.error("Error al cargar tiendas:", error));
+
+  // 6. Cargar parques
+  fetch('/api/parques')
+    .then(response => response.json())
+    .then(data => {
+      parques = data;
+      crearMarcadoresParques();
+    })
+    .catch(error => console.error("Error al cargar parques:", error));
+
+  // 7. Cargar atracciones
+  fetch('/api/atracciones')
+    .then(response => response.json())
+    .then(data => {
+      atracciones = data;
+      crearMarcadoresAtracciones();
+    })
+    .catch(error => console.error("Error al cargar atracciones:", error));
+
+  // 8. Cargar museos
+  fetch('/api/museos')
+    .then(response => response.json())
+    .then(data => {
+      museos = data;
+      crearMarcadoresMuseos();
+    })
+    .catch(error => console.error("Error al cargar museos:", error));
+
+  // 9. Cargar transporte
+  fetch('/api/transporte')
+    .then(response => response.json())
+    .then(data => {
+      transporte = data;
+      crearMarcadoresTransporte();
+    })
+    .catch(error => console.error("Error al cargar transporte:", error));
 }
 
 // =======================
-// 2) Crear Marcadores
+// 2) Crear Marcadores (hoteles, restaurantes, etc.)
 // =======================
 function crearMarcadores() {
   hotels.forEach(hotel => {
-    // hotel: { nombre, lat, lng, imagen, descripcion, precio, servicios, ... }
-
-    // Creamos el marcador
     const marker = new google.maps.Marker({
       position: { lat: hotel.lat, lng: hotel.lng },
       map: map,
       title: hotel.nombre,
       icon: {
-        url: "/static/Images/hotel.png", // Ícono base, ajusta si deseas
+        url: "/static/Images/hotel.png",
         scaledSize: new google.maps.Size(80, 80)
       }
     });
 
-    // Guardamos el marcador en el objeto hotel para acceder a él luego desde la lista
     hotel.marker = marker;
-
-    // Creamos un InfoWindow (tarjeta pequeña)
     const infoWindow = new google.maps.InfoWindow();
 
-    // Escuchamos el click en el marcador
     marker.addListener("click", () => {
-      // Animación de rebote
       marker.setAnimation(google.maps.Animation.BOUNCE);
       setTimeout(() => marker.setAnimation(null), 1500);
 
-      // Obtenemos la puntuación del hotel si existe
       const ratingData = ratingsInfo[hotel.nombre] || null;
       let ratingContent = "<p>Sin opiniones</p>";
       if (ratingData) {
-        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)}
-          (${ratingData.numero_comentarios} opiniones)</p>`;
+        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)} (${ratingData.numero_comentarios} opiniones)</p>`;
       }
 
-      // Tarjeta pequeña (InfoWindow) con imagen, nombre, rating
       infoWindow.setContent(`
         <div style="min-width:250px">
-          <img src="/static/Images/Hoteles/${hotel.imagen || "default.jpg"}"
-               alt="${hotel.nombre}"
+          <img src="/static/Images/Hoteles/${hotel.imagen || "default.jpg"}" 
+               alt="${hotel.nombre}" 
                style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
           <h3>${hotel.nombre}</h3>
           ${ratingContent}
@@ -121,49 +192,89 @@ function crearMarcadores() {
       `);
       infoWindow.open(map, marker);
 
-      // Tarjeta grande (panel lateral) con más detalles
       const sidePanelHTML = getSidePanelHTML(hotel, ratingData);
       openMarkerInfo(marker, infoWindow, sidePanelHTML);
     });
   });
 }
 
+function crearMarcadoresHoteles() {
+  // A pesar del nombre, esto crea marcadores de "restaurants"
+  restaurants.forEach(restaurant => {
+    const marker = new google.maps.Marker({
+      position: { lat: restaurant.lat, lng: restaurant.lng },
+      map: map,
+      title: restaurant.nombre,
+      icon: {
+        url: "/static/Images/restaurante.png",
+        scaledSize: new google.maps.Size(80, 80)
+      }
+    });
+    restaurant.marker = marker;
+    const infoWindow = new google.maps.InfoWindow();
+
+    marker.addListener("click", () => {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(() => marker.setAnimation(null), 1500);
+
+      const ratingData = ratingsInfo[restaurant.nombre] || null;
+      let ratingContent = "<p>Sin opiniones</p>";
+      if (ratingData) {
+        ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)} (${ratingData.numero_comentarios} opiniones)</p>`;
+      }
+
+      infoWindow.setContent(`
+        <div style="min-width:250px">
+          <img src="/static/Images/Restaurantes/${restaurant.imagen || "default.jpg"}"
+               alt="${restaurant.nombre}"
+               style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
+          <h3>${restaurant.nombre}</h3>
+          ${ratingContent}
+        </div>
+      `);
+      infoWindow.open(map, marker);
+
+      const sidePanelHTML = getSidePanelHTML(restaurant, ratingData);
+      openMarkerInfo(marker, infoWindow, sidePanelHTML);
+    });
+  });
+}
+
+// Crea marcadores para farmacias, tiendas, parques, etc. (lógica similar)
+function crearMarcadoresFarmacias() { /* ... */ }
+function crearMarcadoresTiendas() { /* ... */ }
+function crearMarcadoresParques() { /* ... */ }
+function crearMarcadoresAtracciones() { /* ... */ }
+function crearMarcadoresMuseos() { /* ... */ }
+function crearMarcadoresTransporte() { /* ... */ }
 
 // =======================
-// 3) Construir Tarjeta Grande
+// Panel lateral (side panel) e InfoWindow
 // =======================
-function getSidePanelHTML(hotel, rating) {
-  // rating: { media_puntuacion, numero_comentarios }
+function getSidePanelHTML(item, rating) {
+  // Muestra información detallada en el panel lateral
   let ratingText = "⭐ 0.0 (0 opiniones)";
   if (rating) {
-    ratingText = `⭐ ${rating.media_puntuacion.toFixed(1)}
-      (${rating.numero_comentarios} opiniones)`;
+    ratingText = `⭐ ${rating.media_puntuacion.toFixed(1)} (${rating.numero_comentarios} opiniones)`;
   }
 
-  // IMPORTANTE: Aquí reemplazamos \\n por <br>
-  const descConSaltos = (hotel.descripcion || "").replace(/\\n/g, "<br>");
-
-  // Listas dinámicas
-  const servicesList = hotel.servicios?.map(s => `<li>${s}</li>`).join("") || "";
-  const attractionsList = hotel.atraccionesCercanas?.map(a => `<li>${a}</li>`).join("") || "";
-  const restaurantsList = hotel.restaurantesCercanos?.map(r => `<li>${r}</li>`).join("") || "";
-  const eventsList = hotel.eventosProximos?.map(e => `<li>${e}</li>`).join("") || "";
-  const detailsURL = `/hoteles/${hotel._id}`;
+  const descConSaltos = (item.descripcion || "").replace(/\\n/g, "<br>");
+  const servicesList = item.servicios?.map(s => `<li>${s}</li>`).join("") || "";
+  const detailsURL = `/hoteles/${item._id}`; // Por si quieres un link a detalles
 
   return `
     <div class="dropdown-container">
       <div class="hotel-card">
-        <img src="/static/Images/Hoteles/${hotel.imagen || "default.jpg"}"
-             alt="${hotel.nombre}" class="hotel-image">
+        <img src="/static/Images/Hoteles/${item.imagen || "default.jpg"}" 
+             alt="${item.nombre}" 
+             class="hotel-image">
         <div class="hotel-info">
-          <h2>${hotel.nombre}</h2>
+          <h2>${item.nombre}</h2>
           <p class="rating">${ratingText}</p>
           <p class="description">${descConSaltos}</p>
           <p><strong>Servicios</strong></p>
-          <ul class="services">
-            ${servicesList}
-          </ul>
-          <p class="price">Desde <strong>$${hotel.precio || 0}</strong> por noche</p>
+          <ul class="services">${servicesList}</ul>
+          <p class="price">Desde <strong>$${item.precio || 0}</strong> por noche</p>
           <div class="buttons">
             <a href="#" class="btn reserve">Reservar Ahora</a>
             <a href="${detailsURL}" class="btn details">Ver Más Detalles</a>
@@ -171,36 +282,16 @@ function getSidePanelHTML(hotel, rating) {
           </div>
         </div>
       </div>
-      <div class="nearby-info">
-        <h3>🏞 Atracciones Cercanas</h3>
-        <ul>
-          ${attractionsList}
-        </ul>
-        <h3>🍽 Restaurantes Recomendados</h3>
-        <ul>
-          ${restaurantsList}
-        </ul>
-        <h3>🎉 Eventos Próximos</h3>
-        <ul>
-          ${eventsList}
-        </ul>
-      </div>
     </div>
   `;
 }
 
-
-// =======================
-// 4) Lógica del Panel Lateral e InfoWindow
-// =======================
 function openMarkerInfo(marker, infoWindow, panelContent) {
   closeAll();
-
   const sidebar = document.getElementById("sidebar");
   sidebar.classList.remove("left", "right");
 
-  // Decide si el panel se abre a la izquierda o a la derecha
-  const referenceLng = 13.66395; // "Aruba Luxury Lodge"
+  const referenceLng = 13.66395; // Para decidir el lado del panel
   const markerLng = marker.getPosition().lng();
   if (markerLng < referenceLng) {
     sidebar.classList.add("right");
@@ -210,7 +301,6 @@ function openMarkerInfo(marker, infoWindow, panelContent) {
 
   infoWindow.open(map, marker);
   currentInfoWindow = infoWindow;
-
   document.getElementById("infoSection").innerHTML = panelContent;
   showSidebar();
 
@@ -224,6 +314,11 @@ function closeAll() {
   if (currentInfoWindow) {
     currentInfoWindow.close();
     currentInfoWindow = null;
+  }
+  // Si hay una ruta dibujada, la quitamos
+  if (currentRoutePolyline) {
+    currentRoutePolyline.setMap(null);
+    currentRoutePolyline = null;
   }
 }
 
@@ -251,95 +346,123 @@ function toggleSidebar() {
 }
 
 // =======================
-// 5) Botón "Hoteles" (lista en panel lateral)
+// Botones del menú: "Hoteles", "Rutas", "Sitios", etc.
 // =======================
 function mostrarHoteles() {
-  // Creamos el listado de hoteles
+  closeAll();
   let content = '<h3>Listado de Hoteles</h3><ul>';
   hotels.forEach((hotel, index) => {
     content += `<li class="hotel-item" data-index="${index}" style="cursor:pointer;">${hotel.nombre}</li>`;
   });
   content += '</ul>';
-
-  // Insertamos el listado en el contenedor infoSection
   document.getElementById("infoSection").innerHTML = content;
-  
-  // Agregamos el listener para cada item de la lista
+  showSidebar();
+
   document.querySelectorAll('.hotel-item').forEach(item => {
     item.addEventListener('click', function() {
       const index = this.getAttribute('data-index');
       const hotel = hotels[index];
-
       if (hotel && hotel.marker) {
-        // Disparamos el evento click en el marcador del hotel (simula el clic del usuario en el mapa)
         google.maps.event.trigger(hotel.marker, 'click');
       }
+    });
+  });
+}
 
-      // === NUEVO: Mostramos la información del hotel en el panel lateral ===
-      if (hotel) {
-        // Reemplazamos los "\n" por <br> para que se vean como saltos de línea en HTML
-        const descripcionConSaltos = hotel.descripcion.replace(/\\n/g, '<br>');
+function mostrarSitios() {
+  closeAll();
+  document.getElementById("infoSection").innerHTML = "<h3>Sitios de Interés</h3><p>Próximamente...</p>";
+  showSidebar();
+}
 
-        // Creamos el HTML que queremos mostrar
-        let infoHotelHTML = `
-          <h3>${hotel.nombre}</h3>
-          <p>${descripcionConSaltos}</p>
-          <p><strong>Precio:</strong> ${hotel.precio} €</p>
-          <h4>Servicios</h4>
-          <ul>
-            ${hotel.servicios.map(servicio => `<li>${servicio}</li>`).join('')}
-          </ul>
+// =======================
+// Mostrar listado de Rutas y dibujar la seleccionada
+// (versión “al estilo Node”: llamamos a /get-route, decodificamos polyline)
+// =======================
+function mostrarRutas() {
+  closeAll();
+  let content = '<h3>Rutas Turísticas</h3><ul>';
+  routes.forEach((route, index) => {
+    // Quitar la parte " - 6.1" si existe
+    const formattedName = route.ruta_nombre.replace(/ - \d+(\.\d+)?$/, '');
+    content += `<li class="route-item" data-index="${index}" style="cursor:pointer;">${formattedName}</li>`;
+  });
+  content += '</ul>';
+
+  document.getElementById("infoSection").innerHTML = content;
+  showSidebar();
+
+  // Evento click en cada ruta
+  document.querySelectorAll('.route-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const index = this.getAttribute('data-index');
+      const route = routes[index];
+      if (route) {
+        // Llamar a /get-route en Flask y dibujar la polyline
+        dibujarRuta(route);
+
+        // Mostrar info de la ruta en el panel
+        let infoRouteHTML = `
+          <h3>${route.ruta_nombre}</h3>
+          <p><strong>Tipo de ruta:</strong> ${route.tipo_ruta}</p>
+          <p><strong>Longitud:</strong> ${route.longitud_km} Km</p>
+          <p><strong>Duración:</strong> ${route.duracion_hr} horas</p>
+          <p><strong>Popularidad:</strong> ${route.popularidad}</p>
         `;
-
-        // Mostramos la información en el mismo contenedor (o en otro, si lo prefieres)
-        document.getElementById("infoSection").innerHTML = infoHotelHTML;
+        document.getElementById("infoSection").innerHTML = infoRouteHTML;
       }
     });
   });
 }
 
 // =======================
-// 6) Rutas y Sitios (opcional)
+// Función para dibujar la ruta en el mapa con la “Routes API v2” vía Flask
+// (al estilo Node: pedimos la polyline a /get-route, luego decodificamos)
 // =======================
-function mostrarRutas() {
-  // Lógica para mostrar rutas en el panel, si procede
-  document.getElementById("infoSection").innerHTML = "<h3>Rutas Turísticas</h3><p>Próximamente...</p>";
-  showSidebar();
-}
-
-function mostrarSitios() {
-  // Lógica para mostrar sitios en el panel, si procede
-  document.getElementById("infoSection").innerHTML = "<h3>Sitios de Interés</h3><p>Próximamente...</p>";
-  showSidebar();
-}
-
-// =======================
-// 7) Chatbot (opcional)
-// =======================
-function sendMessage() {
-  const userMessage = document.getElementById("user-input")?.value;
-  if (!userMessage) {
-    alert("Por favor escribe un mensaje");
-    return;
+async function dibujarRuta(route) {
+  // Quitar la polilínea anterior si existe
+  if (currentRoutePolyline) {
+    currentRoutePolyline.setMap(null);
   }
 
-  fetch("/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: userMessage }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.response) {
-        document.getElementById("chat-response").innerHTML =
-          `<p><strong>IA:</strong> ${data.response}</p>`;
-      } else {
-        document.getElementById("chat-response").innerHTML =
-          `<p><strong>Error:</strong> ${data.error}</p>`;
-      }
-    })
-    .catch(error => console.error("Error:", error));
-}
+  // Construir el objeto origin/destination
+  const origin = { latitude: route.origen[0], longitude: route.origen[1] };
+  const destination = { latitude: route.destino[0], longitude: route.destino[1] };
 
-// Inicializa el mapa al cargar la ventana
-window.onload = initMap;
+  try {
+    // 1) Llamar a nuestro backend Flask
+    const resp = await fetch("/get-route", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ origin, destination }),
+    });
+    const data = await resp.json();
+
+    // 2) Verificar que haya una ruta
+    if (!data.routes || !data.routes[0]) {
+      console.error("No se encontró una ruta válida en la respuesta:", data);
+      return;
+    }
+
+    // 3) Decodificar la polyline
+    const encoded = data.routes[0].polyline.encodedPolyline;
+    const path = google.maps.geometry.encoding.decodePath(encoded);
+
+    // 4) Dibujar la polyline en el mapa
+    currentRoutePolyline = new google.maps.Polyline({
+      path,
+      geodesic: true,
+      strokeColor: "#FF0000",
+      strokeOpacity: 1.0,
+      strokeWeight: 4,
+      map: map,
+    });
+
+    // 5) Centrar el mapa en el primer punto (opcional)
+    if (path.length > 0) {
+      map.setCenter(path[0]);
+    }
+  } catch (error) {
+    console.error("Error llamando a /get-route:", error);
+  }
+}
