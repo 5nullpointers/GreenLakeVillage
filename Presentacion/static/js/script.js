@@ -496,3 +496,15 @@ document.addEventListener('click', function(e) {
     assistant.classList.remove('open');
   }
 });
+
+const profileImg = document.querySelector('.profile-img');
+const dropdown = document.getElementById('userDropdown');
+
+profileImg.addEventListener('click', function (event) {
+    dropdown.classList.toggle('open');
+    event.stopPropagation();
+});
+
+document.addEventListener('click', function () {
+    dropdown.classList.remove('open');
+});

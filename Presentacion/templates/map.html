@@ -22,6 +22,16 @@
   <!-- Tu barra de navegación, overlay de carga, panel lateral, etc. -->
   <nav>
     <div class="nav-logo">Green Lake</div>
+    <div class="user-profile">
+      <!-- Se ha eliminado el span del nombre -->
+      <img src="/static/Images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
+      <div class="user-dropdown" id="userDropdown">
+        <ul>
+          <li><a href="#">Configuración</a></li>
+          <li><a href="/">Cerrar sesión</a></li>
+        </ul>
+      </div>
+    </div>
     <ul>
       <li><a onclick="mostrarHoteles()">Hoteles</a></li>
       <li><a onclick="mostrarRutas()">Rutas</a></li>
@@ -54,25 +64,7 @@
 </div>
 
 
-<!-- Asistente Virtual -->
-<div id="assistant">
-  <div class="assistant-header">
-    <img src="/static/Images/robot.png" alt="Asistente Robot">
-  </div>
-  <div id="assistant-chat">
-    <!-- Aquí se mostrarán los mensajes -->
-  </div>
-  <div class="assistant-input-container">
-    <input type="text" id="assistant-input" placeholder="Haz una pregunta...">
-    <button id="assistant-send">Enviar</button>
-  </div>
-</div>
-
-
-
-  <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&map_ids=TU_MAP_ID"></script>
-
-  <!-- Carga JS principal -->
+  <!-- Carga tu script principal con la lógica del mapa -->
   <script src="/static/js/script.js"></script>
 </body>
 </html>
