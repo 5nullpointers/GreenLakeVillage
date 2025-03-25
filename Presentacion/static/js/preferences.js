@@ -16,7 +16,10 @@ document.addEventListener("DOMContentLoaded", function() {
     // Función para mostrar la preferencia
     function showPreference(index) {
         if (index < preferences.length) {
-            preferences[index].classList.add('slide-in');
+            preferences[index].style.display = 'flex'; // Asegúrate de que la preferencia esté visible
+            setTimeout(() => {
+                preferences[index].classList.add('visible'); // Aplica la clase visible para animación
+            }, 10); // Retardo pequeño para aplicar la animación correctamente
         } else {
             // Mostrar resumen de preferencias
             selectedPreferencesSection.style.display = "block";
@@ -27,8 +30,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // Función para manejar las respuestas
     function handleResponse(answer, preference) {
         const currentPreference = preferences[currentPreferenceIndex];
-        currentPreference.classList.add('slide-out');
-        
+        currentPreference.classList.remove('visible'); // Eliminar la clase de visibilidad antes de pasar a la siguiente
+
         // Solo agregar la preferencia si el usuario dijo "Sí"
         if (answer) {
             selectedPreferences.push(preference);  // Almacenar solo las preferencias "Sí"
@@ -39,14 +42,16 @@ document.addEventListener("DOMContentLoaded", function() {
             currentPreference.style.display = 'none'; // Ocultar la preferencia actual
             currentPreferenceIndex++;
             if (currentPreferenceIndex < preferences.length) {
-                preferences[currentPreferenceIndex].style.display = 'block';
-                preferences[currentPreferenceIndex].classList.add('slide-in');
+                preferences[currentPreferenceIndex].style.display = 'flex'; // Mostrar la siguiente preferencia
+                setTimeout(() => {
+                    preferences[currentPreferenceIndex].classList.add('visible'); // Agregar la clase visible para la animación
+                }, 10); // Retardo pequeño para aplicar la animación correctamente
             } else {
                 // Mostrar el resumen si ya no hay más preferencias
                 selectedPreferencesSection.style.display = "block";
                 preferencesList.innerHTML = selectedPreferences.map(preference => `<li>${preference}</li>`).join('');
             }
-        }, 1000); // Tiempo de la animación de deslizamiento
+        }, 600); // Tiempo de la animación de deslizamiento
     }
 
     // Añadir los eventos para los botones "Sí" y "No"
