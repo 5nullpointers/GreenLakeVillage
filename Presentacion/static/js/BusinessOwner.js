@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const nuevasImagenes = [
         "/static/images/inicioBlanco.png",
         "/static/images/PropiedadesBlanco.png",
-        "/static/images/ForoBlanco.png",
         "/static/images/ReseñasBlanco.png"
     ];
 
