@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Array con las rutas de las imágenes en versión blanca
     const nuevasImagenes = [
         "/static/images/inicioBlanco.png",
-        "/static/images/profileBlanco.png",
+        "/static/images/PropiedadesBlanco.png",
         "/static/images/ForoBlanco.png",
         "/static/images/ReseñasBlanco.png"
     ];
