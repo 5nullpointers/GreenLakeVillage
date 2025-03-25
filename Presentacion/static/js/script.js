@@ -436,6 +436,16 @@ document.getElementById('assistant-send').addEventListener('click', async () => 
   if (!message) return;
   appendMessage('user', message);
   input.value = '';
+
+  // Agregar indicador de carga (tres puntos animados)
+  const loadingMessage = document.createElement('div');
+  loadingMessage.className = 'message assistant loading';
+  // Creamos tres spans para los puntos
+  loadingMessage.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+  const chatContainer = document.getElementById('assistant-chat');
+  chatContainer.appendChild(loadingMessage);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+
   try {
     const response = await fetch('/chat', {
       method: 'POST',
@@ -443,25 +453,32 @@ document.getElementById('assistant-send').addEventListener('click', async () => 
       body: JSON.stringify({ message })
     });
     const data = await response.json();
+    // Eliminar el indicador de carga
+    loadingMessage.remove();
     if (data.response) {
       appendMessage('assistant', data.response);
     } else {
       appendMessage('assistant', 'Lo siento, no pude obtener una respuesta.');
     }
   } catch (error) {
+    loadingMessage.remove();
     appendMessage('assistant', 'Error al conectar con el asistente.');
     console.error(error);
   }
 });
 
+
 function appendMessage(sender, text) {
   const chatContainer = document.getElementById('assistant-chat');
   const messageElem = document.createElement('div');
   messageElem.className = 'message ' + sender;
-  messageElem.textContent = text;
+  // Convertir markdown a HTML
+  messageElem.innerHTML = marked.parse(text);
   chatContainer.appendChild(messageElem);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
+
+
 
 // =======================
 // Asistente Virtual: Mostrar/Ocultar desplegable
