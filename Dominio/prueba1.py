@@ -513,6 +513,7 @@ def api_ratings():
 
 from bson import ObjectId
 from flask import render_template, abort
+from Entidades.asistenteIA import obtener_respuesta
 
 @app.route('/hoteles/<string:hotel_id>')
 def hotel_detalle(hotel_id):
@@ -546,6 +547,21 @@ def format_number(value):
             return f"{value:,.0f}".replace(",", ".")
     except Exception:
         return value
+
+# Asistente con IA
+@app.route('/chat')
+def chat_page():
+
+    user_message = request.json.get("message")
+
+    if not user_message:
+        return jsonify({"error": "Mensaje vacío"}), 400
+
+    try:
+        response = obtener_respuesta(user_message)
+        return jsonify({"response": response})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/estadisticas_ocupacion')
 def api_estadisticas_ocupacion():

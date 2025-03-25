@@ -3,7 +3,7 @@
    Estilo turístico con animaciones
 ------------------------------ */
 
-/* Reinicios / configuraciones básicas */
+/* Reinicios y configuraciones básicas */
 * {
   margin: 0;
   padding: 0;
@@ -18,7 +18,7 @@ body {
 }
 
 body {
-  overflow: hidden; /* Evita scrolls en la página */
+  overflow: hidden;
 }
 
 /* Barra de navegación superior */
@@ -84,9 +84,7 @@ nav a:hover {
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 /* Mapa a pantalla completa debajo del nav */
@@ -98,17 +96,16 @@ nav a:hover {
 /* Panel lateral base */
 #sidebar {
   position: absolute;
-  top: 60px; /* Debajo del nav */
+  top: 60px;
   width: 400px;
   height: calc(100vh - 60px);
   background-color: #fff;
   padding: 1.5rem;
   transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
   opacity: 0;
-  overflow-y: auto;  
+  overflow-y: auto;
 }
 
-/* Panel lateral para posición derecha */
 #sidebar.right {
   right: 0;
   left: auto;
@@ -122,7 +119,6 @@ nav a:hover {
   opacity: 1;
 }
 
-/* Panel lateral para posición izquierda */
 #sidebar.left {
   left: 0;
   right: auto;
@@ -177,12 +173,8 @@ nav a:hover {
 
 /* Responsivo */
 @media (max-width: 768px) {
-  nav {
-    height: 50px;
-  }
-  #map {
-    height: calc(100vh - 50px);
-  }
+  nav { height: 50px; }
+  #map { height: calc(100vh - 50px); }
   #sidebar {
     top: 50px;
     height: calc(100vh - 50px);
@@ -197,14 +189,14 @@ nav a:hover {
   }
 }
 
-/* Tarjeta desplegable mejorada para el panel lateral */
+/* Tarjeta desplegable para el panel lateral */
 .dropdown-container {
   width: 100%;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  font-family: inherit; /* Usa la fuente principal definida en el sitio */
+  font-family: inherit;
   transition: box-shadow 0.3s ease;
 }
 
@@ -212,7 +204,6 @@ nav a:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Estilos para las tarjetas de hotel dentro del desplegable */
 .hotel-card {
   display: flex;
   flex-direction: column;
@@ -231,7 +222,6 @@ nav a:hover {
   object-fit: cover;
 }
 
-/* Información del hotel */
 .hotel-info h2 {
   margin: 15px 0 10px;
   font-size: 20px;
@@ -250,7 +240,6 @@ nav a:hover {
   color: #555;
 }
 
-/* Lista de servicios */
 .services {
   list-style: none;
   padding: 0;
@@ -262,7 +251,6 @@ nav a:hover {
   margin-bottom: 5px;
 }
 
-/* Precio destacado */
 .price {
   font-size: 18px;
   font-weight: bold;
@@ -270,7 +258,6 @@ nav a:hover {
   color: #000;
 }
 
-/* Botones de acción */
 .buttons {
   display: flex;
   flex-direction: row;
@@ -293,32 +280,120 @@ nav a:hover {
   transform: scale(1.03);
 }
 
-.reserve {
-  background: #4CAF50;
+.reserve { background: #4CAF50; }
+.details { background: #2196F3; }
+.map { background: #FF9800; }
+
+.nearby-info { margin-top: 20px; }
+.nearby-info h3 { font-size: 18px; margin-bottom: 10px; color: #333; }
+.nearby-info ul { list-style: none; padding: 0; font-size: 14px; color: #555; }
+
+/* -------------------------------
+   Estilos del Asistente Virtual
+-------------------------------- */
+
+/* Contenedor principal del asistente (estado cerrado: solo icono) */
+#assistant {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+  z-index: 10000;
+  transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.details {
-  background: #2196F3;
+/* Estado abierto: se expande para mostrar el chat y el input */
+#assistant.open {
+  width: 300px;
+  height: auto;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.map {
-  background: #FF9800;
+/* Ocultar chat e input cuando el asistente no está abierto */
+#assistant:not(.open) #assistant-chat,
+#assistant:not(.open) .assistant-input-container {
+  display: none;
 }
 
-/* Sección de información cercana */
-.nearby-info {
-  margin-top: 20px;
-}
-
-.nearby-info h3 {
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.nearby-info ul {
-  list-style: none;
+/* Estilos del header (icono del asistente) */
+.assistant-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
-  font-size: 14px;
-  color: #555;
+  height: 50px;
+  width: 50px;
+}
+
+#assistant.open .assistant-header {
+  width: 100%;
+  height: auto;
+  padding: 10px;
+  justify-content: flex-start;
+}
+
+/* Imagen del logo */
+.assistant-header img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+/* Contenedor de mensajes */
+#assistant-chat {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+  background: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Área de entrada */
+.assistant-input-container {
+  display: flex;
+  border-top: 1px solid #ddd;
+}
+
+#assistant-input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  outline: none;
+}
+
+#assistant-send {
+  background-color: #009688;
+  border: none;
+  color: #fff;
+  padding: 10px;
+  cursor: pointer;
+}
+
+/* Estilos para los mensajes del chat */
+.message {
+  padding: 5px 8px;
+  border-radius: 5px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.message.user {
+  background-color: #e0f7fa;
+  align-self: flex-end;
+}
+
+.message.assistant {
+  background-color: #f1f8e9;
+  align-self: flex-start;
 }
