@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 @dataclass
 class User:
@@ -6,6 +7,7 @@ class User:
     name: str
     email: str
     password: str
+    preferencias: List[str]
 
     def register(self) -> None:
         """Simula el registro de un usuario"""

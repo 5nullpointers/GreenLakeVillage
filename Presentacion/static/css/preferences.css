@@ -1,0 +1,70 @@
+/* Contenedor principal */
+.container {
+    width: 80%;
+    margin: 50px auto;
+    text-align: center;
+}
+
+/* Estilo de cada preferencia */
+.preference {
+    display: none;
+    opacity: 0;
+    transition: all 1s ease;
+}
+
+.preference img {
+    width: 80%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+/* Botones de respuesta */
+.options {
+    margin: 20px;
+}
+
+.options .btn {
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #009688;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.options .btn:hover {
+    background-color: #00796b;
+}
+
+/* Estilo para la sección de preferencias seleccionadas */
+.selected-preferences {
+    margin-top: 30px;
+}
+
+.selected-preferences ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.selected-preferences li {
+    margin: 10px 0;
+}
+
+/* Estilo para el mensaje final */
+.final-message {
+    font-size: 20px;
+    margin-top: 50px;
+}
+
+/* Transiciones para deslizamiento y fundido */
+.preference.slide-in {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.preference.slide-out {
+    opacity: 0;
+    transform: translateX(-100%);
+}
