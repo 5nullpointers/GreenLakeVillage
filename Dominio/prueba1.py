@@ -579,20 +579,24 @@ def format_number(value):
     except Exception:
         return value
 
-# Asistente con IA
-@app.route('/chat')
+@app.route('/chat', methods=['POST'])
 def chat_page():
+    # Obtener el usuario (correo) de la sesión
+    user_email = session.get("user_id")
+    if not user_email:
+        return jsonify({"error": "Usuario no autenticado"}), 401
 
     user_message = request.json.get("message")
-
     if not user_message:
         return jsonify({"error": "Mensaje vacío"}), 400
 
     try:
-        response = obtener_respuesta(user_message)
+        # Llama a la función que construye el prompt usando los datos del usuario (de la BBDD)
+        response = obtener_respuesta(user_email, user_message)
         return jsonify({"response": response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/api/estadisticas_ocupacion')
 def api_estadisticas_ocupacion():
