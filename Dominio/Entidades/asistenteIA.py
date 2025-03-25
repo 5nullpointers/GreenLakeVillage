@@ -5,6 +5,7 @@ from openai import OpenAI
 openai_api_key = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=openai_api_key)
 
+
 def obtener_respuesta(pregunta):
     prompt = f"Eres un experto en el capitales'. Responde de forma corta y precisa a la siguiente pregunta: {pregunta}"
     completion = client.chat.completions.create(
@@ -16,5 +17,3 @@ def obtener_respuesta(pregunta):
     )
 
     return completion.choices[0].message.content.strip()
-
-print(obtener_respuesta("¿Cuál es la capital de Francia?"))
