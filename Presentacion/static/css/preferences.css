@@ -1,70 +1,156 @@
-/* Contenedor principal */
-.container {
-    width: 80%;
-    margin: 50px auto;
-    text-align: center;
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Estilo de cada preferencia */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #4d9e98;
+    color: #333;
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    margin: 100px; /* Adjusted margin to move the card up */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #007c73;
+}
+
+/* Preference Container */
+#preference-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .preference {
     display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     opacity: 0;
-    transition: all 1s ease;
+    transition: opacity 0.6s ease-in-out;
+}
+
+.preference.visible {
+    display: flex;
+    opacity: 1;
 }
 
 .preference img {
-    width: 80%;
+    width: 100%;
+    max-width: 2000px;
     height: auto;
     margin-bottom: 20px;
+    border-radius: 8px;
 }
 
-/* Botones de respuesta */
-.options {
-    margin: 20px;
+.preference p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #333;
 }
 
-.options .btn {
+/* Button Styles */
+.btn {
     padding: 10px 20px;
-    margin: 10px;
-    background-color: #009688;
-    color: white;
+    font-size: 1rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.3s ease;
 }
 
-.options .btn:hover {
-    background-color: #00796b;
+.yes {
+    background-color: #009688;
+    color: white;
 }
 
-/* Estilo para la sección de preferencias seleccionadas */
+.yes:hover {
+    background-color: #007c73;
+}
+
+.no {
+    background-color: #f44336;
+    color: white;
+}
+
+.no:hover {
+    background-color: #d32f2f;
+}
+
+/* Selected Preferences */
 .selected-preferences {
-    margin-top: 30px;
+    display: none;
+    margin-top: 20px;
 }
 
-.selected-preferences ul {
+.selected-preferences h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #007c73;
+}
+
+#preferences-list {
     list-style-type: none;
     padding-left: 0;
 }
 
-.selected-preferences li {
-    margin: 10px 0;
+#preferences-list li {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #333;
 }
 
-/* Estilo para el mensaje final */
-.final-message {
-    font-size: 20px;
-    margin-top: 50px;
+#cancel, #save-preferences {
+    background-color: #009688;
+    color: white;
+    margin-top: 10px;
 }
 
-/* Transiciones para deslizamiento y fundido */
-.preference.slide-in {
-    display: block;
-    opacity: 1;
-    transform: translateX(0);
+#cancel:hover, #save-preferences:hover {
+    background-color: #007c73;
 }
 
-.preference.slide-out {
-    opacity: 0;
-    transform: translateX(-100%);
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .preference img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+    }
 }
