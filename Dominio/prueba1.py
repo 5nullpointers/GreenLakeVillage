@@ -310,7 +310,6 @@ def login():
         flash("Usuario no encontrado.")
         return redirect(url_for('login_page'))
 
-# Ruta de registro: procesar formulario de registro
 @app.route('/register', methods=['POST'])
 def register():
     name = request.form.get('name')
@@ -334,13 +333,79 @@ def register():
         "email": email,
         "pass": hashed_password,
         "type": "Tourist",  # o asignar otro tipo según corresponda
-        "blocked": blocked
+        "blocked": blocked,
+        "preferencias": []  # Añadimos un campo para las preferencias, vacío por ahora.
     }
 
+    # Insertar usuario en la base de datos
     UserDAO.insertar_dato(nuevo_usuario)
-    flash("Registro exitoso. Ahora puedes iniciar sesión.")
-    return redirect(url_for('login_page'))
+    flash("Registro exitoso. Ahora elige tus preferencias.")
 
+    # Almacenar la información del usuario en la sesión
+    session['user_id'] = email  # Almacenar el correo electrónico del usuario en la sesión
+    session['user_name'] = name  # Almacenar el nombre del usuario en la sesión
+
+    # Redirigir a la página de preferencias después de registrarse
+    return redirect(url_for('preferences', user_email=email))
+
+@app.route('/preferences', methods=['GET', 'POST'])
+def preferences():
+    # Obtener el correo del usuario desde la URL
+    user_email = request.args.get('user_email')
+    usuario = UserDAO.obtener_dato({"email": user_email})
+
+    if request.method == 'POST':
+        # Recibir las preferencias seleccionadas desde el formulario
+        preferences = request.form.getlist('preferences')
+
+        # Actualizar las preferencias del usuario en la base de datos
+        UserDAO.actualizar_dato(
+            {"email": user_email},
+            {"preferencias": preferences}
+        )
+
+        flash("Tus preferencias se han guardado correctamente.")
+        return redirect(url_for('map'))  # Redirigir al mapa u otra página
+
+    return render_template('Preferences.html', user=usuario)
+
+
+@app.route('/save-preferences', methods=['POST'])
+def save_preferences():
+    data = request.json
+    # Obtener el correo electrónico del usuario desde la sesión
+    user_email = session.get('user_id')
+    preferences = data.get('preferencias')
+
+    if not user_email or not preferences:
+        return jsonify({"error": "Email o preferencias no proporcionadas"}), 400
+
+    print(f"Correo: {user_email}, Preferencias: {preferences}")  # Verificar los datos recibidos
+
+    try:
+        # Buscar al usuario en la base de datos utilizando el correo electrónico
+        user = UserDAO.obtener_dato({"email": user_email})
+
+        # Verificar si el usuario fue encontrado
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 400
+
+        # Si el usuario existe, actualizar sus preferencias
+        result = UserDAO.actualizar_dato(
+            {"email": user_email},
+            {"preferencias": preferences}
+        )
+
+        print(f"Resultado de la actualización: {result.modified_count} documentos modificados")
+
+        if result.modified_count > 0:
+            # Redirigir al usuario a la página de mapa
+            return jsonify({"success": True, "redirect": url_for('map')})
+        else:
+            return jsonify({"error": "No se pudo actualizar las preferencias"}), 500
+    except Exception as e:
+        print(f"Error al guardar preferencias: {str(e)}")  # Agregar información detallada del error
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/contacto')
 def contacto():

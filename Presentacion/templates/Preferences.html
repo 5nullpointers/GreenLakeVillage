@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preferencias - GreenLake Village</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/preferences.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Selecciona tus preferencias</h1>
+
+        <!-- Contenedor para las preferencias -->
+        <div id="preference-container">
+            <!-- Preferencia de montaña -->
+            <div class="preference" id="montana">
+                <img src="https://example.com/mountain-image.jpg" alt="Montaña">
+                <p>¿Quieres hacer senderismo por montañas?</p>
+                <div class="options">
+                    <button class="btn yes">Sí</button>
+                    <button class="btn no">No</button>
+                </div>
+            </div>
+
+            <!-- Preferencia de playa -->
+            <div class="preference" id="playa" style="display:none;">
+                <img src="https://example.com/beach-image.jpg" alt="Playa">
+                <p>¿Te gustaría pasar tiempo en la playa?</p>
+                <div class="options">
+                    <button class="btn yes">Sí</button>
+                    <button class="btn no">No</button>
+                </div>
+            </div>
+
+            <!-- Preferencia de lagos -->
+            <div class="preference" id="lagos" style="display:none;">
+                <img src="https://example.com/lake-image.jpg" alt="Lagos">
+                <p>¿Te gustan los lagos?</p>
+                <div class="options">
+                    <button class="btn yes">Sí</button>
+                    <button class="btn no">No</button>
+                </div>
+            </div>
+
+            <!-- Sección para ver preferencias seleccionadas -->
+            <div class="selected-preferences" style="display:none;">
+                <h2>Resumen de tus preferencias:</h2>
+                <ul id="preferences-list"></ul>
+                <button class="btn" id="cancel">Cancelar</button>
+                <button class="btn" id="save-preferences">Guardar Preferencias</button>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/preferences.js') }}"></script>
+</body>
+</html>
