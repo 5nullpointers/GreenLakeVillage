@@ -16,7 +16,7 @@ let ratingsInfo = {};
 let currentRoutePolyline = null;
 
 // =======================
-// 1) Se llama automáticamente cuando la API de Google Maps termina de cargar
+// 1) Inicializar el mapa cuando la API de Google Maps termine de cargar
 // =======================
 function initMap() {
   const centerCoords = { lat: 47.5626, lng: 13.6493 };
@@ -29,7 +29,7 @@ function initMap() {
     east: 13.72
   };
 
-  // Crear el mapa con estilo satélite y sin labels/roads
+  // Crear el mapa con estilo satélite sin labels/roads
   map = new google.maps.Map(document.getElementById("map"), {
     center: centerCoords,
     zoom: 16,
@@ -61,13 +61,11 @@ function initMap() {
   });
 
   // =======================
-  // 1. Cargar rutas de la API (para mostrarlas en el panel)
+  // 1. Cargar rutas para el panel
   // =======================
   fetch('/api/rutas')
     .then(response => response.json())
-    .then(data => {
-      routes = data; // Guardamos en variable global
-    })
+    .then(data => { routes = data; })
     .catch(error => console.error("Error al cargar rutas:", error));
 
   // 2. Cargar hoteles y sus ratings
@@ -80,7 +78,7 @@ function initMap() {
     .then(response => response.json())
     .then(ratingsData => {
       ratingsInfo = ratingsData;
-      crearMarcadores(); // Marcadores de hoteles
+      crearMarcadores();
     })
     .catch(error => console.error("Error al cargar hoteles:", error));
 
@@ -94,7 +92,7 @@ function initMap() {
     .then(response => response.json())
     .then(ratingsData => {
       ratingsInfo = ratingsData;
-      crearMarcadoresHoteles(); // Marcadores de restaurantes (el nombre "Hoteles" es herencia)
+      crearMarcadoresHoteles();
     })
     .catch(error => console.error("Error al cargar restaurantes:", error));
 
@@ -154,16 +152,14 @@ function initMap() {
 }
 
 function cambiarImagenFallback(img, imagenNombre) {
-  // Intentar cargar desde la carpeta "Restaurantes"
   img.onerror = function() {
-      // Si tampoco está en "Restaurantes", usar la imagen por defecto de Hoteles
-      img.src = "/static/Images/Hoteles/default.jpg";
+    img.src = "/static/Images/Hoteles/default.jpg";
   };
   img.src = "/static/Images/Restaurantes/" + imagenNombre;
 }
 
 // =======================
-// 2) Crear Marcadores (hoteles, restaurantes, etc.)
+// Crear Marcadores para hoteles, restaurantes, etc.
 // =======================
 function crearMarcadores() {
   hotels.forEach(hotel => {
@@ -171,10 +167,7 @@ function crearMarcadores() {
       position: { lat: hotel.lat, lng: hotel.lng },
       map: map,
       title: hotel.nombre,
-      icon: {
-        url: "/static/Images/hotel.png",
-        scaledSize: new google.maps.Size(80, 80)
-      }
+      icon: { url: "/static/Images/hotel.png", scaledSize: new google.maps.Size(80, 80) }
     });
 
     hotel.marker = marker;
@@ -183,13 +176,11 @@ function crearMarcadores() {
     marker.addListener("click", () => {
       marker.setAnimation(google.maps.Animation.BOUNCE);
       setTimeout(() => marker.setAnimation(null), 1500);
-
       const ratingData = ratingsInfo[hotel.nombre] || null;
       let ratingContent = "<p>Sin opiniones</p>";
       if (ratingData) {
         ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)} (${ratingData.numero_comentarios} opiniones)</p>`;
       }
-
       infoWindow.setContent(`
         <div style="min-width:250px">
           <img src="/static/Images/Hoteles/${hotel.imagen || "default.jpg"}" 
@@ -201,7 +192,6 @@ function crearMarcadores() {
         </div>
       `);
       infoWindow.open(map, marker);
-
       const sidePanelHTML = getSidePanelHTML(hotel, ratingData);
       openMarkerInfo(marker, infoWindow, sidePanelHTML);
     });
@@ -209,16 +199,12 @@ function crearMarcadores() {
 }
 
 function crearMarcadoresHoteles() {
-  // A pesar del nombre, esto crea marcadores de "restaurants"
   restaurants.forEach(restaurant => {
     const marker = new google.maps.Marker({
       position: { lat: restaurant.lat, lng: restaurant.lng },
       map: map,
       title: restaurant.nombre,
-      icon: {
-        url: "/static/Images/restaurante.png",
-        scaledSize: new google.maps.Size(80, 80)
-      }
+      icon: { url: "/static/Images/restaurante.png", scaledSize: new google.maps.Size(80, 80) }
     });
     restaurant.marker = marker;
     const infoWindow = new google.maps.InfoWindow();
@@ -226,13 +212,11 @@ function crearMarcadoresHoteles() {
     marker.addListener("click", () => {
       marker.setAnimation(google.maps.Animation.BOUNCE);
       setTimeout(() => marker.setAnimation(null), 1500);
-
       const ratingData = ratingsInfo[restaurant.nombre] || null;
       let ratingContent = "<p>Sin opiniones</p>";
       if (ratingData) {
         ratingContent = `<p>⭐ ${ratingData.media_puntuacion.toFixed(1)} (${ratingData.numero_comentarios} opiniones)</p>`;
       }
-
       infoWindow.setContent(`
         <div style="min-width:250px">
           <img src="/static/Images/Restaurantes/${restaurant.imagen || "default.jpg"}"
@@ -244,14 +228,13 @@ function crearMarcadoresHoteles() {
         </div>
       `);
       infoWindow.open(map, marker);
-
       const sidePanelHTML = getSidePanelHTML(restaurant, ratingData);
       openMarkerInfo(marker, infoWindow, sidePanelHTML);
     });
   });
 }
 
-// Crea marcadores para farmacias, tiendas, parques, etc. (lógica similar)
+// Las siguientes funciones se definen de forma similar
 function crearMarcadoresFarmacias() { /* ... */ }
 function crearMarcadoresTiendas() { /* ... */ }
 function crearMarcadoresParques() { /* ... */ }
@@ -260,19 +243,16 @@ function crearMarcadoresMuseos() { /* ... */ }
 function crearMarcadoresTransporte() { /* ... */ }
 
 // =======================
-// Panel lateral (side panel) e InfoWindow
+// Panel lateral e InfoWindow
 // =======================
 function getSidePanelHTML(item, rating) {
-  // Muestra información detallada en el panel lateral
   let ratingText = "⭐ 0.0 (0 opiniones)";
   if (rating) {
     ratingText = `⭐ ${rating.media_puntuacion.toFixed(1)} (${rating.numero_comentarios} opiniones)`;
   }
-
   const descConSaltos = (item.descripcion || "").replace(/\\n/g, "<br>");
   const servicesList = item.servicios?.map(s => `<li>${s}</li>`).join("") || "";
-  const detailsURL = `/hoteles/${item._id}`; // Por si quieres un link a detalles
-
+  const detailsURL = `/hoteles/${item._id}`;
   return `
     <div class="dropdown-container">
       <div class="hotel-card">
@@ -302,23 +282,18 @@ function openMarkerInfo(marker, infoWindow, panelContent) {
   closeAll();
   const sidebar = document.getElementById("sidebar");
   sidebar.classList.remove("left", "right");
-
-  const referenceLng = 13.66395; // Para decidir el lado del panel
+  const referenceLng = 13.66395;
   const markerLng = marker.getPosition().lng();
   if (markerLng < referenceLng) {
     sidebar.classList.add("right");
   } else {
     sidebar.classList.add("left");
   }
-
   infoWindow.open(map, marker);
   currentInfoWindow = infoWindow;
   document.getElementById("infoSection").innerHTML = panelContent;
   showSidebar();
-
-  infoWindow.addListener("closeclick", () => {
-    closeAll();
-  });
+  infoWindow.addListener("closeclick", () => { closeAll(); });
 }
 
 function closeAll() {
@@ -327,7 +302,6 @@ function closeAll() {
     currentInfoWindow.close();
     currentInfoWindow = null;
   }
-  // Si hay una ruta dibujada, la quitamos
   if (currentRoutePolyline) {
     currentRoutePolyline.setMap(null);
     currentRoutePolyline = null;
@@ -358,7 +332,7 @@ function toggleSidebar() {
 }
 
 // =======================
-// Botones del menú: "Hoteles", "Rutas", "Sitios", etc.
+// Botones del menú: Hoteles, Rutas, Sitios, etc.
 // =======================
 function mostrarHoteles() {
   closeAll();
@@ -369,7 +343,6 @@ function mostrarHoteles() {
   content += '</ul>';
   document.getElementById("infoSection").innerHTML = content;
   showSidebar();
-
   document.querySelectorAll('.hotel-item').forEach(item => {
     item.addEventListener('click', function() {
       const index = this.getAttribute('data-index');
@@ -387,33 +360,22 @@ function mostrarSitios() {
   showSidebar();
 }
 
-// =======================
-// Mostrar listado de Rutas y dibujar la seleccionada
-// (versión “al estilo Node”: llamamos a /get-route, decodificamos polyline)
-// =======================
 function mostrarRutas() {
   closeAll();
   let content = '<h3>Rutas Turísticas</h3><ul>';
   routes.forEach((route, index) => {
-    // Quitar la parte " - 6.1" si existe
     const formattedName = route.ruta_nombre.replace(/ - \d+(\.\d+)?$/, '');
     content += `<li class="route-item" data-index="${index}" style="cursor:pointer;">${formattedName}</li>`;
   });
   content += '</ul>';
-
   document.getElementById("infoSection").innerHTML = content;
   showSidebar();
-
-  // Evento click en cada ruta
   document.querySelectorAll('.route-item').forEach(item => {
     item.addEventListener('click', function() {
       const index = this.getAttribute('data-index');
       const route = routes[index];
       if (route) {
-        // Llamar a /get-route en Flask y dibujar la polyline
         dibujarRuta(route);
-
-        // Mostrar info de la ruta en el panel
         let infoRouteHTML = `
           <h3>${route.ruta_nombre}</h3>
           <p><strong>Tipo de ruta:</strong> ${route.tipo_ruta}</p>
@@ -428,39 +390,27 @@ function mostrarRutas() {
 }
 
 // =======================
-// Función para dibujar la ruta en el mapa con la “Routes API v2” vía Flask
-// (al estilo Node: pedimos la polyline a /get-route, luego decodificamos)
+// Función para dibujar la ruta vía Flask (Routes API v2)
 // =======================
 async function dibujarRuta(route) {
-  // Quitar la polilínea anterior si existe
   if (currentRoutePolyline) {
     currentRoutePolyline.setMap(null);
   }
-
-  // Construir el objeto origin/destination
   const origin = { latitude: route.origen[0], longitude: route.origen[1] };
   const destination = { latitude: route.destino[0], longitude: route.destino[1] };
-
   try {
-    // 1) Llamar a nuestro backend Flask
     const resp = await fetch("/get-route", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ origin, destination }),
     });
     const data = await resp.json();
-
-    // 2) Verificar que haya una ruta
     if (!data.routes || !data.routes[0]) {
       console.error("No se encontró una ruta válida en la respuesta:", data);
       return;
     }
-
-    // 3) Decodificar la polyline
     const encoded = data.routes[0].polyline.encodedPolyline;
     const path = google.maps.geometry.encoding.decodePath(encoded);
-
-    // 4) Dibujar la polyline en el mapa
     currentRoutePolyline = new google.maps.Polyline({
       path,
       geodesic: true,
@@ -469,8 +419,6 @@ async function dibujarRuta(route) {
       strokeWeight: 4,
       map: map,
     });
-
-    // 5) Centrar el mapa en el primer punto (opcional)
     if (path.length > 0) {
       map.setCenter(path[0]);
     }
@@ -478,3 +426,85 @@ async function dibujarRuta(route) {
     console.error("Error llamando a /get-route:", error);
   }
 }
+
+// =======================
+// Asistente Virtual: Enviar mensaje y mostrar respuesta
+// =======================
+document.getElementById('assistant-send').addEventListener('click', async () => {
+  const input = document.getElementById('assistant-input');
+  const message = input.value.trim();
+  if (!message) return;
+  appendMessage('user', message);
+  input.value = '';
+
+  // Agregar indicador de carga (tres puntos animados)
+  const loadingMessage = document.createElement('div');
+  loadingMessage.className = 'message assistant loading';
+  // Creamos tres spans para los puntos
+  loadingMessage.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+  const chatContainer = document.getElementById('assistant-chat');
+  chatContainer.appendChild(loadingMessage);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+
+  try {
+    const response = await fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+    const data = await response.json();
+    // Eliminar el indicador de carga
+    loadingMessage.remove();
+    if (data.response) {
+      appendMessage('assistant', data.response);
+    } else {
+      appendMessage('assistant', 'Lo siento, no pude obtener una respuesta.');
+    }
+  } catch (error) {
+    loadingMessage.remove();
+    appendMessage('assistant', 'Error al conectar con el asistente.');
+    console.error(error);
+  }
+});
+
+
+function appendMessage(sender, text) {
+  const chatContainer = document.getElementById('assistant-chat');
+  const messageElem = document.createElement('div');
+  messageElem.className = 'message ' + sender;
+  // Convertir markdown a HTML
+  messageElem.innerHTML = marked.parse(text);
+  chatContainer.appendChild(messageElem);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+
+
+// =======================
+// Asistente Virtual: Mostrar/Ocultar desplegable
+// =======================
+const assistant = document.getElementById('assistant');
+const assistantHeader = document.querySelector('.assistant-header');
+
+assistantHeader.addEventListener('click', function(e) {
+  e.stopPropagation();
+  assistant.classList.toggle('open');
+});
+
+document.addEventListener('click', function(e) {
+  if (!assistant.contains(e.target)) {
+    assistant.classList.remove('open');
+  }
+});
+
+const profileImg = document.querySelector('.profile-img');
+const dropdown = document.getElementById('userDropdown');
+
+profileImg.addEventListener('click', function (event) {
+    dropdown.classList.toggle('open');
+    event.stopPropagation();
+});
+
+document.addEventListener('click', function () {
+    dropdown.classList.remove('open');
+});

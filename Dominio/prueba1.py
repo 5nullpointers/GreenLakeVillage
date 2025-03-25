@@ -329,7 +329,6 @@ def login():
         flash("Usuario no encontrado.")
         return redirect(url_for('login_page'))
 
-# Ruta de registro: procesar formulario de registro
 @app.route('/register', methods=['POST'])
 def register():
     name = request.form.get('name')
@@ -353,13 +352,79 @@ def register():
         "email": email,
         "pass": hashed_password,
         "type": "Tourist",  # o asignar otro tipo según corresponda
-        "blocked": blocked
+        "blocked": blocked,
+        "preferencias": []  # Añadimos un campo para las preferencias, vacío por ahora.
     }
 
+    # Insertar usuario en la base de datos
     UserDAO.insertar_dato(nuevo_usuario)
-    flash("Registro exitoso. Ahora puedes iniciar sesión.")
-    return redirect(url_for('login_page'))
+    flash("Registro exitoso. Ahora elige tus preferencias.")
 
+    # Almacenar la información del usuario en la sesión
+    session['user_id'] = email  # Almacenar el correo electrónico del usuario en la sesión
+    session['user_name'] = name  # Almacenar el nombre del usuario en la sesión
+
+    # Redirigir a la página de preferencias después de registrarse
+    return redirect(url_for('preferences', user_email=email))
+
+@app.route('/preferences', methods=['GET', 'POST'])
+def preferences():
+    # Obtener el correo del usuario desde la URL
+    user_email = request.args.get('user_email')
+    usuario = UserDAO.obtener_dato({"email": user_email})
+
+    if request.method == 'POST':
+        # Recibir las preferencias seleccionadas desde el formulario
+        preferences = request.form.getlist('preferences')
+
+        # Actualizar las preferencias del usuario en la base de datos
+        UserDAO.actualizar_dato(
+            {"email": user_email},
+            {"preferencias": preferences}
+        )
+
+        flash("Tus preferencias se han guardado correctamente.")
+        return redirect(url_for('map'))  # Redirigir al mapa u otra página
+
+    return render_template('Preferences.html', user=usuario)
+
+
+@app.route('/save-preferences', methods=['POST'])
+def save_preferences():
+    data = request.json
+    # Obtener el correo electrónico del usuario desde la sesión
+    user_email = session.get('user_id')
+    preferences = data.get('preferencias')
+
+    if not user_email or not preferences:
+        return jsonify({"error": "Email o preferencias no proporcionadas"}), 400
+
+    print(f"Correo: {user_email}, Preferencias: {preferences}")  # Verificar los datos recibidos
+
+    try:
+        # Buscar al usuario en la base de datos utilizando el correo electrónico
+        user = UserDAO.obtener_dato({"email": user_email})
+
+        # Verificar si el usuario fue encontrado
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 400
+
+        # Si el usuario existe, actualizar sus preferencias
+        result = UserDAO.actualizar_dato(
+            {"email": user_email},
+            {"preferencias": preferences}
+        )
+
+        print(f"Resultado de la actualización: {result.modified_count} documentos modificados")
+
+        if result.modified_count > 0:
+            # Redirigir al usuario a la página de mapa
+            return jsonify({"success": True, "redirect": url_for('map')})
+        else:
+            return jsonify({"error": "No se pudo actualizar las preferencias"}), 500
+    except Exception as e:
+        print(f"Error al guardar preferencias: {str(e)}")  # Agregar información detallada del error
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/contacto')
 def contacto():
@@ -409,41 +474,6 @@ def api_restaurantes():
 MAX_HISTORY = 5
 conversation_history = []
 
-@app.route('/chat', methods=['POST'])
-def chat():
-    user_message = request.json.get("message")
-
-    if not user_message:
-        return jsonify({"error": "Mensaje vacío"}), 400
-
-    try:
-        client = openai.OpenAI()
-
-        # Agregar el nuevo mensaje al historial
-        conversation_history.append({"role": "user", "content": user_message})
-
-        # Limitar el historial solo a los últimos MAX_HISTORY mensajes
-        # Multiplicamos por 2 porque cada mensaje tiene respuesta de la IA
-        conversation_history_trimmed = conversation_history[-(MAX_HISTORY * 2):]
-
-        # Crear el mensaje con el historial recortado
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "system", "content": "Eres un asistente virtual para facilitar ayuda turística de rutas y hoteles..."}] + conversation_history_trimmed
-        )
-
-        chat_response = response.choices[0].message.content
-
-        # Agregar la respuesta de la IA al historial
-        conversation_history.append({"role": "assistant", "content": chat_response})
-
-        return jsonify({"response": chat_response})
-
-    except openai.OpenAIError as e:
-        return jsonify({"error": f"Error en OpenAI: {str(e)}"}), 500
-    except Exception as e:
-        return jsonify({"error": f"Error desconocido: {str(e)}"}), 500
-
 @app.route('/api/ratings')
 def api_ratings():
     """
@@ -467,6 +497,7 @@ def api_ratings():
 
 from bson import ObjectId
 from flask import render_template, abort
+from Entidades.asistenteIA import obtener_respuesta
 
 @app.route('/hoteles/<string:hotel_id>')
 def hotel_detalle(hotel_id):
@@ -500,6 +531,43 @@ def format_number(value):
             return f"{value:,.0f}".replace(",", ".")
     except Exception:
         return value
+
+from bson import ObjectId
+
+@app.route('/chat', methods=['POST'])
+def chat_page():
+    # Obtener el identificador del usuario de la sesión
+    user_identifier = session.get("user_id")
+    if not user_identifier:
+        return jsonify({"error": "Usuario no autenticado"}), 401
+
+    # Intentar obtener el usuario usando _id si user_identifier es un ObjectId en forma de cadena
+    try:
+        usuario = mongo_agent.db["usuarios"].find_one({"_id": ObjectId(user_identifier)})
+        if usuario:
+            user_email = usuario.get("email")
+        else:
+            user_email = None
+    except Exception as e:
+        # Si falla la conversión, asumimos que ya es un email
+        user_email = user_identifier
+
+    if not user_email:
+        return jsonify({"error": "No se pudo recuperar el correo del usuario"}), 401
+
+    user_message = request.json.get("message")
+    if not user_message:
+        return jsonify({"error": "Mensaje vacío"}), 400
+
+    try:
+        # Llama a la función que construye el prompt usando los datos del usuario desde la BBDD
+        response = obtener_respuesta(user_email, user_message)
+        return jsonify({"response": response})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 
 @app.route('/api/estadisticas_ocupacion')
 def api_estadisticas_ocupacion():
