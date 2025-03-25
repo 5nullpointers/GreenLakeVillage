@@ -486,41 +486,6 @@ def api_restaurantes():
 MAX_HISTORY = 5
 conversation_history = []
 
-@app.route('/chat', methods=['POST'])
-def chat():
-    user_message = request.json.get("message")
-
-    if not user_message:
-        return jsonify({"error": "Mensaje vacío"}), 400
-
-    try:
-        client = openai.OpenAI()
-
-        # Agregar el nuevo mensaje al historial
-        conversation_history.append({"role": "user", "content": user_message})
-
-        # Limitar el historial solo a los últimos MAX_HISTORY mensajes
-        # Multiplicamos por 2 porque cada mensaje tiene respuesta de la IA
-        conversation_history_trimmed = conversation_history[-(MAX_HISTORY * 2):]
-
-        # Crear el mensaje con el historial recortado
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "system", "content": "Eres un asistente virtual para facilitar ayuda turística de rutas y hoteles..."}] + conversation_history_trimmed
-        )
-
-        chat_response = response.choices[0].message.content
-
-        # Agregar la respuesta de la IA al historial
-        conversation_history.append({"role": "assistant", "content": chat_response})
-
-        return jsonify({"response": chat_response})
-
-    except openai.OpenAIError as e:
-        return jsonify({"error": f"Error en OpenAI: {str(e)}"}), 500
-    except Exception as e:
-        return jsonify({"error": f"Error desconocido: {str(e)}"}), 500
-
 @app.route('/api/ratings')
 def api_ratings():
     """
@@ -579,23 +544,41 @@ def format_number(value):
     except Exception:
         return value
 
+from bson import ObjectId
+
 @app.route('/chat', methods=['POST'])
 def chat_page():
-    # Obtener el usuario (correo) de la sesión
-    user_email = session.get("user_id")
-    if not user_email:
+    # Obtener el identificador del usuario de la sesión
+    user_identifier = session.get("user_id")
+    if not user_identifier:
         return jsonify({"error": "Usuario no autenticado"}), 401
+
+    # Intentar obtener el usuario usando _id si user_identifier es un ObjectId en forma de cadena
+    try:
+        usuario = mongo_agent.db["usuarios"].find_one({"_id": ObjectId(user_identifier)})
+        if usuario:
+            user_email = usuario.get("email")
+        else:
+            user_email = None
+    except Exception as e:
+        # Si falla la conversión, asumimos que ya es un email
+        user_email = user_identifier
+
+    if not user_email:
+        return jsonify({"error": "No se pudo recuperar el correo del usuario"}), 401
 
     user_message = request.json.get("message")
     if not user_message:
         return jsonify({"error": "Mensaje vacío"}), 400
 
     try:
-        # Llama a la función que construye el prompt usando los datos del usuario (de la BBDD)
+        # Llama a la función que construye el prompt usando los datos del usuario desde la BBDD
         response = obtener_respuesta(user_email, user_message)
         return jsonify({"response": response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 
 
 @app.route('/api/estadisticas_ocupacion')

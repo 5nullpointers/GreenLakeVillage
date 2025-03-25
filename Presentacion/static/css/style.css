@@ -396,4 +396,67 @@ nav a:hover {
 .message.assistant {
   background-color: #f1f8e9;
   align-self: flex-start;
+  text-align: left; /* Alineación a la izquierda */
+  max-width: 80%;   /* Limita el ancho de la burbuja */
+  margin-bottom: 8px;
+  word-wrap: break-word;
+  padding: 10px;    /* Espacio interno para que el texto no pegue a los bordes */
+  border-radius: 5px;
+}
+
+/* Ajustar listas y elementos dentro de la burbuja */
+.message.assistant ol,
+.message.assistant ul {
+  margin: 0;              /* Eliminar márgenes por defecto */
+  padding-left: 1.5rem;   /* Sangría para la numeración */
+}
+
+.message.assistant li {
+  margin-bottom: 0.5rem;  /* Separación entre ítems de lista */
+}
+
+.message.assistant h3,
+.message.assistant p {
+  margin: 0;              /* Ajustar márgenes en títulos y párrafos */
+  text-align: left;       /* Alineación a la izquierda */
+}
+
+
+
+/* Estilos para el indicador de carga en el chat */
+.message.assistant.loading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  padding: 5px 8px;
+  background-color: #f1f8e9;
+  border-radius: 5px;
+}
+
+.message.assistant.loading .dot {
+  width: 6px;
+  height: 6px;
+  background-color: #999;
+  border-radius: 50%;
+  animation: blink 1.4s infinite both;
+}
+
+.message.assistant.loading .dot:nth-child(1) {
+  animation-delay: 0s;
+}
+.message.assistant.loading .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.message.assistant.loading .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%, 80%, 100% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
 }
