@@ -131,23 +131,21 @@ document.addEventListener('DOMContentLoaded', function () {
         // Ordenar por mayor media_puntuacion
         ratingsArray.sort((a, b) => b.media_puntuacion - a.media_puntuacion);
         const topHotels = ratingsArray.slice(0, 3);
-        const topListElem = document.getElementById('topRestaurants');
-        topListElem.innerHTML = '';
-        topHotels.forEach(hotel => {
-          const li = document.createElement('li');
-          
-          // Crea la imagen, en este ejemplo se usa un placeholder
-          const img = document.createElement('img');
-          img.classList.add('top-hotel-img');
-          img.src = '/static/images/hotel.png';
-          
-          // Crea un span para el texto
-          const span = document.createElement('span');
-          span.textContent = `${hotel.hotelName} - Puntuación: ${hotel.media_puntuacion.toFixed(2)}`;
-        
-          li.appendChild(img);
-          li.appendChild(span);
-          topListElem.appendChild(li);
+        const podiumContainer = document.getElementById('podiumContainer');
+        podiumContainer.innerHTML = '';
+
+        const podiumClasses = ['podium-place-2', 'podium-place-1', 'podium-place-3'];
+        topHotels.forEach((hotel, index) => {
+          const placeDiv = document.createElement('div');
+          placeDiv.classList.add('podium-place', podiumClasses[index] || 'podium-place-3');
+          placeDiv.innerHTML = `
+            <div class="podium-name">${hotel.hotelName}</div>
+            <div class="podium-rating">
+              Puntuación: ${hotel.media_puntuacion.toFixed(2)}<br>
+              ${hotel.numero_comentarios} opiniones
+            </div>
+          `;
+          podiumContainer.appendChild(placeDiv);
         });
       })
       .catch(error => console.error('Error al obtener los mejores hoteles:', error));

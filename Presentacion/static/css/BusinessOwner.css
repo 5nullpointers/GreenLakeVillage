@@ -383,6 +383,48 @@ body {
   color: #009688;
 }
 
+.podium {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  margin-top: 20px;
+}
+
+.podium-place {
+  background: #f8f8f8;
+  width: 28%;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  position: relative;
+  padding: 10px;
+}
+
+.podium-place-1 {
+  height: 140px;
+  background: #ffe082; /* Primer lugar */
+}
+
+.podium-place-2 {
+  height: 110px;
+  background: #e0e0e0; /* Segundo lugar */
+}
+
+.podium-place-3 {
+  height: 90px;
+  background: #ffd54f; /* Tercer lugar */
+}
+
+.podium-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.podium-rating {
+  font-size: 14px;
+  color: #555;
+}
+
 /* Responsividad para pantallas pequeñas */
 @media (max-width: 768px) {
   .admin-grid {
