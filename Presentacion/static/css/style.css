@@ -99,7 +99,7 @@ nav a:hover {
   top: 60px;
   width: 400px;
   height: calc(100vh - 60px);
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.8);
   padding: 1.5rem;
   transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
   opacity: 0;
@@ -194,7 +194,7 @@ nav a:hover {
   width: 100%;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
   padding: 20px;
   font-family: inherit;
   transition: box-shadow 0.3s ease;
