@@ -496,6 +496,30 @@ def api_ratings():
     }
     return jsonify(ratings_dict)
 
+@app.route('/api/ratings_Propietarios')
+def api_ratings_Propietarios():
+    from bson import ObjectId
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado"}), 401
+
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "El usuario no es un Propietario"}), 403
+
+    user_properties = business_owner.get("properties", [])
+    agregados = OpinionesTuristicasDAO.obtener_agregados()
+
+    # Filtrar los resultados de 'agregados' solo por propiedades del usuario
+    ratings_dict = {}
+    for entry in agregados:
+        if entry["_id"] in user_properties:
+            ratings_dict[entry["_id"]] = {
+                "media_puntuacion": entry["media_puntuacion"],
+                "numero_comentarios": entry["numero_comentarios"]
+            }
+    return jsonify(ratings_dict)
+
 from bson import ObjectId
 from flask import render_template, abort
 from Entidades.asistenteIA import obtener_respuesta

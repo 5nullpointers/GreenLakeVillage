@@ -113,5 +113,32 @@ document.addEventListener('DOMContentLoaded', function () {
       
     })
     .catch(error => console.error('Error al obtener las estadísticas:', error));
+
+    // Ajustar el widget para tomar solo las propiedades del usuario
+    fetch('/api/ratings_Propietarios')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Datos filtrados recibidos:', data); // DEBUG
+        const ratingsArray = Object.keys(data).map(hotelName => ({
+          hotelName,
+          media_puntuacion: data[hotelName].media_puntuacion || 0,
+          numero_comentarios: data[hotelName].numero_comentarios || 0
+        }));
+        if (!ratingsArray.length) {
+          console.warn('No se encontraron hoteles en tus propiedades.');
+          return;
+        }
+        // Ordenar por mayor media_puntuacion
+        ratingsArray.sort((a, b) => b.media_puntuacion - a.media_puntuacion);
+        const topHotels = ratingsArray.slice(0, 3);
+        const topListElem = document.getElementById('topRestaurants');
+        topListElem.innerHTML = '';
+        topHotels.forEach(hotel => {
+          const li = document.createElement('li');
+          li.textContent = `${hotel.hotelName} - Puntuación: ${hotel.media_puntuacion.toFixed(2)} (${hotel.numero_comentarios} opiniones)`;
+          topListElem.appendChild(li);
+        });
+      })
+      .catch(error => console.error('Error al obtener los mejores hoteles:', error));
   
 });
