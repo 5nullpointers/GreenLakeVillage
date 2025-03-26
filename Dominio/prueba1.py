@@ -2,6 +2,8 @@ import sys
 import signal
 from dotenv import load_dotenv
 import os
+dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+load_dotenv(dotenv_path)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import openai
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
@@ -37,8 +39,6 @@ app.json = app.json_provider_class(app)
 
 # Configurar clave secreta para sesiones y mensajes flash
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
-# Cargar variables de entorno desde .env
-load_dotenv()
 
 # Clave de la API de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -493,6 +493,30 @@ def api_ratings():
         }
         for entry in agregados
     }
+    return jsonify(ratings_dict)
+
+@app.route('/api/ratings_Propietarios')
+def api_ratings_Propietarios():
+    from bson import ObjectId
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado"}), 401
+
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "El usuario no es un Propietario"}), 403
+
+    user_properties = business_owner.get("properties", [])
+    agregados = OpinionesTuristicasDAO.obtener_agregados()
+
+    # Filtrar los resultados de 'agregados' solo por propiedades del usuario
+    ratings_dict = {}
+    for entry in agregados:
+        if entry["_id"] in user_properties:
+            ratings_dict[entry["_id"]] = {
+                "media_puntuacion": entry["media_puntuacion"],
+                "numero_comentarios": entry["numero_comentarios"]
+            }
     return jsonify(ratings_dict)
 
 from bson import ObjectId

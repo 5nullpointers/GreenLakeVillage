@@ -113,5 +113,41 @@ document.addEventListener('DOMContentLoaded', function () {
       
     })
     .catch(error => console.error('Error al obtener las estadísticas:', error));
+
+    // Ajustar el widget para tomar solo las propiedades del usuario
+    fetch('/api/ratings_Propietarios')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Datos filtrados recibidos:', data); // DEBUG
+        const ratingsArray = Object.keys(data).map(hotelName => ({
+          hotelName,
+          media_puntuacion: data[hotelName].media_puntuacion || 0,
+          numero_comentarios: data[hotelName].numero_comentarios || 0
+        }));
+        if (!ratingsArray.length) {
+          console.warn('No se encontraron hoteles en tus propiedades.');
+          return;
+        }
+        // Ordenar por mayor media_puntuacion
+        ratingsArray.sort((a, b) => b.media_puntuacion - a.media_puntuacion);
+        const topHotels = ratingsArray.slice(0, 3);
+        const podiumContainer = document.getElementById('podiumContainer');
+        podiumContainer.innerHTML = '';
+
+        const podiumClasses = ['podium-place-2', 'podium-place-1', 'podium-place-3'];
+        topHotels.forEach((hotel, index) => {
+          const placeDiv = document.createElement('div');
+          placeDiv.classList.add('podium-place', podiumClasses[index] || 'podium-place-3');
+          placeDiv.innerHTML = `
+            <div class="podium-name">${hotel.hotelName}</div>
+            <div class="podium-rating">
+              Puntuación: ${hotel.media_puntuacion.toFixed(2)}<br>
+              ${hotel.numero_comentarios} opiniones
+            </div>
+          `;
+          podiumContainer.appendChild(placeDiv);
+        });
+      })
+      .catch(error => console.error('Error al obtener los mejores hoteles:', error));
   
 });
