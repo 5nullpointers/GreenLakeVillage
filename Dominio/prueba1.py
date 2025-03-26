@@ -750,7 +750,7 @@ def propiedades_usuario():
         # Obtener precio según el tipo
         if tipo_servicio == "Hotel":
             precio = ocupacion.get("precio_promedio_noche", "N/A")
-        elif tipo_servicio == "Restaurante":
+        elif tipo_servicio == "Servicio":
             restaurante = mongo_agent.db["restaurantes"].find_one({"nombre": propiedad}) or {}
             precio = restaurante.get("precio_medio", "N/A")
         else:
