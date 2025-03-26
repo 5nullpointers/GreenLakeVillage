@@ -121,9 +121,10 @@ body {
 /* Grid principal */
 .admin-grid {
   display: grid;
-  grid-template-columns: 250px repeat(3, 1fr);
+  grid-template-columns: 250px 1fr 1fr 1fr; /* Ajusta las columnas según necesites */
   grid-auto-rows: auto;
   gap: 16px;
+  align-items: stretch; /* Estira verticalmente cada celda */
 }
 
 /* Barra lateral */
@@ -133,11 +134,11 @@ body {
   background: #ffffff;
   border-radius: 12px;
   padding: 10px;
-  position: sticky;
-  top: 0;
   z-index: 1;
   transition: width 0.3s ease;
   overflow: hidden;
+  align-self: stretch;  /* Se extiende con la altura de la grilla */
+  height: auto; 
 }
 
 .sidebar ul {
@@ -255,7 +256,7 @@ body {
   padding: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  text-align: center;
+  text-align: left;
 }
 
 .mapa {
@@ -328,8 +329,19 @@ body {
   border-radius: 4px;
 }
 
+/* Widgets: Panel centrado horizontalmente */
+.admin-widget-1,
+.admin-widget-2,
+.admin-widget-3 {
+  margin: 0 auto;      /* Centra horizontalmente la tarjeta */
+  max-width: 600px;    /* Ancho máximo de la tarjeta */
+  width: 100%;
+  text-align: left;    /* Texto a la izquierda */
+  align-self: start;   /* Evita que el panel se expanda innecesariamente */
+}
+
 .admin-widget-2 {
-  grid-column: 2 / 3;
+  grid-column: 2 / 3; /* Ajusta si lo necesitas */
   grid-row: 40 / 80;
 }
 
@@ -346,14 +358,10 @@ body {
 /* Responsividad para pantallas pequeñas */
 @media (max-width: 768px) {
   .admin-grid {
-    grid-template-columns: 1fr;
-    /* Todo en una sola columna */
+    grid-template-columns: 1fr; /* Todo en una sola columna */
   }
 
   .sidebar {
-    position: relative;
-    left: 0;
-    top: 0;
     width: 100%;
     border-radius: 0;
     padding: 10px 0;
@@ -381,4 +389,84 @@ body {
   .cards-row {
     justify-content: flex-start;
   }
+}
+
+/* Icono de premio */
+.award-icon {
+  width: 55px;
+  height: 55px;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* Estrellas doradas */
+.star {
+  color: #FFD700;
+  font-size: 18px;
+  margin-right: -4px;
+  font-weight: 900;
+}
+
+.panel h3 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Quita el estilo por defecto de las listas en los 3 widgets */
+#topHotelesList,
+#topServiciosList,
+#topRutasList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#topHotelesList li,
+#topServiciosList li,
+#topRutasList li {
+  margin-bottom: 10px;
+}
+
+/* Contenedor principal de cada fila (para la imagen y el contenido) */
+.ranking-row {
+  display: flex;
+  align-items: center;
+  gap: 7px; /* Separación entre la imagen (award) y el contenido */
+}
+
+/* Contenedor para el texto (nombre + valoración) */
+.ranking-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Nombre del hotel/servicio/ruta */
+.service-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+/* Sección de valoración: estrellas, puntuación y opiniones */
+.rating-section {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Número de valoración y opiniones */
+.rating-number,
+.opiniones {
+  color: #333;
+  font-size: 14px;
+}
+
+/* Contenedor interno si deseas centrar el contenido sin perder la alineación de texto */
+.widget-inner {
+  max-width: 500px;
+  margin: 0 auto;  /* Centra horizontalmente */
+  text-align: left; 
+  padding: 0 50px; /* Opcional, para margen interior */
 }

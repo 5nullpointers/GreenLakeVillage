@@ -530,6 +530,21 @@ def api_estadisticas_ocupacion():
         "cancelaciones_percent": cancelaciones_percent  # ← con 3 decimales
     })
 
+@app.route('/api/top_hoteles')
+def api_top_hoteles():
+    top_hoteles = OpinionesTuristicasDAO.obtener_top_hoteles()
+    return jsonify(top_hoteles)
+
+@app.route('/api/top_servicios')
+def api_top_servicios():
+    top_servicios = OpinionesTuristicasDAO.obtener_top_servicios()
+    return jsonify(top_servicios)
+
+@app.route('/api/top_rutas')
+def api_top_rutas():
+    top_rutas = OpinionesTuristicasDAO.obtener_top_rutas()
+    return jsonify(top_rutas)
+
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
     app.run(host='0.0.0.0', port=5000, debug=True)
