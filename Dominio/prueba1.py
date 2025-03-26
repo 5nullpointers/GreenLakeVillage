@@ -38,7 +38,8 @@ app.json = app.json_provider_class(app)
 # Configurar clave secreta para sesiones y mensajes flash
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 # Cargar variables de entorno desde .env
-load_dotenv()
+dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+load_dotenv(dotenv_path)
 
 # Clave de la API de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
