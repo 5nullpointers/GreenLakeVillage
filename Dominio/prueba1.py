@@ -1,9 +1,9 @@
 import sys
 import signal
 from dotenv import load_dotenv
+import os
 dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
 load_dotenv(dotenv_path)
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import openai
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
