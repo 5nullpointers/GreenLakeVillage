@@ -135,7 +135,18 @@ document.addEventListener('DOMContentLoaded', function () {
         topListElem.innerHTML = '';
         topHotels.forEach(hotel => {
           const li = document.createElement('li');
-          li.textContent = `${hotel.hotelName} - Puntuación: ${hotel.media_puntuacion.toFixed(2)} (${hotel.numero_comentarios} opiniones)`;
+          
+          // Crea la imagen, en este ejemplo se usa un placeholder
+          const img = document.createElement('img');
+          img.classList.add('top-hotel-img');
+          img.src = '/static/images/hotel.png';
+          
+          // Crea un span para el texto
+          const span = document.createElement('span');
+          span.textContent = `${hotel.hotelName} - Puntuación: ${hotel.media_puntuacion.toFixed(2)}`;
+        
+          li.appendChild(img);
+          li.appendChild(span);
           topListElem.appendChild(li);
         });
       })
