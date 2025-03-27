@@ -200,7 +200,8 @@ def login_page():
 
 @app.route('/MapaAdmin')
 def MapaAdmin():
-    return render_template('MapaAdmin.html')
+    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+    return render_template('MapaAdmin.html', google_maps_api_key=google_maps_api_key)
 
 @app.route('/admin/UsuariosAdmin')
 def UsuariosAdmin():
@@ -246,7 +247,8 @@ def admin():
         ingreso = precio * ocup_dict.get(hotel_nombre, 0)
         # print("Hotel:", hotel_nombre, "Precio:", precio, "Reservas:", ocup_dict.get(hotel_nombre, 0), "Ingreso:", ingreso)
         ingresos_totales += ingreso
-    return render_template('Admin.html', ingresosTotales=ingresos_totales, totalReservas=totalReservas, consumoTotal=consumo_total)
+    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+    return render_template('Admin.html', ingresosTotales=ingresos_totales, totalReservas=totalReservas, consumoTotal=consumo_total, google_maps_api_key=google_maps_api_key)
 
 @app.route('/api/foro/temas')
 def api_foro_temas():
