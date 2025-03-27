@@ -311,6 +311,37 @@ def login_page():
 def Propietarios():
     return render_template('BusinessOwner.html')
 
+@app.route('/Propietarios/ReservasHoteles')
+def ver_reservas_hoteles():
+    return render_template("ReservasBusinessOwner.html")
+
+@app.route('/api/propietarios/reservas')
+def api_reservas_propietario():
+    user_name = session.get("user_name")
+    user_type = session.get("user_type")
+
+    if not user_name or user_type != "BusinessOwner":
+        return jsonify([])
+
+    # Obtener lista de propiedades del usuario
+    usuario = mongo_agent.db["usuarios"].find_one({"name": user_name})
+    if not usuario or "properties" not in usuario:
+        return jsonify([])
+
+    nombres_hoteles = usuario["properties"]  # lista de nombres de hoteles
+
+    # Buscar reservas que correspondan a esos hoteles
+    reservas = list(mongo_agent.db["reservas"].find({
+        "nombre_hotel": {"$in": nombres_hoteles}
+    }))
+
+    # Convertir ObjectId a string para que sea JSON serializable
+    for r in reservas:
+        r["_id"] = str(r["_id"])
+
+    return jsonify(reservas)
+
+
 @app.route('/MapaAdmin')
 def MapaAdmin():
     google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reservas de mis Hoteles</title>
+  <link rel="stylesheet" href="/static/css/BusinessOwner.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <div class="admin-container">
+    <!-- Menú Superior -->
+    <nav class="admin-menu">
+      <div class="left-section">
+        <div class="logo">Mis Propiedades - Green Lake Village</div>
+      </div>
+      <div class="user-profile">
+        <img src="/static/images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
+        <div class="user-dropdown" id="userDropdown">
+          <ul>
+            <li><a href="#">Configuración</a></li>
+            <li><a href="/">Cerrar sesión</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="admin-content">
+      <div class="admin-grid">
+        <!-- Barra lateral -->
+        <div class="sidebar" id="sidebar">
+          <ul>
+            <li>
+              <img src="/static/images/inicio.png" alt="Inicio" class="option-icon" />
+              <span class="text-label"><a href="/Propietarios">Inicio</a></span>
+            </li>
+            <li>
+              <img src="/static/images/Propiedades.png" alt="Propiedades" class="option-icon" />
+              <a href="/Propietarios/PropiedadesUsuario">Propiedades</a>
+            </li>
+            <li class="active">
+              <img src="/static/images/Reseñas.png" alt="Reservas" class="option-icon" />
+              <span class="text-label"><a href="/Propietarios/ReservasHoteles">Reservas</a></span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Panel con tabla -->
+        <div class="panel panel-reservas">
+          <h2 style="margin-bottom: 1rem;">Reservas de tus Hoteles</h2>
+          <table class="reserva-table">
+            <thead>
+              <tr>
+                <th>Hotel</th>
+                <th>Cliente</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Personas</th>
+              </tr>
+            </thead>
+            <tbody id="tablaReservasBody">
+              <!-- Se llenará desde JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/ReservasBusinessOwner.js"></script>
+</body>
+</html>
