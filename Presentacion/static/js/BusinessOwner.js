@@ -154,4 +154,33 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .catch(error => console.error('Error al obtener los mejores hoteles:', error));
   
+    fetch('/api/billed_Propietarios')
+      .then(response => response.json())
+      .then(data => {
+        const topBilledContainer = document.getElementById('BilledContainer');
+        if (!data || !data.length) {
+          console.warn('No se encontraron propiedades para facturación.');
+          return;
+        }
+        topBilledContainer.innerHTML = '';
+
+        const podiumClassesBilled = ['podium-place-2', 'podium-place-1', 'podium-place-3'];
+        const podiumImagesBilled = [
+          '/static/images/award_2_P.png',
+          '/static/images/award_1_P.png',
+          '/static/images/award_3_P.png'
+        ];
+        data.forEach((item, index) => {
+          const placeDiv = document.createElement('div');
+          placeDiv.classList.add('podium-place', podiumClassesBilled[index] || 'podium-place-3');
+          placeDiv.innerHTML = `
+            <img src="${podiumImagesBilled[index] || '/static/images/podium-default.png'}" alt="Podio" class="Podio" style="width: 80px; height: auto;">
+            <div class="podium-img">
+              <div class="podium-name">${item.hotelName}</div>
+            </div>
+          `;
+          topBilledContainer.appendChild(placeDiv);
+        });
+      })
+      .catch(error => console.error('Error al obtener las propiedades con mayor facturación:', error));
 });

@@ -776,6 +776,59 @@ def propiedades_usuario():
     # 7) Si no es fetch => renderizar la plantilla con Jinja2
     return render_template('PropiedadesUsuario.html', propiedades=propiedades_info)
 
+@app.route('/api/billed_Propietarios')
+def api_billed_Propietarios():
+    from Persistencia.DAOS.UserDAO import UserDAO
+    from Persistencia.DAOS.HotelesDAO import HotelesDAO
+    from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
+    from bson import ObjectId
+
+    user_id = session.get('user_id')
+    if not user_id:
+        return
+
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return
+
+    # Obtener propiedades del usuario
+    user_properties = business_owner.get("properties", [])
+
+    # Obtener precios de hoteles
+    hoteles_data = HotelesDAO.obtener_precios()
+    # Obtener reservas confirmadas
+    ocupaciones_data = OcupacionHoteleraDAO.obtener_todos()
+
+    # Construir un dict para precios
+    precios_dict = {}
+    for h in hoteles_data:
+        nombre_hotel = h.get("nombre")
+        precio_hotel = h.get("precio", 0)
+        precios_dict[nombre_hotel] = precio_hotel
+
+    # Construir un dict para reservas
+    reservas_dict = {}
+    for o in ocupaciones_data:
+        nombre_occ = o.get("hotel_nombre")
+        reservas = o.get("reservas_confirmadas", 0)
+        reservas_dict[nombre_occ] = reservas_dict.get(nombre_occ, 0) + reservas
+
+    # Calcular facturación
+    facturacion = []
+    for propiedad in user_properties:
+        precio = precios_dict.get(propiedad, 0)
+        reserv = reservas_dict.get(propiedad, 0)
+        facturacion.append({
+            "hotelName": propiedad,
+            "total": precio * reserv
+        })
+
+    # Ordenar top 3
+    facturacion.sort(key=lambda x: x["total"], reverse=True)
+    top3 = facturacion[:3]
+
+    return jsonify(top3)
+
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
     app.run(host='0.0.0.0', port=5000, debug=True)
