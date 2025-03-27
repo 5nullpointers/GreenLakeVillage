@@ -355,6 +355,34 @@ def MapaPropietarios():
 def UsuariosAdmin():
     return render_template('UsuariosAdmin.html')
 
+@app.route('/admin/ForoAdmin')
+def ForoAdmin():
+    return render_template('ForoAdmin.html')
+
+@app.route('/api/admin/crear-tema', methods=['POST'])
+def crear_tema():
+    titulo = request.form.get("titulo")
+    descripcion = request.form.get("descripcion")
+    categoria = request.form.get("categoria")
+
+    if not titulo or not descripcion:
+        return jsonify({"error": "Falta el título o la descripción"}), 400
+    
+    nuevo_tema = {
+        "titulo": titulo,
+        "descripcion": descripcion,
+        "autor": session.get("user_name", "Admin"),
+        "fecha": datetime.utcnow(),
+        "categoria": categoria,
+        "estado": "activo"
+    }
+    result = mongo_agent.db["temas_forum"].insert_one(nuevo_tema)
+    #Comprobar si se ha insertado correctamente
+    if result.inserted_id:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False}), 500
+
 @app.route('/admin')
 def admin():
     from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO

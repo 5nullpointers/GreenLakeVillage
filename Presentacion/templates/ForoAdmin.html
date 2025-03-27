@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Administración de Usuarios</title>
+    <link rel="stylesheet" href="/static/css/UsuariosAdmin.css" />
+    <link rel="stylesheet" href="/static/css/ForoAdmin.css" />
+    <!-- Nuevo: incluir SweetAlert2 -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Nuevo: Incluir Animate.css para animaciones -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+  </head>
+
+  <body>
+    <!-- Barra de navegación superior -->
+    <nav class="superiorAdmin">
+      <div class="logo">Mi Admin - Green Lake Village</div>
+      <div class="user-profile">
+        <img
+          src="/static/images/user-circle.png"
+          alt="Imagen de perfil"
+          class="profile-img"
+        />
+        <span class="user-name"
+          >{{ session.user_name or 'Nombre de Usuario' }}</span
+        >
+        <div class="user-dropdown" id="userDropdown">
+          <ul>
+            <li><a href="#">Configuración</a></li>
+            <li><a href="/">Cerrar sesión</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Nuevo layout con panel de menú y panel blanco -->
+    <div class="layout">
+      <div class="panelBlancoMenu">
+        <div class="menuPanel">
+          <ul>
+            <li>
+              <img
+                src="/static/images/inicio.png"
+                alt="Inicio"
+                class="option-icon"
+              />
+              <a href="/admin">Inicio</a>
+            </li>
+            <li>
+              <img
+                src="/static/images/profile.png"
+                alt="Usuarios"
+                class="option-icon"
+              />
+              <a href="/admin/UsuariosAdmin">Usuarios</a>
+            </li>
+            <li class="active">
+              <img
+                src="/static/images/Foro.png"
+                alt="Foro"
+                class="option-icon"
+              />
+              <a href="/admin/ForoAdmin">Foro</a>
+            </li>
+            <li>
+              <img
+                src="/static/images/Reseñas.png"
+                alt="Reseñas"
+                class="option-icon"
+              />
+              <a href="#">Reseñas</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="panel">
+        <div id="adminSection" class="admin-container">
+          <h2>Administración del Foro</h2>
+          <button id="crearTemaBtn" class="btn-nuevo-tema">
+            + Crear Nuevo Tema
+          </button>
+          <div id="temasAdmin" class="temas-lista"></div>
+          <div id="comentariosAdmin" class="comentarios-container"></div>
+        </div>
+
+        <!-- Modal para crear tema -->
+        <div id="modalCrearTema" class="modal">
+          <div class="modal-content">
+            <span class="cerrar">&times;</span>
+            <h3>Nuevo Tema</h3>
+            <form id="formNuevoTema" method="POST">
+              <input
+                type="text"
+                name="titulo"
+                placeholder="Título del tema"
+                required
+              /><br />
+              <textarea
+                name="descripcion"
+                placeholder="Descripción del tema"
+                required
+              ></textarea
+              ><br />
+              <select name="categoria" required>
+                <option selected disabled value="">Selecciona una categoría</option>
+                <option value="Hoteles">Hoteles</option>
+                <option value="Servicios">Servicios</option>
+                <option value="Rutas">Rutas</option>
+              </select><br /><br />
+              <button type="submit">Crear Tema</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/js/UsuariosAdmin.js"></script>
+    <script src="/static/js/ForoAdmin.js"></script>
+    <script src="/static/js/script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,172 @@
+.admin-container {
+  max-width: 100%;
+  padding: 20px;
+  overflow: hidden; /* No scroll aquí */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-nuevo-tema {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  display: inline-block; /* Esto evita que se estire */
+  width: auto;           /* Asegura que no tome todo el ancho */
+  max-width: fit-content; /* Ajusta al contenido */
+  font-size: 14px;
+}
+
+.temas-lista ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.temas-lista li {
+  padding: 8px;
+  background-color: #f2f2f2;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.comentarios-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100%;  /* Ajusta dentro del contenedor padre */
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  font-family: sans-serif;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.modal-content input[type="text"],
+.modal-content textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 10px 0 20px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.modal-content textarea {
+  min-height: 100px;
+}
+
+.modal-content button[type="submit"] {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.modal-content select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #333;
+  box-sizing: border-box;
+  appearance: none; /* quita estilo nativo en algunos navegadores */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23333' d='M2 0L0 2h4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px;
+}
+
+
+.cerrar {
+  position: absolute;
+  right: 20px;
+  top: 16px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.comentario {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 12px;
+  background-color: #f4f4f4;
+  max-width: 100%;
+  max-height: 400px;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+}
+
+.comentario p {
+  margin: 4px 0;
+}
+
+.comentario img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+.panel {
+  flex: 1;
+  background-color: #fff;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 12px;
+  height: 670px; /* Altura fija */
+  margin-right: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
