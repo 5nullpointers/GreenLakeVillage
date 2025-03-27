@@ -330,17 +330,17 @@ body {
 
 .admin-widget-2 {
   grid-column: 2 / 3;
-  grid-row: 40 / 80;
+  grid-row: 40 / 63;
 }
 
 .admin-widget-3 {
   grid-column: 3 / 4;
-  grid-row: 40 / 80;
+  grid-row: 40 / 63;
 }
 
 .admin-widget-4 {
   grid-column: 4 / 5;
-  grid-row: 40 / 80;
+  grid-row: 40 / 63;
 }
 
 .top-hotels-widget {
@@ -383,11 +383,15 @@ body {
   color: #009688;
 }
 
+.Podio {
+  margin-top: -150px;
+}
+
 .podium {
   display: flex;
   justify-content: space-around;
   align-items: flex-end;
-  margin-top: 20px;
+  margin-top: 100px;
 }
 
 .podium-place {
@@ -407,12 +411,12 @@ body {
 
 .podium-place-2 {
   height: 110px;
-  background: #e0e0e0; /* Segundo lugar */
+  background: #94f3f6; /* Segundo lugar */
 }
 
 .podium-place-3 {
   height: 90px;
-  background: #ffd54f; /* Tercer lugar */
+  background: #c26940; /* Tercer lugar */
 }
 
 .podium-name {

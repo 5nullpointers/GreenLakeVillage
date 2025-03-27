@@ -135,14 +135,18 @@ document.addEventListener('DOMContentLoaded', function () {
         podiumContainer.innerHTML = '';
 
         const podiumClasses = ['podium-place-2', 'podium-place-1', 'podium-place-3'];
+        const podiumImages = [
+          '/static/images/award_2_P.png',
+          '/static/images/award_1_P.png',
+          '/static/images/award_3_P.png'
+        ];
         topHotels.forEach((hotel, index) => {
           const placeDiv = document.createElement('div');
           placeDiv.classList.add('podium-place', podiumClasses[index] || 'podium-place-3');
           placeDiv.innerHTML = `
-            <div class="podium-name">${hotel.hotelName}</div>
-            <div class="podium-rating">
-              Puntuación: ${hotel.media_puntuacion.toFixed(2)}<br>
-              ${hotel.numero_comentarios} opiniones
+            <img src="${podiumImages[index] || '/static/images/podium-default.png'}" alt="Podio" class="Podio" style="width: 80px; height: auto;">
+            <div class="podium-img">
+              <div class="podium-name">${hotel.hotelName}</div>
             </div>
           `;
           podiumContainer.appendChild(placeDiv);
