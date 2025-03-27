@@ -389,6 +389,86 @@ function mostrarRutas() {
   });
 }
 
+function mostrarForo() {
+  closeAll();
+  // Mostrar un indicador de carga, si lo deseas.
+  fetch('/api/foro/temas')
+    .then(response => response.json())
+    .then(temas => {
+      let content = '<h3>Temas del Foro</h3><ul>';
+      temas.forEach((tema, index) => {
+        content += `<li class="tema-item" data-index="${index}" style="cursor:pointer;">${tema.titulo}</li>`;
+      });
+      content += '</ul>';
+      document.getElementById("infoSection").innerHTML = content;
+      showSidebar();
+      document.querySelectorAll('.tema-item').forEach(item => {
+        item.addEventListener('click', function() {
+          const index = this.getAttribute('data-index');
+          cargarComentarios(temas[index]);
+        });
+      });
+    })
+    .catch(error => console.error("Error al cargar los temas del foro:", error));
+}
+
+function cargarComentarios(tema) {
+  fetch(`/api/foro/temas/${tema._id}/comentarios`)
+    .then(response => response.json())
+    .then(comentarios => {
+      let content = `<h3>${tema.titulo}</h3>`;
+      content += `<p>${tema.descripcion}</p>`;
+      content += `<hr><h4>Comentarios</h4>`;
+      if (comentarios.length === 0) {
+        content += `<p>No hay comentarios aún.</p>`;
+      } else {
+        comentarios.forEach(c => {
+          content += `<div class="comentario">
+                        <p><strong>${c.autor}</strong> dice:</p>
+                        <p>${c.comentario}</p>`;
+          if(c.imagen_url) {
+            content += `<img src="${c.imagen_url}" alt="Imagen de comentario" style="max-width: 100%;">`;
+          }
+          content += `</div><hr>`;
+        });
+      }
+      // Formulario para agregar un nuevo comentario
+      content += `
+        <h4>Agrega tu comentario</h4>
+        <form id="comentarioForm" enctype="multipart/form-data">
+          <textarea name="comentario" placeholder="Escribe tu comentario..." required></textarea><br>
+          <input type="file" name="imagen"><br>
+          <button type="submit">Enviar</button>
+        </form>
+      `;
+      document.getElementById("infoSection").innerHTML = content;
+      showSidebar();
+
+      // Manejar el envío del formulario
+      document.getElementById("comentarioForm").addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        formData.append("tema_id", tema._id);
+        fetch('/api/foro/comentar', {
+          method: "POST",
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if(data.success) {
+            cargarComentarios(tema); // Recargar comentarios
+          } else {
+            alert("Error al enviar el comentario");
+          }
+        })
+        .catch(error => console.error("Error al enviar comentario:", error));
+      });
+    })
+    .catch(error => console.error("Error al cargar comentarios:", error));
+}
+
+
+
 // =======================
 // Función para dibujar la ruta vía Flask (Routes API v2)
 // =======================
