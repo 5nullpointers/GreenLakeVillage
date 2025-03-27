@@ -1,9 +1,11 @@
+from datetime import datetime
 import sys
 import signal
+import os
+from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
 load_dotenv(dotenv_path)
-import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import openai
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
@@ -245,6 +247,60 @@ def admin():
         # print("Hotel:", hotel_nombre, "Precio:", precio, "Reservas:", ocup_dict.get(hotel_nombre, 0), "Ingreso:", ingreso)
         ingresos_totales += ingreso
     return render_template('Admin.html', ingresosTotales=ingresos_totales, totalReservas=totalReservas, consumoTotal=consumo_total)
+
+@app.route('/api/foro/temas')
+def api_foro_temas():
+    temas = list(mongo_agent.db["temas_forum"].find({}))
+    for tema in temas:
+        tema["_id"] = str(tema["_id"])
+    return jsonify(temas)
+
+@app.route('/api/foro/temas/<string:tema_id>/comentarios')
+def api_foro_comentarios(tema_id):
+    comentarios = list(mongo_agent.db["comentarios_forum"].find({"tema_id": tema_id}))
+    for c in comentarios:
+        c["_id"] = str(c["_id"])
+    return jsonify(comentarios)
+
+# Configuración para archivos
+UPLOAD_FOLDER = os.path.join(STATIC_DIR, 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/api/foro/comentar', methods=['POST'])
+def api_foro_comentar():
+    tema_id = request.form.get("tema_id")
+    comentario_texto = request.form.get("comentario")
+    # Obtener usuario desde la sesión
+    autor = session.get("user_name", "Anónimo")
+    imagen_url = None
+
+    # Manejar la imagen si se envió
+    if 'imagen' in request.files:
+        file = request.files['imagen']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            # Aquí puedes construir la URL de la imagen, por ejemplo:
+            imagen_url = '/static/uploads/' + filename
+
+    comentario = {
+        "tema_id": tema_id,
+        "autor": autor,
+        "comentario": comentario_texto,
+        "imagen_url": imagen_url,
+        "fecha": datetime.utcnow()
+    }
+    result = mongo_agent.db["comentarios_forum"].insert_one(comentario)
+    if result.inserted_id:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False}), 500
+
 
 @app.route('/UserBlock')
 def UserBlock():
