@@ -108,6 +108,36 @@ def get_route():
         return jsonify(resp_data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/retos/marcar_notificado', methods=['POST'])
+def marcar_reto_notificado():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado"}), 401
+    
+    reto_id = request.json.get("reto_id")
+    if not reto_id:
+        return jsonify({"error": "Reto id no proporcionado"}), 400
+
+    try:
+        result = mongo_agent.db["usuarios"].update_one(
+            {
+                "_id": ObjectId(user_id),
+                "retos_completados.reto_id": reto_id
+            },
+            {
+                "$set": {"retos_completados.$.popup_mostrado": True}
+            }
+        )
+        if result.modified_count > 0:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "No se pudo actualizar el reto."}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 
 
 @app.route("/map")
@@ -287,7 +317,7 @@ def api_foro_comentar():
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
-            # Aquí puedes construir la URL de la imagen, por ejemplo:
+            # Construir la URL de la imagen
             imagen_url = '/static/uploads/' + filename
 
     comentario = {
@@ -299,9 +329,20 @@ def api_foro_comentar():
     }
     result = mongo_agent.db["comentarios_forum"].insert_one(comentario)
     if result.inserted_id:
+        # Registrar el reto de comentario si aún no ha sido completado
+        user_id = session.get("user_id")
+        if user_id:
+            try:
+                usuario = mongo_agent.db["usuarios"].find_one({"_id": ObjectId(user_id)})
+                if usuario:
+                    # Aquí debes usar el id del reto correspondiente al "Reto de Comentario"
+                    registrar_reto(usuario, "647a1ba13d5f1c4a9e8a1236")
+            except Exception as e:
+                print("Error registrando reto:", e)
         return jsonify({"success": True})
     else:
         return jsonify({"success": False}), 500
+
 
 
 @app.route('/UserBlock')
@@ -333,7 +374,6 @@ def edit_user():
 def login():
     email = request.form.get('email')
     password = request.form.get('password')
-    # blocked = request.form.get('blocked')
 
     if not email or not password:
         flash("Por favor, completa ambos campos.")
@@ -344,18 +384,34 @@ def login():
         if usuario.get("blocked") == True:
             return redirect(url_for('UserBlock'))
 
+        # Para usuarios que no sean Admin
         if usuario.get("type") != "Admin":
-            # Si ya se almacena la contraseña hasheada, usamos check_password_hash
             if check_password_hash(usuario.get("pass"), password):
+                # Guardar el _id como cadena para usarlo en actualizaciones posteriores
                 session['user_id'] = str(usuario["_id"])
                 session['user_name'] = usuario.get("name")
+                
+                # Buscar todos los retos activos
+                retos = list(mongo_agent.db["retos"].find({"activo": True}))
+                retos_pendientes = []
+                # Obtener los retos ya completados por el usuario
+                retos_completados = usuario.get("retos_completados", [])
+                # Filtrar aquellos retos que no hayan sido notificados (popup_mostrado True)
+                for reto in retos:
+                    reto_id = str(reto["_id"])
+                    if not any(str(r["reto_id"]) == reto_id and r.get("popup_mostrado", False) for r in retos_completados):
+                        retos_pendientes.append(reto)
+                
+                # Almacenar en la sesión la lista de retos pendientes para que el front-end los muestre
+                session['retos_pendientes'] = retos_pendientes
+
                 flash("Inicio de sesión exitoso!")
                 return redirect(url_for('map'))
             else:
                 flash("Contraseña incorrecta.")
                 return redirect(url_for('login_page'))
         else:
-             # Si ya se almacena la contraseña hasheada, usamos check_password_hash
+            # Para Admin
             if check_password_hash(usuario.get("pass"), password):
                 session['user_id'] = str(usuario["_id"])
                 session['user_name'] = usuario.get("name")
@@ -368,6 +424,41 @@ def login():
         flash("Usuario no encontrado.")
         return redirect(url_for('login_page'))
 
+
+@app.route('/api/retos_pendientes', methods=['GET'])
+def api_retos_pendientes():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado"}), 401
+
+    try:
+        usuario = mongo_agent.db["usuarios"].find_one({"_id": ObjectId(user_id)})
+    except Exception as e:
+        return jsonify({"error": "Error al obtener el usuario"}), 500
+
+    if not usuario:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    retos_pendientes = []
+    # Solo se consideran los retos completados (es decir, que existen en el arreglo)
+    # y que no han sido notificados (popup_mostrado: False)
+    retos_completados = usuario.get("retos_completados", [])
+    for registro in retos_completados:
+        if not registro.get("popup_mostrado", False):
+            reto_id = registro["reto_id"]
+            reto_info = mongo_agent.db["retos"].find_one({"_id": ObjectId(reto_id)})
+            if reto_info:
+                retos_pendientes.append({
+                    "id": str(reto_info["_id"]),
+                    "nombre": reto_info.get("name"),
+                    "descripcion": reto_info.get("descripcion"),
+                    "tokens": reto_info.get("tokens")
+                })
+
+    return jsonify(retos_pendientes)
+
+
+
 @app.route('/register', methods=['POST'])
 def register():
     name = request.form.get('name')
@@ -379,32 +470,39 @@ def register():
         flash("Todos los campos son obligatorios.")
         return redirect(url_for('login_page'))
 
-    # Verificar si el usuario ya existe
     if UserDAO.obtener_dato({"email": email}):
         flash("El correo ya está registrado.")
         return redirect(url_for('login_page'))
 
-    # Hashear la contraseña antes de guardarla
     hashed_password = generate_password_hash(password)
     nuevo_usuario = {
         "name": name,
         "email": email,
         "pass": hashed_password,
-        "type": "Tourist",  # o asignar otro tipo según corresponda
+        "type": "Tourist",
         "blocked": blocked,
-        "preferencias": []  # Añadimos un campo para las preferencias, vacío por ahora.
+        "preferencias": [],
+        "retos_completados": [],
+        "tokens": 0
     }
 
-    # Insertar usuario en la base de datos
     UserDAO.insertar_dato(nuevo_usuario)
+
+    usuario = UserDAO.obtener_dato({"email": email})
+    if usuario:
+        # Registrar el reto de registro para que no se muestre en futuras sesiones
+        registrar_reto(usuario, "647a1b9f3d5f1c4a9e8a1234")
+        # Almacenar el _id (como string) en la sesión
+        session['user_id'] = str(usuario["_id"])
+        session['user_name'] = usuario.get("name")
+    else:
+        flash("Error en el registro")
+        return redirect(url_for('login_page'))
+
     flash("Registro exitoso. Ahora elige tus preferencias.")
-
-    # Almacenar la información del usuario en la sesión
-    session['user_id'] = email  # Almacenar el correo electrónico del usuario en la sesión
-    session['user_name'] = name  # Almacenar el nombre del usuario en la sesión
-
-    # Redirigir a la página de preferencias después de registrarse
     return redirect(url_for('preferences', user_email=email))
+
+
 
 @app.route('/preferences', methods=['GET', 'POST'])
 def preferences():
@@ -431,39 +529,40 @@ def preferences():
 @app.route('/save-preferences', methods=['POST'])
 def save_preferences():
     data = request.json
-    # Obtener el correo electrónico del usuario desde la sesión
-    user_email = session.get('user_id')
+    # Obtenemos el _id del usuario (almacenado en la sesión)
+    user_id = session.get('user_id')
     preferences = data.get('preferencias')
 
-    if not user_email or not preferences:
+    if not user_id or not preferences:
         return jsonify({"error": "Email o preferencias no proporcionadas"}), 400
 
-    print(f"Correo: {user_email}, Preferencias: {preferences}")  # Verificar los datos recibidos
+    print(f"User ID: {user_id}, Preferencias: {preferences}")  # Verificar los datos recibidos
 
     try:
-        # Buscar al usuario en la base de datos utilizando el correo electrónico
-        user = UserDAO.obtener_dato({"email": user_email})
+        # Buscar al usuario en la base de datos utilizando el _id
+        from bson import ObjectId
+        user = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
 
         # Verificar si el usuario fue encontrado
         if not user:
             return jsonify({"error": "Usuario no encontrado"}), 400
 
-        # Si el usuario existe, actualizar sus preferencias
+        # Actualizar las preferencias del usuario
         result = UserDAO.actualizar_dato(
-            {"email": user_email},
+            {"_id": ObjectId(user_id)},
             {"preferencias": preferences}
         )
 
         print(f"Resultado de la actualización: {result.modified_count} documentos modificados")
 
         if result.modified_count > 0:
-            # Redirigir al usuario a la página de mapa
             return jsonify({"success": True, "redirect": url_for('map')})
         else:
             return jsonify({"error": "No se pudo actualizar las preferencias"}), 500
     except Exception as e:
-        print(f"Error al guardar preferencias: {str(e)}")  # Agregar información detallada del error
+        print(f"Error al guardar preferencias: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/contacto')
 def contacto():
@@ -655,6 +754,30 @@ def api_estadisticas_ocupacion():
         "cancelaciones": total_cancelaciones,
         "cancelaciones_percent": cancelaciones_percent  # ← con 3 decimales
     })
+
+def registrar_reto(usuario, reto_id):
+    reto_info = mongo_agent.db["retos"].find_one({"_id": ObjectId(reto_id)})
+    if not reto_info:
+        return
+
+    # Si ya se registró (sin importar el flag), no volvemos a registrar
+    retos_completados = usuario.get("retos_completados", [])
+    if any(str(r["reto_id"]) == reto_id for r in retos_completados):
+        return
+
+    nuevo_reto = {
+        "reto_id": reto_id,
+        "fecha": datetime.utcnow(),
+        "popup_mostrado": False
+    }
+    mongo_agent.db["usuarios"].update_one(
+        {"_id": usuario["_id"]},
+        {
+            "$push": {"retos_completados": nuevo_reto},
+            "$inc": {"tokens": reto_info.get("tokens", 0)}
+        }
+    )
+
 
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000

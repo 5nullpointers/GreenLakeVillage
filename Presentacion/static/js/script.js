@@ -61,14 +61,13 @@ function initMap() {
   });
 
   // =======================
-  // 1. Cargar rutas para el panel
+  // Cargar datos para el mapa
   // =======================
   fetch('/api/rutas')
     .then(response => response.json())
     .then(data => { routes = data; })
     .catch(error => console.error("Error al cargar rutas:", error));
 
-  // 2. Cargar hoteles y sus ratings
   fetch('/api/hoteles')
     .then(response => response.json())
     .then(data => {
@@ -82,7 +81,6 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar hoteles:", error));
 
-  // 3. Cargar restaurantes y sus ratings
   fetch('/api/restaurantes')
     .then(response => response.json())
     .then(data => {
@@ -96,7 +94,6 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar restaurantes:", error));
 
-  // 4. Cargar farmacias
   fetch('/api/farmacias')
     .then(response => response.json())
     .then(data => {
@@ -105,7 +102,6 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar farmacias:", error));
 
-  // 5. Cargar tiendas
   fetch('/api/tiendas')
     .then(response => response.json())
     .then(data => {
@@ -114,7 +110,6 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar tiendas:", error));
 
-  // 6. Cargar parques
   fetch('/api/parques')
     .then(response => response.json())
     .then(data => {
@@ -123,7 +118,6 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar parques:", error));
 
-  // 7. Cargar atracciones
   fetch('/api/atracciones')
     .then(response => response.json())
     .then(data => {
@@ -132,7 +126,6 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar atracciones:", error));
 
-  // 8. Cargar museos
   fetch('/api/museos')
     .then(response => response.json())
     .then(data => {
@@ -141,7 +134,6 @@ function initMap() {
     })
     .catch(error => console.error("Error al cargar museos:", error));
 
-  // 9. Cargar transporte
   fetch('/api/transporte')
     .then(response => response.json())
     .then(data => {
@@ -151,6 +143,7 @@ function initMap() {
     .catch(error => console.error("Error al cargar transporte:", error));
 }
 
+// Función para fallback de imagen
 function cambiarImagenFallback(img, imagenNombre) {
   img.onerror = function() {
     img.src = "/static/Images/Hoteles/default.jpg";
@@ -391,7 +384,6 @@ function mostrarRutas() {
 
 function mostrarForo() {
   closeAll();
-  // Mostrar un indicador de carga, si lo deseas.
   fetch('/api/foro/temas')
     .then(response => response.json())
     .then(temas => {
@@ -432,7 +424,6 @@ function cargarComentarios(tema) {
           content += `</div><hr>`;
         });
       }
-      // Formulario para agregar un nuevo comentario
       content += `
         <h4>Agrega tu comentario</h4>
         <form id="comentarioForm" enctype="multipart/form-data">
@@ -443,8 +434,6 @@ function cargarComentarios(tema) {
       `;
       document.getElementById("infoSection").innerHTML = content;
       showSidebar();
-
-      // Manejar el envío del formulario
       document.getElementById("comentarioForm").addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -456,7 +445,7 @@ function cargarComentarios(tema) {
         .then(response => response.json())
         .then(data => {
           if(data.success) {
-            cargarComentarios(tema); // Recargar comentarios
+            cargarComentarios(tema);
           } else {
             alert("Error al enviar el comentario");
           }
@@ -466,8 +455,6 @@ function cargarComentarios(tema) {
     })
     .catch(error => console.error("Error al cargar comentarios:", error));
 }
-
-
 
 // =======================
 // Función para dibujar la ruta vía Flask (Routes API v2)
@@ -507,6 +494,58 @@ async function dibujarRuta(route) {
   }
 }
 
+// Función para marcar un reto como notificado
+function marcarRetoNotificado(retoId) {
+  fetch('/api/retos/marcar_notificado', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({reto_id: retoId})
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (!data.success) {
+      console.error("No se pudo marcar el reto como notificado", data.error);
+    }
+  })
+  .catch(error => console.error("Error al marcar el reto", error));
+}
+
+// Función que consulta los retos completados pendientes de notificación
+function checkRetosPendientes() {
+  fetch('/api/retos_pendientes')
+    .then(response => response.json())
+    .then(retos => {
+      if (retos.length > 0) {
+        // Se muestra el primer reto pendiente
+        const reto = retos[0];
+        const popup = document.createElement('div');
+        popup.id = "retoPopup";
+        popup.style.position = "fixed";
+        popup.style.top = "20px";
+        popup.style.right = "20px";
+        popup.style.backgroundColor = "#4caf50";
+        popup.style.color = "#fff";
+        popup.style.padding = "15px";
+        popup.style.borderRadius = "5px";
+        popup.style.zIndex = "1000";
+        popup.textContent = `¡Nuevo reto: ${reto.nombre}! ${reto.descripcion}`;
+        document.body.appendChild(popup);
+        // Marcar el reto como notificado para que no se muestre en futuras cargas
+        marcarRetoNotificado(reto.id);
+        setTimeout(() => {
+          popup.remove();
+        }, 5000);
+      }
+    })
+    .catch(error => console.error("Error al obtener retos pendientes:", error));
+}
+
+// Se consulta al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+  checkRetosPendientes();
+});
+
+
 // =======================
 // Asistente Virtual: Enviar mensaje y mostrar respuesta
 // =======================
@@ -517,10 +556,8 @@ document.getElementById('assistant-send').addEventListener('click', async () => 
   appendMessage('user', message);
   input.value = '';
 
-  // Agregar indicador de carga (tres puntos animados)
   const loadingMessage = document.createElement('div');
   loadingMessage.className = 'message assistant loading';
-  // Creamos tres spans para los puntos
   loadingMessage.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
   const chatContainer = document.getElementById('assistant-chat');
   chatContainer.appendChild(loadingMessage);
@@ -533,7 +570,6 @@ document.getElementById('assistant-send').addEventListener('click', async () => 
       body: JSON.stringify({ message })
     });
     const data = await response.json();
-    // Eliminar el indicador de carga
     loadingMessage.remove();
     if (data.response) {
       appendMessage('assistant', data.response);
@@ -547,18 +583,14 @@ document.getElementById('assistant-send').addEventListener('click', async () => 
   }
 });
 
-
 function appendMessage(sender, text) {
   const chatContainer = document.getElementById('assistant-chat');
   const messageElem = document.createElement('div');
   messageElem.className = 'message ' + sender;
-  // Convertir markdown a HTML
   messageElem.innerHTML = marked.parse(text);
   chatContainer.appendChild(messageElem);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
-
-
 
 // =======================
 // Asistente Virtual: Mostrar/Ocultar desplegable
