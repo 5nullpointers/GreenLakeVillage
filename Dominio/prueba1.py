@@ -318,29 +318,23 @@ def ver_reservas_hoteles():
 @app.route('/api/propietarios/reservas')
 def api_reservas_propietario():
     user_name = session.get("user_name")
-    user_type = session.get("user_type")
-
-    if not user_name or user_type != "BusinessOwner":
-        return jsonify([])
 
     # Obtener lista de propiedades del usuario
     usuario = mongo_agent.db["usuarios"].find_one({"name": user_name})
     if not usuario or "properties" not in usuario:
         return jsonify([])
 
-    nombres_hoteles = usuario["properties"]  # lista de nombres de hoteles
-
-    # Buscar reservas que correspondan a esos hoteles
+    nombres_hoteles = usuario["properties"]
+    
+    # Para depuración, descomenta la siguiente línea para devolver todas las reservas
+    # reservas = list(mongo_agent.db["reservas"].find({}))
+    
     reservas = list(mongo_agent.db["reservas"].find({
         "nombre_hotel": {"$in": nombres_hoteles}
     }))
-
-    # Convertir ObjectId a string para que sea JSON serializable
     for r in reservas:
         r["_id"] = str(r["_id"])
-
     return jsonify(reservas)
-
 
 @app.route('/MapaAdmin')
 def MapaAdmin():
