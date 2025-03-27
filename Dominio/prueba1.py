@@ -3,6 +3,7 @@ import signal
 import os
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+import os
 dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
 load_dotenv(dotenv_path)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -306,10 +307,19 @@ def login_page():
     # Ahora la ruta '/login' redirige a loginRegister.html
     return render_template('loginRegister.html')
 
+@app.route('/Propietarios')
+def Propietarios():
+    return render_template('BusinessOwner.html')
+
 @app.route('/MapaAdmin')
 def MapaAdmin():
     google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
     return render_template('MapaAdmin.html', google_maps_api_key=google_maps_api_key)
+
+@app.route('/MapaPropietarios')
+def MapaPropietarios():
+    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+    return render_template('MapaPropietarios.html', google_maps_api_key=google_maps_api_key)
 
 @app.route('/admin/UsuariosAdmin')
 def UsuariosAdmin():
@@ -452,25 +462,36 @@ def login():
         if usuario.get("blocked") == True:
             return redirect(url_for('UserBlock'))
 
-        if usuario.get("type") != "Admin":
-            # Si ya se almacena la contraseña hasheada, usamos check_password_hash
-            if check_password_hash(usuario.get("pass"), password):
-                session['user_id'] = str(usuario["_id"])
-                session['user_name'] = usuario.get("name")
-                flash("Inicio de sesión exitoso!")
-                return redirect(url_for('map'))
-            else:
-                flash("Contraseña incorrecta.")
-                return redirect(url_for('login_page'))
-        else:
-             # Si ya se almacena la contraseña hasheada, usamos check_password_hash
-            if check_password_hash(usuario.get("pass"), password):
-                session['user_id'] = str(usuario["_id"])
-                session['user_name'] = usuario.get("name")
-                flash("Inicio de sesión exitoso!")
-                return redirect(url_for('admin'))
-            else:
-                flash("Contraseña incorrecta.")
+        match usuario.get("type"):
+            case "Tourist":
+                if check_password_hash(usuario.get("pass"), password):
+                    session['user_id'] = str(usuario["_id"])
+                    session['user_name'] = usuario.get("name")
+                    flash("Inicio de sesión exitoso!")
+                    return redirect(url_for('map'))
+                else:
+                    flash("Contraseña incorrecta.")
+                    return redirect(url_for('login_page'))
+            case "Admin":
+                if check_password_hash(usuario.get("pass"), password):
+                    session['user_id'] = str(usuario["_id"])
+                    session['user_name'] = usuario.get("name")
+                    flash("Inicio de sesión exitoso!")
+                    return redirect(url_for('admin'))
+                else:
+                    flash("Contraseña incorrecta.")
+                    return redirect(url_for('login_page'))
+            case "BusinessOwner":
+                if check_password_hash(usuario.get("pass"), password):
+                    session['user_id'] = str(usuario["_id"])
+                    session['user_name'] = usuario.get("name")
+                    flash("Inicio de sesión exitoso!")
+                    return redirect(url_for('Propietarios'))
+                else:
+                    flash("Contraseña incorrecta.")
+                    return redirect(url_for('login_page'))
+            case _:
+                flash("Tipo de usuario desconocido.")
                 return redirect(url_for('login_page'))
     else:
         flash("Usuario no encontrado.")
@@ -642,6 +663,30 @@ def api_ratings():
     }
     return jsonify(ratings_dict)
 
+@app.route('/api/ratings_Propietarios')
+def api_ratings_Propietarios():
+    from bson import ObjectId
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado"}), 401
+
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "El usuario no es un Propietario"}), 403
+
+    user_properties = business_owner.get("properties", [])
+    agregados = OpinionesTuristicasDAO.obtener_agregados()
+
+    # Filtrar los resultados de 'agregados' solo por propiedades del usuario
+    ratings_dict = {}
+    for entry in agregados:
+        if entry["_id"] in user_properties:
+            ratings_dict[entry["_id"]] = {
+                "media_puntuacion": entry["media_puntuacion"],
+                "numero_comentarios": entry["numero_comentarios"]
+            }
+    return jsonify(ratings_dict)
+
 from bson import ObjectId
 from flask import render_template, abort
 from Entidades.asistenteIA import obtener_respuesta
@@ -763,6 +808,218 @@ def api_estadisticas_ocupacion():
         "cancelaciones": total_cancelaciones,
         "cancelaciones_percent": cancelaciones_percent  # ← con 3 decimales
     })
+
+@app.route('/api/estadisticas_ocupacion_Propietarios')
+def api_estadisticas_ocupacion_Propietarios():
+    # Nuevo: Obtener el usuario logueado y sus propiedades
+    from Persistencia.DAOS.UserDAO import UserDAO
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado."}), 401
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "Acceso no autorizado."}), 403
+    user_properties = business_owner.get("properties", [])
+    
+    # Obtener datos de ocupación y filtrar por propiedades del usuario
+    all_ocupaciones = OcupacionHoteleraDAO.obtener_todos()
+    ocupaciones = [o for o in all_ocupaciones if o.get("hotel_nombre") in user_properties]
+    
+    if not ocupaciones:
+        # Si no hay datos, devolvemos ceros
+        return jsonify({
+            "tasa_ocupacion_users": 0,
+            "tasa_ocupacion_percent": 0,
+            "reservas_confirmadas": 0,
+            "reservas_percent": 0,
+            "cancelaciones": 0,
+            "cancelaciones_percent": 0
+        })
+    
+    # 1) Calcular totales
+    total_reservas = sum(o["reservas_confirmadas"] for o in ocupaciones)
+    total_cancelaciones = sum(o["cancelaciones"] for o in ocupaciones)
+    total_usuarios = total_reservas + total_cancelaciones
+
+    # 2) Calcular promedios
+    total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)  # suma de % ocupacion
+    promedio_tasa = round(total_tasa / len(ocupaciones), 3)     # promedio de % ocupacion
+
+    # 3) Convertir “tasa de ocupación” (porcentaje) a número de usuarios
+    if total_usuarios > 0:
+        ocupacion_users = round((promedio_tasa / 100) * total_usuarios)
+    else:
+        ocupacion_users = 0
+
+    # 4) Calcular porcentajes de reservas y cancelaciones sobre el total
+    if total_usuarios > 0:
+        reservas_percent = round((total_reservas / total_usuarios) * 100, 3)
+        cancelaciones_percent = round((total_cancelaciones / total_usuarios) * 100, 3)
+    else:
+        reservas_percent = 0
+        cancelaciones_percent = 0
+    
+    return jsonify({
+        "tasa_ocupacion_users": ocupacion_users,
+        "tasa_ocupacion_percent": promedio_tasa,        # ← con 3 decimales
+        "reservas_confirmadas": total_reservas,
+        "reservas_percent": reservas_percent,           # ← con 3 decimales
+        "cancelaciones": total_cancelaciones,
+        "cancelaciones_percent": cancelaciones_percent  # ← con 3 decimales
+    })
+
+@app.route('/Propietarios/PropiedadesUsuario', methods=['GET'])
+def propiedades_usuario():
+    """
+    Muestra (o retorna en JSON) las propiedades de un usuario BusinessOwner.
+
+    - Si es una petición normal (GET sin 'X-Requested-With'),
+      se renderiza la plantilla 'PropiedadesUsuario.html' con Jinja2,
+      mostrando las propiedades en un <ul>.
+
+    - Si es una petición fetch/JS con 'X-Requested-With: XMLHttpRequest',
+      se retorna JSON para que el front-end rellene la tabla <table id="propiedadesTable">.
+    """
+    user_id = session.get('user_id')
+    if not user_id:
+        # Si no hay usuario en sesión, respondemos según sea fetch o normal
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({"error": "Usuario no autenticado."}), 401
+        else:
+            return "No hay usuario logueado. <a href='/login'>Ir a login</a>", 401
+
+    # 1) Buscar al usuario con el UserDAO
+    usuario = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not usuario:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({"error": "Usuario no encontrado."}), 404
+        else:
+            return "Usuario no encontrado.", 404
+
+    # 2) Extraer sus propiedades (array de strings)
+    propiedades = usuario.get("properties", [])
+
+    propiedades_info = []
+    for propiedad in propiedades:
+        # 3) Buscar datos de ocupación en "ocupacion_hotelera"
+        ocupacion = OcupacionHoteleraDAO.obtener_por_nombre(propiedad) or {}
+        # 4) Buscar opiniones en "opiniones_turisticas"
+        opiniones = list(mongo_agent.db["opiniones_turisticas"].find({"hotel_nombre": propiedad}))
+        # Calcular rating medio
+        if opiniones:
+            avg_rating = sum(op.get("puntuacion", 0) for op in opiniones) / len(opiniones)
+        else:
+            avg_rating = None
+
+        tipo_servicio = OpinionesTuristicasDAO.obtener_tipo_servicio(propiedad)
+
+        precio = ""
+
+        # Obtener precio según el tipo
+        if tipo_servicio == "Hotel":
+            precio = ocupacion.get("precio_promedio_noche", "N/A")
+        elif tipo_servicio == "Servicio":
+            restaurante = mongo_agent.db["restaurantes"].find_one({"nombre": propiedad}) or {}
+            precio = restaurante.get("precio_medio", "N/A")
+        else:
+            precio = "N/A"
+
+        # 5) Construir la info de la propiedad
+        propiedades_info.append({
+            "nombre": propiedad,
+            "tipo_servicio": tipo_servicio,
+            "ocupacion": {
+                "reservas_confirmadas": ocupacion.get("reservas_confirmadas", 0),
+                "cancelaciones": ocupacion.get("cancelaciones", 0),
+                "precio": precio
+            },
+            "opiniones": opiniones,
+            "avg_rating": avg_rating
+        })
+
+    # 6) Si la petición es fetch/JS => devolver JSON
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify(propiedades_info)
+
+    # 7) Si no es fetch => renderizar la plantilla con Jinja2
+    return render_template('PropiedadesUsuario.html', propiedades=propiedades_info)
+
+@app.route('/api/billed_Propietarios')
+def api_billed_Propietarios():
+    from Persistencia.DAOS.UserDAO import UserDAO
+    from Persistencia.DAOS.HotelesDAO import HotelesDAO
+    from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
+    from bson import ObjectId
+
+    user_id = session.get('user_id')
+    if not user_id:
+        return
+
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return
+
+    # Obtener propiedades del usuario
+    user_properties = business_owner.get("properties", [])
+
+    # Obtener precios de hoteles
+    hoteles_data = HotelesDAO.obtener_precios()
+    # Obtener reservas confirmadas
+    ocupaciones_data = OcupacionHoteleraDAO.obtener_todos()
+
+    # Construir un dict para precios
+    precios_dict = {}
+    for h in hoteles_data:
+        nombre_hotel = h.get("nombre")
+        precio_hotel = h.get("precio", 0)
+        precios_dict[nombre_hotel] = precio_hotel
+
+    # Construir un dict para reservas
+    reservas_dict = {}
+    for o in ocupaciones_data:
+        nombre_occ = o.get("hotel_nombre")
+        reservas = o.get("reservas_confirmadas", 0)
+        reservas_dict[nombre_occ] = reservas_dict.get(nombre_occ, 0) + reservas
+
+    # Calcular facturación
+    facturacion = []
+    for propiedad in user_properties:
+        precio = precios_dict.get(propiedad, 0)
+        reserv = reservas_dict.get(propiedad, 0)
+        facturacion.append({
+            "hotelName": propiedad,
+            "total": precio * reserv
+        })
+
+    # Ordenar top 3
+    facturacion.sort(key=lambda x: x["total"], reverse=True)
+    top3 = facturacion[:3]
+
+    return jsonify(top3)
+
+from bson import ObjectId
+import math  # Añade esta línea si no existe
+
+@app.route('/api/latest_reviews_propietarios')
+def api_latest_reviews_propietarios():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado."}), 401
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "Acceso no autorizado."}), 403
+    user_properties = business_owner.get("properties", [])
+    reseñas_cursor = mongo_agent.db["opiniones_turisticas"].find(
+        {"nombre_servicio": {"$in": user_properties}}
+    ).sort("fecha", -1).limit(3)
+    reseñas = list(reseñas_cursor)
+    for r in reseñas:
+        r["_id"] = str(r["_id"])
+        # Reemplazar cualquier valor NaN en el registro por None
+        for key, value in r.items():
+            if isinstance(value, float) and math.isnan(value):
+                r[key] = None
+    return jsonify(reseñas)
 
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000

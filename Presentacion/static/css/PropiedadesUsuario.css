@@ -1,0 +1,223 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* ===== Reset básico (opcional) ===== */
+* {
+  margin: 0;
+  padding: 0;
+  font-family:  "Poppins", sans-serif;
+  box-sizing: border-box;
+}
+
+/* ===== Estilos generales de la página ===== */
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
+}
+
+h1 {
+  text-align: left;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Menú Superior */
+.superiorAdmin {
+  height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  background: #009688;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.superiorAdmin .logo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin-left: 1rem;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-weight: bold;
+  position: relative;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.user-name {
+  margin-right: 20px;
+}
+
+/* Dropdown */
+.user-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+}
+
+.user-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+}
+
+.user-dropdown li {
+  margin: 10px;
+  color: black;
+}
+
+.user-dropdown a {
+  color: black;
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+}
+
+.user-dropdown a:hover {
+  background: #f0f0f0;
+  border-radius: 12px;
+}
+
+/* Layout con menú lateral y panel blanco */
+.layout {
+  display: flex;
+  margin-top: 10px;
+}
+
+.panelBlancoMenu {
+  background-color: #fff;
+  text-align: left;
+  padding: 10px;
+  margin: 10px;
+  width: 200px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-radius: 12px;
+  height: 670px;
+  margin-left: 20px;
+}
+
+.menuPanel ul {
+  margin-top: 10px;
+}
+
+.menuPanel li {
+  transition: background-color 0.3s, color 0.3s, transform 0.3s;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 12px;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.menuPanel li:hover {
+  background-color: #009688;
+  color: #fff;
+  transform: translateX(5px);
+}
+
+.menuPanel li a {
+  color: inherit;
+  text-decoration: none;
+  margin-left: 8px;
+}
+
+.menuPanel li.active {
+  background-color: #009688;
+  color: #fff;
+}
+
+.option-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.panelBlanco {
+  flex: 1;
+  background-color: #fff;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 12px;
+  height: 670px;
+  margin-right: 20px;
+}
+
+.containerPrincipal {
+  margin: 10px;
+}
+
+/* ===== Estilos de la tabla (ID: propiedadesTable) ===== */
+#propiedadesTable {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#propiedadesTable thead {
+  background-color: #f2f2f2;
+}
+
+#propiedadesTable thead tr {
+  font-weight: bold;
+}
+
+#propiedadesTable th,
+#propiedadesTable td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Resalta la fila al pasar el mouse */
+#propiedadesTable tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Filas alternas (striped) */
+#propiedadesTable tbody tr:nth-child(even) {
+  background-color: #fcfcfc;
+}
+
+/* Cursor en los th para indicar que se puede ordenar */
+#propiedadesTable th {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* SweetAlert2 con bordes redondeados (opcional) */
+.swal2-popup {
+  border-radius: 30px !important;
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mis Propiedades - Green Lake Village</title>
+  <link rel="stylesheet" href="/static/css/PropiedadesUsuario.css">
+  <!-- SweetAlert2 (opcional) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Animate.css (opcional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</head>
+
+<body>
+  <!-- Barra de navegación superior -->
+  <nav class="superiorAdmin">
+    <div class="logo">Mis Propiedades - Green Lake Village</div>
+    <div class="user-profile">
+      <img src="/static/images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
+      <!-- Nombre del usuario (si está en session) -->
+      <span class="user-name">{{ session.user_name or 'Nombre de Usuario' }}</span>
+      <div class="user-dropdown" id="userDropdown">
+        <ul>
+          <li><a href="#">Configuración</a></li>
+          <li><a href="/">Cerrar sesión</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Layout con panel de menú y panel blanco -->
+  <div class="layout">
+    <div class="panelBlancoMenu">
+      <div class="menuPanel">
+        <ul>
+          <li>
+            <img src="/static/images/inicio.png" alt="Inicio" class="option-icon" />
+            <a href="/Propietarios">Inicio</a>
+          </li>
+          <li class="active">
+            <img src="/static/images/PropiedadesBlanco.png" alt="Propiedades" class="option-icon" />
+            <a href="/Propietarios/PropiedadesUsuario">Propiedades</a>
+          </li>
+          <li>
+            <img src="/static/images/Reseñas.png" alt="Reseñas" class="option-icon" />
+            <a href="#">Reseñas</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Panel principal con tabla -->
+    <div class="panelBlanco">
+      <div class="containerPrincipal">
+        <h1>Propiedades del Usuario</h1>
+
+        <!-- Tabla que el JS llenará si se llama vía fetch -->
+        <table id="propiedadesTable" border="1" cellspacing="0" cellpadding="5">
+          <thead>
+            <tr>
+              <th onclick="sortColumn(0)">Nombre</th>
+              <th onclick="sortColumn(1)">Tipo</th>
+              <th onclick="sortColumn(2)">Cancelaciones</th>
+              <th onclick="sortColumn(3)">Reservas</th>
+              <th onclick="sortColumn(4)">Precio (€)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Se rellenará dinámicamente con JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/PropiedadesUsuario.js"></script>
+</body>
+</html>

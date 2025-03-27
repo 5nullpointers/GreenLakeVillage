@@ -1,0 +1,494 @@
+/* Importar la fuente Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* Estilos Globales */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  text-decoration: none;
+  list-style: none;
+}
+
+/* Fondo del body con degradado */
+body {
+  background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
+  min-height: 100vh;
+}
+
+/* Contenedor principal */
+.admin-container {
+  width: 100vw;
+  height: 100vh;
+  background: #8ACFC8;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Menú Superior */
+.admin-menu {
+  height: 70px;
+  background: #009688;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+}
+
+.admin-menu .left-section {
+  display: flex;
+  align-items: center;
+}
+
+.admin-menu .logo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin-left: 1rem;
+}
+
+/* Perfil de usuario en menú superior */
+.user-profile {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-weight: bold;
+  position: relative;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+/* Dropdown de usuario */
+.user-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+}
+
+.user-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+}
+
+.user-dropdown li {
+  margin: 0;
+  color: black;
+}
+
+.user-dropdown a {
+  color: black;
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+}
+
+.user-dropdown a:hover {
+  background: #f0f0f0;
+  border-radius: 12px;
+}
+
+/* Contenido Principal */
+.admin-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Grid principal */
+.admin-grid {
+  display: grid;
+  grid-template-columns: 250px repeat(3, 1fr);
+  grid-auto-rows: auto;
+  gap: 16px;
+}
+
+/* Barra lateral */
+.sidebar {
+  grid-column: 1 / 2;
+  grid-row: 1 / 49;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.sidebar ul {
+  margin-top: 10px;
+}
+
+.sidebar li {
+  transition: background-color 0.3s, color 0.3s, transform 0.3s;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 12px;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar li:hover {
+  background-color: #009688;
+  color: #fff;
+  transform: translateX(5px);
+}
+
+.sidebar li a {
+  color: inherit;
+  text-decoration: none;
+  margin-left: 8px;
+}
+
+.option-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Texto de cada opción */
+.text-label {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+/* Sección activa */
+.sidebar li.active {
+  background-color: #009688;
+  color: #fff;
+}
+
+/* Sección de Bienvenida + Tarjetas */
+.Bienvenida {
+  grid-column: 2 / 5;
+  grid-row: 1 / 2;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0px 0px 0 20px;
+}
+
+.welcome-text p {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+.welcome-text h2 {
+  font-size: 28px;
+  margin-top: -10px;
+  margin-left: 10px;
+  font-weight: normal;
+  color: white;
+}
+
+.cards-row {
+  display: flex;
+  flex: 1;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+.info-card {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon-left {
+  width: 55px;
+  height: 55px;
+  margin-right: 35px;
+}
+
+.card-text {
+  text-align: left;
+}
+
+.card-text h3 {
+  margin: 0 0 4px 0;
+  font-size: 20px;
+  color: #009688;
+}
+
+.card-text p {
+  margin: 0;
+  font-size: 14px;
+  color: #000;
+}
+
+/* Paneles */
+.panel {
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.mapa {
+  grid-column: 2 / 5;
+  grid-row: 2 / 40;
+  border-radius: 12px;
+  box-shadow: 0 0 200px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.map-stats-container {
+  display: flex;
+  width: 100%;
+  padding: 16px;
+  gap: 16px;
+}
+
+.map-container {
+  flex: 2.5;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+#mapIframe {
+  width: 100%;
+  height: 550px;
+  border: none;
+}
+
+.stats-container {
+  flex: 1;
+  background: transparent;
+  border-radius: 12px;
+  box-shadow: none;
+  text-align: left;
+  padding: 16px;
+}
+
+.stat-item {
+  margin-bottom: 20px;
+}
+
+.stat-item p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.stat-item span {
+  display: block;
+  font-size: 14px;
+  color: #009688;
+  margin-bottom: 8px;
+}
+
+.stat-bar {
+  background: #f0f0f0;
+  height: 8px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.stat-bar-fill {
+  background: #009688;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.admin-widget-2 {
+  grid-column: 2 / 3;
+  grid-row: 40 / 63;
+}
+
+.admin-widget-3 {
+  grid-column: 3 / 4;
+  grid-row: 40 / 63;
+}
+
+.admin-widget-4 {
+  grid-column: 4 / 5;
+  grid-row: 40 / 63;
+}
+
+.top-hotels-widget {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.top-hotels-widget h3 {
+  margin-bottom: 10px;
+  color: #333;
+  text-align: center;
+}
+
+.top-hotels-widget ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.top-hotels-widget li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  color: #555;
+  transition: color 0.3s;
+}
+
+.top-hotel-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.top-hotels-widget li:hover {
+  color: #009688;
+}
+
+.Podio {
+  margin-top: -150px;
+}
+
+.podium {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  margin-top: 100px;
+}
+
+.podium-place {
+  background: #f8f8f8;
+  width: 28%;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  position: relative;
+  padding: 10px;
+}
+
+.podium-place-1 {
+  height: 160px;
+  background: #ffe082; /* Primer lugar */
+}
+
+.podium-place-2 {
+  height: 130px;
+  background: #94f3f6; /* Segundo lugar */
+}
+
+.podium-place-3 {
+  height: 110px;
+  background: #c26940; /* Tercer lugar */
+}
+
+.podium-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.podium-rating {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+    /* Todo en una sola columna */
+  }
+
+  .sidebar {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border-radius: 0;
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .sidebar ul {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+  }
+
+  .sidebar li {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .Bienvenida {
+    margin: 20px 0;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cards-row {
+    justify-content: flex-start;
+  }
+}
+
+#latestReviews {
+  background: #f7f9fc;
+  border: 2px solid #009688;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+#latestReviews li {
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+#latestReviews li:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+#latestReviews li strong {
+  color: #009688;
+}

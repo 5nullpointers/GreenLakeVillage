@@ -20,6 +20,17 @@ class OpinionesTuristicasDAO:
     @staticmethod
     def obtener_todos():
         return mongoDBAgent.find(OpinionesTuristicasDAO.COLLECTION)
+    
+    @staticmethod
+    def obtener_tipo_servicio(nombre_servicio):
+        """
+        Devuelve el tipo_servicio (Hotel, Restaurante, etc.) de la primera opinión del servicio dado.
+        """
+        opinion = mongoDBAgent.db[OpinionesTuristicasDAO.COLLECTION].find_one(
+            {"nombre_servicio": nombre_servicio},
+            {"_id": 0, "tipo_servicio": 1}
+        )
+        return opinion.get("tipo_servicio", "N/A") if opinion else "N/A"
 
     @staticmethod
     def actualizar_dato(filtro, nuevo_valor):

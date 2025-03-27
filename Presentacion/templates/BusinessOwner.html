@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Propietarios</title>
+  <!-- Enlaza tu hoja de estilos principal -->
+  <link rel="stylesheet" href="/static/css/BusinessOwner.css" />
+</head>
+
+<body>
+  <div class="admin-container">
+    <!-- Menú Superior -->
+    <nav class="admin-menu">
+      <div class="left-section">
+        <div class="logo">Mis Propiedades - Green Lake Village</div>
+      </div>
+      <div class="user-profile">
+        <!-- Se ha eliminado el span del nombre -->
+        <img src="/static/images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
+        <div class="user-dropdown" id="userDropdown">
+          <ul>
+            <li><a href="#">Configuración</a></li>
+            <li><a href="/">Cerrar sesión</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="admin-content">
+      <div class="admin-grid">
+        <!-- Barra lateral -->
+        <div class="sidebar" id="sidebar">
+          <ul>
+            <!-- Se marca la opción activa con "active" -->
+            <li class="active">
+              <img src="/static/images/inicio.png" alt="Inicio" class="option-icon" />
+              <span class="text-label"><a href="/Propietarios">Inicio</a></span>
+            </li>
+            <li>
+              <img src="/static/images/Propiedades.png" alt="Propiedades" class="option-icon" />
+              <a href="/Propietarios/PropiedadesUsuario">Propiedades</a>
+            </li>
+            <li>
+              <img src="/static/images/Reseñas.png" alt="Reseñas" class="option-icon" />
+              <span class="text-label"><a href="#">Reseñas</a></span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Sección de Bienvenida + Tarjetas -->
+        <div class="Bienvenida">
+          <div class="welcome-text">
+            <p>Hola, {{ session.user_name or 'Nombre de Usuario' }}</p>
+            <h2>Overview</h2>
+          </div>
+          <div class="cards-row">
+            <div class="info-card">
+              <img src="/static/images/Dinero.png" alt="Dinero icon" class="card-icon-left">
+              <div class="card-text">
+                <h3>Ingresos totales</h3>
+                <p>434,34 Millones de euros</p>
+              </div>
+            </div>
+            <div class="info-card">
+              <img src="/static/images/Visitantes.png" alt="Visitantes icon" class="card-icon-left">
+              <div class="card-text">
+                <h3>Visitantes totales</h3>
+                <p>526,55 Mil visitantes</p>
+              </div>
+            </div>
+            <div class="info-card">
+              <img src="/static/images/huellaAmbiental.png" alt="Huella icon" class="card-icon-left">
+              <div class="card-text">
+                <h3>Huella ambiental</h3>
+                <p>2,45 Millones de kWh</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel principal: Mapa + Estadísticas -->
+        <div class="panel mapa">
+          <div class="map-stats-container">
+            <div class="map-container">
+              <iframe id="mapIframe" src="/MapaPropietarios"></iframe>
+            </div>
+            <div class="stats-container">
+              <div class="stat-item">
+                <p>Tasa de ocupación</p>
+                <span id="ocupacionRate"></span>
+                <div class="stat-bar">
+                  <div id="ocupacionBarFill" class="stat-bar-fill" style="width: 0%;"></div>
+                </div>
+              </div>              
+              <div class="stat-item">
+                <p>Reservas confirmadas</p>
+                <span id="reservasRate"></span>
+                <div class="stat-bar">
+                  <div id="reservasBarFill" class="stat-bar-fill" style="width: 0%;"></div>
+                </div>
+              </div>              
+              <div class="stat-item">
+                <p>Cancelaciones</p>
+                <span id="cancelacionesRate"></span>
+                <div class="stat-bar">
+                  <div id="cancelacionesBarFill" class="stat-bar-fill" style="width: 0%;"></div>
+                </div>
+              </div>          
+              </div>
+            </div>
+        </div>
+
+        <!-- Otros Widgets (opcional) -->
+        <div class="panel admin-widget-2 top-hotels-widget">
+          <h3>Top 3 Tus Mejores Propiedades</h3>
+          <div id="podiumContainer" class="podium"></div>
+        </div>
+        <div class="panel admin-widget-3 top-billed-widget">
+          <h3>Top 3 Mejores Facturadas</h3>
+          <div id="BilledContainer" class="podium"></div>
+        </div>
+        <div class="panel admin-widget-4">
+          <!-- Se reemplaza "Widget 4" por la lista de últimas reseñas -->
+          <h3>Últimas Reseñas</h3>
+          <ul id="latestReviews">
+            <!-- Se insertarán las reseñas via JavaScript -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enlaza tu script principal -->
+  <script src="/static/js/BusinessOwner.js"></script>
+</body>
+
+</html>

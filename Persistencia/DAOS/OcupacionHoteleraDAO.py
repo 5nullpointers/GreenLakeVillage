@@ -59,3 +59,12 @@ class OcupacionHoteleraDAO:
         if result and len(result) > 0:
             return result[0].get("totalCancelaciones", 0)
         return 0
+
+    @staticmethod
+    def obtener_por_nombre(nombre_hotel):
+        """
+        Busca en la colección ocupacion_hotelera el documento cuyo 'hotel_nombre' coincida.
+        Retorna el documento o None si no existe.
+        """
+        filtro = {"hotel_nombre": nombre_hotel}
+        return mongoDBAgent.find_one(OcupacionHoteleraDAO.COLLECTION, filtro)

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Green Lake Village</title>
+
+  <!-- Fuente Poppins (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Carga CSS desde /static/css/style.css -->
+  <link rel="stylesheet" href="/static/css/MapaPropietarios.css">
+</head>
+
+<body>
+
+  <!-- Mapa a pantalla completa -->
+  <div id="map"></div>
+
+  <!-- Carga la API de Google Maps (reemplaza TU_API_KEY y TU_MAP_ID) -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&map_ids=TU_MAP_ID&libraries=visualization"></script>
+
+  <!-- Carga JS desde /static/js/script.js -->
+  <script src="/static/js/MapaPropietarios.js"></script>
+
+</body>
+
+</html>
