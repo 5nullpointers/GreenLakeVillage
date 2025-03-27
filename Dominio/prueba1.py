@@ -210,7 +210,8 @@ def MapaAdmin():
 
 @app.route('/MapaPropietarios')
 def MapaPropietarios():
-    return render_template('MapaPropietarios.html')
+    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+    return render_template('MapaPropietarios.html', google_maps_api_key=google_maps_api_key)
 
 @app.route('/admin/UsuariosAdmin')
 def UsuariosAdmin():
