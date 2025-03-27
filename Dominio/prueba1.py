@@ -889,6 +889,30 @@ def api_billed_Propietarios():
 
     return jsonify(top3)
 
+from bson import ObjectId
+import math  # Añade esta línea si no existe
+
+@app.route('/api/latest_reviews_propietarios')
+def api_latest_reviews_propietarios():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado."}), 401
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "Acceso no autorizado."}), 403
+    user_properties = business_owner.get("properties", [])
+    reseñas_cursor = mongo_agent.db["opiniones_turisticas"].find(
+        {"nombre_servicio": {"$in": user_properties}}
+    ).sort("fecha", -1).limit(3)
+    reseñas = list(reseñas_cursor)
+    for r in reseñas:
+        r["_id"] = str(r["_id"])
+        # Reemplazar cualquier valor NaN en el registro por None
+        for key, value in r.items():
+            if isinstance(value, float) and math.isnan(value):
+                r[key] = None
+    return jsonify(reseñas)
+
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
     app.run(host='0.0.0.0', port=5000, debug=True)

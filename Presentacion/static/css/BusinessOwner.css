@@ -468,3 +468,27 @@ body {
     justify-content: flex-start;
   }
 }
+
+#latestReviews {
+  background: #f7f9fc;
+  border: 2px solid #009688;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+#latestReviews li {
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+#latestReviews li:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+#latestReviews li strong {
+  color: #009688;
+}

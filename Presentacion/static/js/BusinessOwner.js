@@ -183,4 +183,32 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       })
       .catch(error => console.error('Error al obtener las propiedades con mayor facturación:', error));
+
+    // Nuevo fetch para obtener las últimas reseñas en widget 4
+    fetch('/api/latest_reviews_propietarios')
+      .then(response => response.json())
+      .then(data => {
+        console.log('DEBUG: Reseñas recibidas:', data);  // Depuración
+        const reviewsList = document.getElementById('latestReviews');
+        reviewsList.innerHTML = ''; // limpiar lista
+        if (data.error) {
+          console.error('Error al obtener reseñas: ' + data.error);
+          reviewsList.innerHTML = `<li>Error de conexión: ${data.error}</li>`;
+          return;
+        }
+        if (data.length === 0) {
+          console.warn('DEBUG: No se encontraron reseñas.');
+          reviewsList.innerHTML = '<li>No se encontraron reseñas para tus propiedades.</li>';
+          return;
+        }
+        data.forEach(review => {
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${review.nombre_servicio}:</strong> ${review.comentario}`;
+          reviewsList.appendChild(li);
+        });
+      })
+      .catch(error => {
+        console.error('Error al obtener reseñas:', error);
+        document.getElementById('latestReviews').innerHTML = `<li>Error de conexión: ${error.message}</li>`;
+      });
 });
