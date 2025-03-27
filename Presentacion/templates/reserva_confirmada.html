@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reserva Confirmada</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .confirmation-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f8f8f8;
+      padding: 2rem;
+    }
+    .confirmation-card {
+      max-width: 500px;
+      width: 100%;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .confirmation-card h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+    .confirmation-card p {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+    .confirmation-card .btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .confirmation-card .btn:hover {
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0;">
+  <!-- ENCABEZADO (Navbar) -->
+  <nav class="navbar" style="background-color: #009688; padding: 1rem 2rem;">
+    <div class="nav-logo" style="color: #fff; font-weight: 600; font-size: 1.4rem;">
+      Green Lake
+    </div>
+    <ul class="nav-links" style="display: flex; gap: 1rem; margin-left: auto;">
+      <li><a href="/map" style="color: #fff;">Hoteles</a></li>
+      <li><a href="#" style="color: #fff;">Rutas</a></li>
+      <li><a href="#" style="color: #fff;">Sitios</a></li>
+      <li><a href="#" style="color: #fff;">Foro</a></li>
+      <li><a href="/login" style="color: #fff;">Iniciar Sesión</a></li>
+    </ul>
+  </nav>
+  <!-- FIN ENCABEZADO -->
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="confirmation-container">
+    <div class="confirmation-card">
+      <h2>¡Gracias por hacer tu reserva!</h2>
+      <p>Tu reserva se ha creado satisfactoriamente.</p>
+      <a href="/map" class="btn">Volver al Mapa</a>
+    </div>
+  </div>
+  <!-- FIN CONTENEDOR PRINCIPAL -->
+
+  <!-- PIE DE PÁGINA (Footer) -->
+  <footer class="footer" style="background-color: #009688; padding: 1rem; text-align: center;">
+    <p style="margin: 0;">
+      © 2023 Green Lake Village. Todos los derechos reservados.
+    </p>
+  </footer>
+  <!-- FIN PIE DE PÁGINA -->
+</body>
+</html>

@@ -268,7 +268,9 @@ function getSidePanelHTML(item, rating) {
           <ul class="services">${servicesList}</ul>
           <p class="price">Desde <strong>$${item.precio || 0}</strong> por noche</p>
           <div class="buttons">
-            <a href="#" class="btn reserve">Reservar Ahora</a>
+            <a href="/reservar/${item._id}" class="btn reserve">
+              Reservar Ahora
+            </a>
             <a href="${detailsURL}" class="btn details">Ver Más Detalles</a>
             <a href="#" class="btn map">📍 Cómo Llegar</a>
           </div>
@@ -588,3 +590,82 @@ profileImg.addEventListener('click', function (event) {
 document.addEventListener('click', function () {
     dropdown.classList.remove('open');
 });
+
+// ------------------------------------------------
+// --- INICIO NUEVO (LÓGICA PARA EL MODAL RESERVA)
+// ------------------------------------------------
+
+// Cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+  const reservationModal = document.getElementById('reservationModal');
+  const closeModalBtn = document.getElementById('closeModal');
+  const reservationForm = document.getElementById('reservationForm');
+  const hotelIdInput = document.getElementById('hotelIdInput');
+
+  // Cerrar modal con la "X"
+  closeModalBtn.addEventListener('click', function() {
+    reservationModal.style.display = 'none';
+  });
+
+  // Cerrar modal si el usuario hace clic fuera del contenido
+  window.addEventListener('click', function(e) {
+    if (e.target === reservationModal) {
+      reservationModal.style.display = 'none';
+    }
+  });
+
+  // Capturar clic en cualquier botón/enlace con class="reserve"
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('reserve')) {
+      e.preventDefault();
+      console.log("¡Clic en Reservar Ahora!");
+      // Obtener el _id del hotel desde data-hotel-id
+      const hotelId = e.target.getAttribute('data-hotel-id');
+      hotelIdInput.value = hotelId || '';
+
+      // Mostrar el modal
+      reservationModal.style.display = 'block';
+    }
+  });
+
+  // Manejo del envío del formulario de reserva
+  reservationForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const hotelId = hotelIdInput.value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const numPersons = document.getElementById('numPersons').value;
+
+    // Petición POST a /api/reservas
+    fetch('/api/reservas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        hotelId: hotelId,
+        startDate: startDate,
+        endDate: endDate,
+        numPersons: numPersons
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Reserva realizada con éxito');
+        // Opcional: redirige a otra página
+        // window.location.href = '/misreservas';
+        reservationModal.style.display = 'none';
+      } else {
+        alert('Error al realizar la reserva: ' + data.message);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Hubo un error al conectarse al servidor');
+    });
+  });
+});
+
+// -----------------------------------------------
+// --- FIN NUEVO (LÓGICA PARA EL MODAL RESERVA) ---
+// -----------------------------------------------

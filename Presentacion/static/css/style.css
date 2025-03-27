@@ -10,15 +10,24 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   height: 100%;
-  font-family: "Poppins", sans-serif;
-  background: #fafafa;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-container {
+  flex: 1; /* Para empujar el footer hacia abajo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 body {
   overflow: hidden;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Barra de navegación superior */
@@ -258,6 +267,7 @@ nav a:hover {
   color: #000;
 }
 
+/* Contenedor de los botones en la tarjeta */
 .buttons {
   display: flex;
   flex-direction: row;
@@ -265,6 +275,7 @@ nav a:hover {
   margin-top: 15px;
 }
 
+/* Base para todos los botones */
 .btn {
   flex: 1;
   text-align: center;
@@ -276,17 +287,30 @@ nav a:hover {
   transition: background 0.3s ease, transform 0.3s ease;
 }
 
+/* Efecto hover */
 .btn:hover {
   transform: scale(1.03);
 }
 
+/* Botones con color específico */
 .reserve { background: #4CAF50; }
 .details { background: #2196F3; }
 .map { background: #FF9800; }
 
-.nearby-info { margin-top: 20px; }
-.nearby-info h3 { font-size: 18px; margin-bottom: 10px; color: #333; }
-.nearby-info ul { list-style: none; padding: 0; font-size: 14px; color: #555; }
+.nearby-info {
+  margin-top: 20px;
+}
+.nearby-info h3 {
+  font-size: 18px; 
+  margin-bottom: 10px; 
+  color: #333;
+}
+.nearby-info ul {
+  list-style: none; 
+  padding: 0; 
+  font-size: 14px; 
+  color: #555;
+}
 
 /* -------------------------------
    Estilos del Asistente Virtual
@@ -323,7 +347,7 @@ nav a:hover {
   display: none;
 }
 
-/* Estilos del header (icono del asistente) */
+/* Header del asistente (icono) */
 .assistant-header {
   display: flex;
   align-items: center;
@@ -348,7 +372,7 @@ nav a:hover {
   border-radius: 50%;
 }
 
-/* Contenedor de mensajes */
+/* Contenedor de mensajes del asistente */
 #assistant-chat {
   max-height: 200px;
   overflow-y: auto;
@@ -359,7 +383,7 @@ nav a:hover {
   gap: 8px;
 }
 
-/* Área de entrada */
+/* Área de entrada de texto */
 .assistant-input-container {
   display: flex;
   border-top: 1px solid #ddd;
@@ -380,7 +404,7 @@ nav a:hover {
   cursor: pointer;
 }
 
-/* Estilos para los mensajes del chat */
+/* Mensajes del chat */
 .message {
   padding: 5px 8px;
   border-radius: 5px;
@@ -396,34 +420,32 @@ nav a:hover {
 .message.assistant {
   background-color: #f1f8e9;
   align-self: flex-start;
-  text-align: left; /* Alineación a la izquierda */
-  max-width: 80%;   /* Limita el ancho de la burbuja */
+  text-align: left;
+  max-width: 80%;
   margin-bottom: 8px;
   word-wrap: break-word;
-  padding: 10px;    /* Espacio interno para que el texto no pegue a los bordes */
+  padding: 10px;
   border-radius: 5px;
 }
 
 /* Ajustar listas y elementos dentro de la burbuja */
 .message.assistant ol,
 .message.assistant ul {
-  margin: 0;              /* Eliminar márgenes por defecto */
-  padding-left: 1.5rem;   /* Sangría para la numeración */
+  margin: 0;
+  padding-left: 1.5rem;
 }
 
 .message.assistant li {
-  margin-bottom: 0.5rem;  /* Separación entre ítems de lista */
+  margin-bottom: 0.5rem;
 }
 
 .message.assistant h3,
 .message.assistant p {
-  margin: 0;              /* Ajustar márgenes en títulos y párrafos */
-  text-align: left;       /* Alineación a la izquierda */
+  margin: 0;
+  text-align: left;
 }
 
-
-
-/* Estilos para el indicador de carga en el chat */
+/* Indicador de carga en el chat */
 .message.assistant.loading {
   display: flex;
   align-items: center;
@@ -448,7 +470,7 @@ nav a:hover {
 .message.assistant.loading .dot:nth-child(2) {
   animation-delay: 0.2s;
 }
-.message.assistant.loading .dot:nth-child(3) {
+message.assistant.loading .dot:nth-child(3) {
   animation-delay: 0.4s;
 }
 
@@ -460,7 +482,6 @@ nav a:hover {
     opacity: 1;
   }
 }
-
 
 /* Perfil de usuario en menú superior */
 .user-profile {
@@ -523,4 +544,73 @@ nav a:hover {
 .user-dropdown a:hover {
   background: #f0f0f0;
   border-radius: 12px;
+}
+
+/* Estilos para el formulario de reserva */
+form {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+form input[type="date"],
+form input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+form button {
+  width: 100%;
+  padding: 10px;
+  background-color: #009688;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #00796b;
+}
+
+/* ======= PIE DE PÁGINA (FOOTER) ======= */
+.footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #006f5a;
+  color: #fff;
+  font-size: 0.9rem;
+  width: 100%;
+  position: relative; /* Permite que el footer se acomode debajo del contenido */
+  margin-top: auto; /* Empuja el footer hacia abajo cuando haya poco contenido */
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer p a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer p a:hover {
+  text-decoration: underline;
 }
