@@ -15,10 +15,7 @@ body {
 }
 
 h1 {
-  text-align: left;
   margin-bottom: 20px;
-  font-weight: 600;
-  color: #333;
 }
 
 /* Menú Superior */
@@ -172,8 +169,8 @@ h1 {
   margin-right: 20px;
 }
 
-.containerPrincipal {
-  margin: 10px;
+.containerPrincipal h1 {
+  font-weight: bold;
 }
 
 /* ===== Estilos de la tabla (ID: propiedadesTable) ===== */
