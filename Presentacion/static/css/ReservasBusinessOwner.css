@@ -1,0 +1,354 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* ===== Reset básico (opcional) ===== */
+* {
+  margin: 0;
+  padding: 0;
+  font-family:  "Poppins", sans-serif;
+  box-sizing: border-box;
+}
+
+/* ===== Estilos generales de la página ===== */
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(90deg, #8ACFC8, #B7E1DD);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+#recordsPerPage {
+  margin-bottom: 20px;
+  padding: 5px;
+}
+
+/* ===== Estilos de la tabla ===== */
+#tablaReservasBody {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden; /* Para respetar los bordes redondeados en las celdas */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#tablaReservasBody thead {
+  background-color: #f2f2f2;
+}
+
+#tablaReservasBody thead tr {
+  font-weight: bold;
+}
+
+#tablaReservasBody th,
+#tablaReservasBody td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Resalta la fila al pasar el mouse */
+#tablaReservasBody tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Filas alternas (striped) */
+#tablaReservasBody tbody tr:nth-child(even) {
+  background-color: #fcfcfc;
+}
+
+/* Cursor en los th para indicar que se puede ordenar */
+#tablaReservasBody th {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ===== Etiquetas de estado ===== */
+.status-verified {
+  display: inline-block;
+  padding: 5px 8px;
+  color: #fff;
+  background-color: #28a745; /* Verde */
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  min-width: 90px;
+}
+
+.status-unverified {
+  display: inline-block;
+  padding: 5px 8px;
+  color: #333;
+  background-color: #e0e0e0; /* Gris claro */
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  min-width: 90px;
+}
+
+.status-blocked {
+    display: inline-block;
+    padding: 5px;
+    background-color: red;
+    color: #fff;
+    border: 1px solid red;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+}
+
+.status-active {
+    display: inline-block;
+    padding: 5px;
+    background-color: #009688;
+    color: #fff;
+    border: 1px solid #009688;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+}
+
+/* ===== Rol (opcional, si quieres distinguir visualmente) ===== */
+.role-admin {
+  font-weight: bold;
+  color: #007bff; /* Azul */
+}
+
+.role-user {
+  color: #555;
+}
+
+/* ===== Botones de acción (Editar/Eliminar) ===== */
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  margin: 2px;
+}
+
+/* Botón Editar */
+.btn-edit {
+  background-color: #007bff; /* Azul */
+  color: #fff;
+}
+
+/* Botón Eliminar */
+.btn-delete {
+  background-color: #dc3545; /* Rojo */
+  color: #fff;
+}
+
+/* ===== Paginación ===== */
+.paginas {
+  display: flex;
+  justify-content: right;
+  margin-top: 20px;
+  margin-right: 20px;
+}
+
+.page-num {
+  min-width: 30px;
+  height: 30px;
+  margin: 0; /* Se elimina la separación lateral */
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #009688; /* Color de letras para botones habilitados */
+  cursor: pointer;
+  padding: 0 6px;
+}
+
+.page-num:disabled {
+  color: gray; /* Color de letras para botones deshabilitados */
+}
+
+.page-num.active {
+  background-color: #009688;
+  color: #fff;
+  border-color: #009688;
+}
+
+.swal2-popup {
+  border-radius: 30px !important;
+}
+
+/* Menú Superior */
+.superiorAdmin {
+  height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  background: #009688;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.superiorAdmin .logo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin-left: 1rem;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-weight: bold;
+  position: relative;
+}
+
+/* Dropdown */
+.user-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+}
+
+.user-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+}
+
+.user-dropdown li {
+  margin: 10px;
+  color: black;
+}
+
+.user-dropdown a {
+  color: black;
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+}
+
+.user-dropdown a:hover {
+  background: #f0f0f0;
+  border-radius: 12px;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+/* Nueva regla para alinear la info de registros y la paginación en la misma fila */
+.info-pagination-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+.option-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Nuevo layout para menú lateral y panel blanco */
+.layout {
+    display: flex;
+    margin-top: 10px; /* nuevo margen para separar de superiorAdmin */
+}
+
+.panelBlanco {
+    flex: 1;
+    background-color: #fff;
+    padding: 20px;
+    margin: 10px; /* se reduce el margen para disminuir la separación */
+    border-radius: 12px;
+    height: 670px;         /* altura fija */
+    margin-right: 20px;
+}
+
+.panelBlancoMenu {
+    background-color: #fff;
+    text-align: left;
+    padding: 10px;
+    margin: 10px; /* se reduce el margen para disminuir la separación */
+    width: 200px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    border-radius: 12px;
+    height: 670px;         /* altura fija */
+    margin-left: 20px;
+}
+
+/* Estilos para la lista en la barra lateral */
+.panelBlancoMenu ul {
+  margin-top: 10px;
+}
+
+.panelBlancoMenu li {
+  transition: background-color 0.3s, color 0.3s, transform 0.3s;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 12px;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.panelBlancoMenu li:hover {
+  background-color: #009688;
+  color: #fff;
+  transform: translateX(5px);
+}
+
+.panelBlancoMenu li a {
+  color: inherit;
+  text-decoration: none;
+  margin-left: 8px;
+}
+
+.containerPrincipal h1 {
+  text-align: left;
+}
+
+.user-name {
+  margin-right: 20px;
+}
+
+/* Sección activa */
+.menuPanel li.active {
+  background-color: #009688;
+  color: #fff;
+}

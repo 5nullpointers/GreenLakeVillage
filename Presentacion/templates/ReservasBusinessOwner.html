@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reservas de mis Hoteles</title>
+  <link rel="stylesheet" href="/static/css/ReservasBusinessOwner.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <div class="admin-container">
+    <!-- Barra de navegación superior -->
+  <nav class="superiorAdmin">
+    <div class="logo">Mis Propiedades - Green Lake Village</div>
+    <div class="user-profile">
+      <img src="/static/images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
+      <span class="user-name">{{ session.user_name or 'Nombre de Usuario' }}</span>
+      <div class="user-dropdown" id="userDropdown">
+        <ul>
+          <li><a href="#">Configuración</a></li>
+          <li><a href="/">Cerrar sesión</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+    <!-- Nuevo layout con panel de menú y panel blanco -->
+  <div class="layout">
+    <div class="panelBlancoMenu">
+      <div class="menuPanel">
+        <ul>
+          <!-- Se marca la opción activa con "active" -->
+          <li>
+            <img src="/static/images/inicio.png" alt="Inicio" class="option-icon" />
+            <a href="/Propietarios">Inicio</a>
+          </li>
+          <li>
+            <img src="/static/images/Propiedades.png" alt="Propiedades" class="option-icon" />
+            <a href="/Propietarios/PropiedadesUsuario">Propiedades</a>
+          </li>
+          <li class="active">
+            <img src="/static/images/ReseñasBlanco.png" alt="Reservas" class="option-icon" />
+            <span class="text-label"><a href="/Propietarios/ReservasHoteles">Reservas</a></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+        <!-- Panel con tabla -->
+        <div class="panelBlanco">
+          <div class="containerPrincipal">
+            <h1>Reservas de tus Hoteles</h1>
+            <table class="reserva-table" id="tablaReservasBody" border="1" cellspacing="0" cellpadding="5">
+              <thead>
+                <tr>
+                  <th onclick="sortColumn(0)">Hotel</th>
+                  <th onclick="sortColumn(1)">Cliente</th>
+                  <th onclick="sortColumn(2)">Inicio</th>
+                  <th onclick="sortColumn(3)">Fin</th>
+                  <th onclick="sortColumn(4)">Personas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Se llenará desde JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/ReservasBusinessOwner.js"></script>
+</body>
+</html>
