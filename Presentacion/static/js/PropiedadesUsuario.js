@@ -97,9 +97,9 @@ function initMenuInteracciones() {
 
   const opciones = document.querySelectorAll('.menuPanel li');
   const nuevasImagenes = [
-    "/static/images/inicioBlanco.png",
-    "/static/images/PropiedadesBlanco.png",
-    "/static/images/ReseñasBlanco.png"
+    "/static/Images/inicioBlanco.png",
+    "/static/Images/PropiedadesBlanco.png",
+    "/static/Images/ReseñasBlanco.png"
   ];
 
   opciones.forEach((opcion, index) => {

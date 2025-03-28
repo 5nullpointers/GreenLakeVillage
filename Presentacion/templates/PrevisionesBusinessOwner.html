@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Previsiones Futuras - Green Lake Village</title>
+    <link rel="stylesheet" href="/static/css/PropiedadesUsuario.css">
+    <!-- SweetAlert2 (opcional) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Animate.css (opcional) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        /* Contenedor principal de los botones y la tabla */
+        .containerPrincipal {
+            padding: 20px;
+        }
+
+        /* Contenedor para los botones de los meses */
+        #monthButtons {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #monthButtons button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007BFF;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #monthButtons button.active {
+            background-color: #0056b3;
+        }
+
+        /* Contenedor para la tabla con scroll */
+        .table-container {
+            max-height: 400px;       /* Ajusta la altura según necesites */
+            overflow-y: auto;        /* Scroll vertical */
+            overflow-x: auto;        /* Scroll horizontal si la tabla es muy ancha */
+            border: 1px solid #ddd;  /* Borde para delimitar el contenedor */
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        /* Estilos para la tabla */
+        #predictionsTable {
+            width: 100%;
+            border-collapse: collapse; /* Quita espacios entre celdas */
+        }
+        #predictionsTable thead th {
+            position: sticky;         /* Encabezado fijo al hacer scroll */
+            top: 0;
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 2px solid #ccc;
+        }
+        #predictionsTable tbody tr:nth-child(even) {
+            background-color: #f9f9f9; /* Color para filas pares */
+        }
+        #predictionsTable td,
+        #predictionsTable th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        #predictionsTable tr:hover {
+            background-color: #f1f1f1; /* Efecto hover */
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación superior -->
+    <nav class="superiorAdmin">
+        <div class="logo">Previsiones Futuras - Green Lake Village</div>
+        <div class="user-profile">
+            <img src="/static/Images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
+            <span class="user-name">{{ session.user_name or 'Nombre de Usuario' }}</span>
+            <div class="user-dropdown" id="userDropdown">
+                <ul>
+                    <li><a href="#">Configuración</a></li>
+                    <li><a href="/">Cerrar sesión</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Layout con panel de menú y panel principal -->
+    <div class="layout">
+        <div class="panelBlancoMenu">
+            <div class="menuPanel">
+                <ul>
+                    <li>
+                        <img src="/static/Images/inicio.png" alt="Inicio" class="option-icon" />
+                        <a href="/Propietarios">Inicio</a>
+                    </li>
+                    <li>
+                        <img src="/static/Images/Propiedades.png" alt="Propiedades" class="option-icon" />
+                        <a href="/Propietarios/PropiedadesUsuario">Propiedades</a>
+                      </li>
+                      <li>
+                        <img src="/static/Images/Reseñas.png" alt="Reservas" class="option-icon" />
+                        <a href="/Propietarios/ReservasHoteles">Reservas</a>
+                      </li>
+                    <li class="active">
+                        <img src="/static/Images/Predicciones.png" alt="Predicciones" class="option-icon" />
+                        <a href="/Propietarios/Previsiones">Previsiones</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Panel principal con botones de selección de mes y tabla de previsiones -->
+        <div class="panelBlanco">
+            <div class="containerPrincipal">
+                <h1>Previsiones Futuras</h1>
+
+                <!-- Contenedor de botones para seleccionar el mes -->
+                <div id="monthButtons"></div>
+
+                <!-- Contenedor con scroll para la tabla -->
+                <div class="table-container">
+                    <table id="predictionsTable">
+                        <thead>
+                            <tr>
+                                <th>Hotel/Restaurante</th>
+                                <th>Tasa de Ocupación (%)</th>
+                                <th>Reservas Confirmadas</th>
+                                <th>Cancelaciones</th>
+                                <th>Precio Promedio Noche (€)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se rellenará dinámicamente según el mes seleccionado -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let predictionsData = [];
+            const monthButtonsDiv = document.getElementById('monthButtons');
+            const predictionsTableBody = document.getElementById('predictionsTable').querySelector('tbody');
+
+            // Se obtiene la información de previsiones desde el endpoint
+            fetch('/api/prediccionesOcupacion')
+                .then(response => response.json())
+                .then(data => {
+                    predictionsData = data;
+                    // Extraer meses únicos y ordenarlos
+                    const months = [...new Set(data.map(item => item.mes))].sort();
+                    // Crear botón para cada mes
+                    months.forEach((month, index) => {
+                        const btn = document.createElement('button');
+                        btn.textContent = month;
+                        btn.dataset.month = month;
+                        if (index === 0) btn.classList.add('active');
+                        btn.addEventListener('click', () => {
+                            document.querySelectorAll('#monthButtons button').forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            updateTable(month);
+                        });
+                        monthButtonsDiv.appendChild(btn);
+                    });
+                    // Mostrar previsiones del primer mes por defecto
+                    if (months.length > 0) {
+                        updateTable(months[0]);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener las previsiones:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudieron obtener las previsiones.'
+                    });
+                });
+
+            // Actualiza la tabla filtrando por el mes seleccionado
+            function updateTable(selectedMonth) {
+                predictionsTableBody.innerHTML = '';
+                const filtered = predictionsData.filter(item => item.mes === selectedMonth);
+                filtered.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.hotel_nombre}</td>
+                        <td>${item.tasa_ocupacion}</td>
+                        <td>${item.reservas_confirmadas}</td>
+                        <td>${item.cancelaciones}</td>
+                        <td>${item.precio_promedio_noche}</td>
+                    `;
+                    predictionsTableBody.appendChild(row);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

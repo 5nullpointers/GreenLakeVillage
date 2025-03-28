@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Array con las rutas de las imágenes en versión blanca
     const nuevasImagenes = [
-        "/static/images/inicioBlanco.png",
-        "/static/images/PropiedadesBlanco.png",
-        "/static/images/ReseñasBlanco.png"
+        "/static/Images/inicioBlanco.png",
+        "/static/Images/PropiedadesBlanco.png",
+        "/static/Images/ReseñasBlanco.png"
     ];
 
     // Selecciona todas las opciones del menú
@@ -136,15 +136,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const podiumClasses = ['podium-place-2', 'podium-place-1', 'podium-place-3'];
         const podiumImages = [
-          '/static/images/award_2_P.png',
-          '/static/images/award_1_P.png',
-          '/static/images/award_3_P.png'
+          '/static/Images/award_2_P.png',
+          '/static/Images/award_1_P.png',
+          '/static/Images/award_3_P.png'
         ];
         topHotels.forEach((hotel, index) => {
           const placeDiv = document.createElement('div');
           placeDiv.classList.add('podium-place', podiumClasses[index] || 'podium-place-3');
           placeDiv.innerHTML = `
-            <img src="${podiumImages[index] || '/static/images/podium-default.png'}" alt="Podio" class="Podio" style="width: 80px; height: auto;">
+            <img src="${podiumImages[index] || '/static/Images/podium-default.png'}" alt="Podio" class="Podio" style="width: 80px; height: auto;">
             <div class="podium-img">
               <div class="podium-name">${hotel.hotelName}</div>
             </div>
@@ -166,15 +166,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const podiumClassesBilled = ['podium-place-2', 'podium-place-1', 'podium-place-3'];
         const podiumImagesBilled = [
-          '/static/images/award_2_P.png',
-          '/static/images/award_1_P.png',
-          '/static/images/award_3_P.png'
+          '/static/Images/award_2_P.png',
+          '/static/Images/award_1_P.png',
+          '/static/Images/award_3_P.png'
         ];
         data.forEach((item, index) => {
           const placeDiv = document.createElement('div');
           placeDiv.classList.add('podium-place', podiumClassesBilled[index] || 'podium-place-3');
           placeDiv.innerHTML = `
-            <img src="${podiumImagesBilled[index] || '/static/images/podium-default.png'}" alt="Podio" class="Podio" style="width: 80px; height: auto;">
+            <img src="${podiumImagesBilled[index] || '/static/Images/podium-default.png'}" alt="Podio" class="Podio" style="width: 80px; height: auto;">
             <div class="podium-img">
               <div class="podium-name">${item.hotelName}</div>
             </div>
