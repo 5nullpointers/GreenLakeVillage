@@ -475,18 +475,37 @@ def format_number(value):
         value = float(value)
         if value >= 1000000:
             # Divide entre 1.000.000 y muestra dos decimales seguidos de "M"
-            return f"{value/1000000:.2f}Millones de"
+            return f"{value/1000000:.2f} Millones de"
         else:
             # Muestra el número con separadores de miles (puntos)
             return f"{value:,.0f}".replace(",", ".")
     except Exception:
         return value
 
+@app.template_filter('short_number')
+def short_number(value):
+    """
+    Devuelve un número en formato abreviado:
+      1,200 => "1.20K"
+      8793114 => "8.79M"
+    """
+    try:
+        num = float(value)
+        if num >= 1_000_000_000:
+            return f"{num / 1_000_000_000:.2f}B"
+        elif num >= 1_000_000:
+            return f"{num / 1_000_000:.2f}M"
+        elif num >= 1_000:
+            return f"{num / 1_000:.2f}K"
+        else:
+            return str(int(num))
+    except:
+        return str(value)
+
 @app.route('/api/estadisticas_ocupacion')
 def api_estadisticas_ocupacion():
     ocupaciones = OcupacionHoteleraDAO.obtener_todos()
     if not ocupaciones:
-        # Si no hay datos, devolvemos ceros
         return jsonify({
             "tasa_ocupacion_users": 0,
             "tasa_ocupacion_percent": 0,
@@ -496,24 +515,18 @@ def api_estadisticas_ocupacion():
             "cancelaciones_percent": 0
         })
 
-    # 1) Calcular totales
     total_reservas = sum(o["reservas_confirmadas"] for o in ocupaciones)
     total_cancelaciones = sum(o["cancelaciones"] for o in ocupaciones)
     total_usuarios = total_reservas + total_cancelaciones
 
-    # 2) Calcular promedios
-    total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)  # suma de % ocupacion
-    promedio_tasa = round(total_tasa / len(ocupaciones), 3)     # promedio de % ocupacion
+    total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)
+    promedio_tasa = round(total_tasa / len(ocupaciones), 3)
 
-    # 3) Convertir “tasa de ocupación” (porcentaje) a número de usuarios
-    #    Ej.: 50% de 200 usuarios => 100 usuarios
     if total_usuarios > 0:
         ocupacion_users = round((promedio_tasa / 100) * total_usuarios)
     else:
         ocupacion_users = 0
 
-    # 4) Calcular porcentajes de reservas y cancelaciones sobre el total
-    #    (si total_usuarios=0, evitamos división por cero)
     if total_usuarios > 0:
         reservas_percent = round((total_reservas / total_usuarios) * 100, 3)
         cancelaciones_percent = round((total_cancelaciones / total_usuarios) * 100, 3)
@@ -521,13 +534,17 @@ def api_estadisticas_ocupacion():
         reservas_percent = 0
         cancelaciones_percent = 0
 
+    # Aplica filtro short_number antes de devolver JSON
+    from flask import current_app
+    short = current_app.jinja_env.filters['short_number']  
+
     return jsonify({
-        "tasa_ocupacion_users": ocupacion_users,
-        "tasa_ocupacion_percent": promedio_tasa,        # ← con 3 decimales
-        "reservas_confirmadas": total_reservas,
-        "reservas_percent": reservas_percent,           # ← con 3 decimales
-        "cancelaciones": total_cancelaciones,
-        "cancelaciones_percent": cancelaciones_percent  # ← con 3 decimales
+        "tasa_ocupacion_users": short(ocupacion_users),
+        "tasa_ocupacion_percent": promedio_tasa,  
+        "reservas_confirmadas": short(total_reservas),
+        "reservas_percent": reservas_percent,
+        "cancelaciones": short(total_cancelaciones),
+        "cancelaciones_percent": cancelaciones_percent
     })
 
 @app.route('/api/top_hoteles')
