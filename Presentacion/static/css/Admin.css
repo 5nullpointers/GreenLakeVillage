@@ -332,27 +332,37 @@ body {
 /* Widgets: Panel centrado horizontalmente */
 .admin-widget-1,
 .admin-widget-2,
-.admin-widget-3 {
-  margin: 0 auto;      /* Centra horizontalmente la tarjeta */
-  max-width: 600px;    /* Ancho máximo de la tarjeta */
+.admin-widget-3,
+.admin-widget-4,
+.admin-widget-5 {
+  margin: 0 auto;     
+  max-width: 600px;  
   width: 100%;
-  text-align: left;    /* Texto a la izquierda */
-  align-self: start;   /* Evita que el panel se expanda innecesariamente */
+  text-align: left;  
+  align-self: start; 
 }
 
+.admin-widget-1 {
+  grid-column: 2 / 3; 
+}
 .admin-widget-2 {
-  grid-column: 2 / 3; /* Ajusta si lo necesitas */
-  grid-row: 40 / 80;
+  grid-column: 3 / 4; 
 }
-
 .admin-widget-3 {
-  grid-column: 3 / 4;
-  grid-row: 40 / 80;
+  grid-column: 4 / 5; 
+}
+.admin-widget-4 {
+  grid-column: 2 / 4; 
+  margin: 0;       
+  max-width: none;
+  width: 100%;
 }
 
-.admin-widget-4 {
-  grid-column: 4 / 5;
-  grid-row: 40 / 80;
+.admin-widget-5 {
+  grid-column: 4 / 5;  
+  margin: 0;
+  max-width: none;
+  width: 100%;
 }
 
 /* Responsividad para pantallas pequeñas */
@@ -466,7 +476,7 @@ body {
 /* Contenedor interno si deseas centrar el contenido sin perder la alineación de texto */
 .widget-inner {
   max-width: 500px;
-  margin: 0 auto;  /* Centra horizontalmente */
+  margin: 0 auto;  
   text-align: left; 
-  padding: 0 50px; /* Opcional, para margen interior */
+  padding: 0 50px; 
 }
