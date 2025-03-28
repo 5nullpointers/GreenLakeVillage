@@ -614,3 +614,144 @@ form button:hover {
 .footer p a:hover {
   text-decoration: underline;
 }
+
+/* Estilos exclusivos para el foro */
+
+/* Aumenta el ancho del panel lateral solo cuando se muestra el foro */
+#sidebar.foro-style {
+  width: 600px; /* Puedes ajustar este valor según lo que necesites */
+}
+
+/* Contenedor principal para el contenido del foro */
+.forum-container {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Títulos y subtítulos */
+.forum-container h3 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Lista de temas */
+.forum-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.forum-container li {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.forum-container li:hover {
+  background-color: #f5f5f5;
+}
+
+/* Estilos para los comentarios */
+.forum-container .comentario {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.forum-container .comentario img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+/* Formulario para agregar nuevos comentarios */
+.forum-container form {
+  margin-top: 20px;
+}
+
+.forum-container form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  resize: vertical;
+}
+
+.forum-container form button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #009688;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.forum-container form button:hover {
+  background-color: #00796b;
+}
+
+/* Estilo para el área de texto del comentario */
+.forum-container form textarea,
+#comentarioForm textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  resize: vertical;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.forum-container form textarea:focus,
+#comentarioForm textarea:focus {
+  border-color: #009688;
+  box-shadow: 0 0 5px rgba(0,150,136,0.3);
+  outline: none;
+}
+
+/* Contenedor para el input de archivo personalizado */
+.custom-file-upload {
+  position: relative;
+  display: inline-block;
+  margin: 10px 0;
+}
+
+/* Ocultar el input file original */
+.custom-file-upload input[type="file"] {
+  display: none;
+}
+
+/* Botón personalizado para examinar archivos */
+.custom-file-label {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #009688;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.custom-file-label:hover {
+  background-color: #00796b;
+}
+
+/* Vista previa de archivos subidos */
+#uploadPreview {
+  margin-top: 10px;
+}
+
+#uploadPreview img {
+  max-width: 100px;
+  margin-right: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+}
+

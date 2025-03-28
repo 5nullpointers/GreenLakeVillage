@@ -277,6 +277,7 @@ function openMarkerInfo(marker, infoWindow, panelContent) {
   closeAll();
   const sidebar = document.getElementById("sidebar");
   sidebar.classList.remove("left", "right");
+  sidebar.classList.remove("foro-style");
   const referenceLng = 13.66395;
   const markerLng = marker.getPosition().lng();
   if (markerLng < referenceLng) {
@@ -385,17 +386,27 @@ function mostrarRutas() {
 }
 
 function mostrarForo() {
+  // Cierra otras ventanas/infowindows
   closeAll();
+  
+  // Obtén el contenedor del sidebar y añade la clase para el foro
+  const sidebar = document.getElementById("sidebar");
+  sidebar.classList.add("foro-style");
+  
+  // Realiza la petición para obtener los temas del foro
   fetch('/api/foro/temas')
     .then(response => response.json())
     .then(temas => {
-      let content = '<h3>Temas del Foro</h3><ul>';
+      let content = '<div class="forum-container">';
+      content += '<h3>Temas del Foro</h3><ul>';
       temas.forEach((tema, index) => {
         content += `<li class="tema-item" data-index="${index}" style="cursor:pointer;">${tema.titulo}</li>`;
       });
-      content += '</ul>';
+      content += '</ul></div>';
       document.getElementById("infoSection").innerHTML = content;
       showSidebar();
+      
+      // Añade el listener para cargar comentarios al hacer clic en cada tema
       document.querySelectorAll('.tema-item').forEach(item => {
         item.addEventListener('click', function() {
           const index = this.getAttribute('data-index');
@@ -405,6 +416,7 @@ function mostrarForo() {
     })
     .catch(error => console.error("Error al cargar los temas del foro:", error));
 }
+
 
 function cargarComentarios(tema) {
   fetch(`/api/foro/temas/${tema._id}/comentarios`)
@@ -426,16 +438,44 @@ function cargarComentarios(tema) {
           content += `</div><hr>`;
         });
       }
+      // Formulario actualizado con botón personalizado y contenedor para vista previa
       content += `
         <h4>Agrega tu comentario</h4>
         <form id="comentarioForm" enctype="multipart/form-data">
-          <textarea name="comentario" placeholder="Escribe tu comentario..." required></textarea><br>
-          <input type="file" name="imagen"><br>
+          <textarea name="comentario" placeholder="Escribe tu comentario..." required></textarea>
+          <div class="custom-file-upload">
+            <input type="file" name="imagen" id="file-upload">
+            <label for="file-upload" class="custom-file-label">Examinar</label>
+          </div>
+          <div id="uploadPreview"></div>
           <button type="submit">Enviar</button>
         </form>
       `;
       document.getElementById("infoSection").innerHTML = content;
       showSidebar();
+
+      // Agregar evento para mostrar la vista previa del archivo seleccionado
+      const fileInput = document.getElementById("file-upload");
+      if (fileInput) {
+        fileInput.addEventListener("change", function(e) {
+          const preview = document.getElementById("uploadPreview");
+          preview.innerHTML = "";
+          const file = e.target.files[0];
+          if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const img = document.createElement("img");
+              img.src = e.target.result;
+              preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+          } else if(file) {
+            preview.textContent = "Archivo seleccionado: " + file.name;
+          }
+        });
+      }
+
+      // Manejar el envío del formulario
       document.getElementById("comentarioForm").addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -457,6 +497,7 @@ function cargarComentarios(tema) {
     })
     .catch(error => console.error("Error al cargar comentarios:", error));
 }
+
 
 // =======================
 // Función para dibujar la ruta vía Flask (Routes API v2)
