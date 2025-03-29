@@ -480,3 +480,8 @@ body {
   text-align: left; 
   padding: 0 50px; 
 }
+
+#transporteChart {
+  width: 100%;
+  height: 300px;
+}

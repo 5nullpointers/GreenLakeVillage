@@ -562,6 +562,18 @@ def api_top_rutas():
     top_rutas = OpinionesTuristicasDAO.obtener_top_rutas()
     return jsonify(top_rutas)
 
+@app.route('/api/uso_transporte')
+def api_uso_transporte():
+
+    datos = UsoTransporteDAO.obtener_todos()
+
+    resumen = {}
+    for dato in datos:
+        tipo = dato.get("tipo_transporte", "Desconocido")
+        num = dato.get("num_usuarios", 0)
+        resumen[tipo] = resumen.get(tipo, 0) + num
+    return jsonify(resumen)
+
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
     app.run(host='0.0.0.0', port=5000, debug=True)

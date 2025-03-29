@@ -6,6 +6,7 @@
   <title>Panel de Administración</title>
   <!-- Enlaza tu hoja de estilos principal -->
   <link rel="stylesheet" href="/static/css/Admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="admin-container">
@@ -138,11 +139,12 @@
           </div>
         </div>
 
-        <!-- NUEVO: Widget doble debajo de los 2 ya existentes (col 2 y 3) -->
+        <!-- Widget doble: Visualización del uso de transporte -->
         <div class="panel admin-widget-4" id="widget-doble">
           <div class="widget-inner">
-            <h3>Nuevo Widget Doble</h3>
-            <p>Contenido extenso que ocupa dos columnas.</p>
+            <h3>Uso de Transporte</h3>
+            <!-- Canvas para el gráfico de barras -->
+            <canvas id="transporteChart"></canvas>
           </div>
         </div>
 

@@ -179,4 +179,42 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       })
       .catch(error => console.error('Error al obtener el top de rutas:', error));
+    // -- Obtener datos y renderizar gráfico de barras para uso de transporte --
+    fetch('/api/uso_transporte')
+      .then(response => response.json())
+      .then(data => {
+        // data es un objeto: { "Bicicleta": 3317, "Metro": 3137, ... }
+        const labels = Object.keys(data);
+        const valores = Object.values(data);
+
+        // Obtener el contexto del canvas
+        const ctx = document.getElementById('transporteChart').getContext('2d');
+        
+        // Crear el gráfico de barras
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Número de Usuarios',
+              data: valores,
+              backgroundColor: 'rgba(0, 150, 136, 0.5)',
+              borderColor: 'rgba(0, 150, 136, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) { return value; }
+                }
+              }
+            }
+          }
+        });
+      })
+      .catch(error => console.error('Error al obtener datos de transporte:', error));
 });
