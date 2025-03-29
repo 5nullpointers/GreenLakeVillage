@@ -1198,10 +1198,16 @@ def registrar_reto(usuario, reto_id):
         }
     )
 
+import pandas as pd
+import numpy as np
+from bson import ObjectId
+from flask import jsonify, session
+
+# Función auxiliar para predecir con regresión lineal simple
 def forecast_series(values, forecast_horizon):
     """
     Realiza una predicción simple usando regresión lineal sobre la serie de datos.
-    Si hay menos de 2 datos, se retorna el último valor repetido.
+    Si hay menos de 2 datos, retorna el último valor repetido 'forecast_horizon' veces.
     """
     n = len(values)
     if n < 2:
@@ -1215,67 +1221,84 @@ def forecast_series(values, forecast_horizon):
         predictions.append(pred)
     return predictions
 
-@app.route('/api/prediccionesOcupacion')
-def api_predicciones_ocupacion():
+@app.route('/api/prediccionesOcupacion_Propietarios')
+def api_predicciones_ocupacion_propietarios():
     """
-    Endpoint que obtiene los datos históricos de ocupación hotelera,
-    y para cada hotel realiza una predicción simple (para 3 meses futuros)
-    de:
-      - tasa_ocupacion,
-      - reservas_confirmadas,
-      - cancelaciones,
-      - precio_promedio_noche.
+    Devuelve las previsiones de ocupación, reservas, cancelaciones y precio
+    solo para los hoteles/restaurantes del usuario BusinessOwner.
     
-    Se asume que la colección "ocupacion_hotelera" tiene un campo 'fecha'
-    en formato compatible con datetime y que los datos históricos son suficientes.
+    Se asume que la colección 'ocupacion_hotelera' tiene:
+        - hotel_nombre
+        - fecha (datetime)
+        - tasa_ocupacion (int/float)
+        - reservas_confirmadas (int)
+        - cancelaciones (int)
+        - precio_promedio_noche (float)
     """
     try:
-        # Obtener datos históricos de ocupación hotelera desde MongoDB
-        data = list(mongo_agent.db["ocupacion_hotelera"].find({}))
+        # Verificar que el usuario está autenticado
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({"error": "Usuario no autenticado"}), 401
+
+        # Verificar que sea un BusinessOwner
+        business_owner = mongo_agent.db["usuarios"].find_one({"_id": ObjectId(user_id)})
+        if not business_owner or business_owner.get("type") != "BusinessOwner":
+            return jsonify({"error": "Acceso no autorizado"}), 403
+
+        # Obtener propiedades (hoteles) del usuario
+        user_properties = business_owner.get("properties", [])
+        if not user_properties:
+            return jsonify([])  # Sin propiedades, retorna lista vacía
+
+        # Obtener datos históricos desde 'ocupacion_hotelera' solo de esas propiedades
+        data_cursor = mongo_agent.db["ocupacion_hotelera"].find({
+            "hotel_nombre": {"$in": user_properties}
+        })
+        data = list(data_cursor)
         if not data:
-            return jsonify({"error": "No hay datos históricos disponibles"}), 404
-        
-        # Convertir a DataFrame y asegurarse de que la fecha es tipo datetime
+            return jsonify([])  # Sin datos para predecir
+
+        # Convertir a DataFrame y asegurar fecha como datetime
         df = pd.DataFrame(data)
         df['fecha'] = pd.to_datetime(df['fecha'])
-        
-        forecast_horizon = 12  # Predecir para los próximos 3 meses
+
+        forecast_horizon = 12 # Predecir para los próximos 3 meses
         predictions = []
-        
-        # Agrupar por hotel
-        for hotel, group in df.groupby('hotel_nombre'):
-            group = group.sort_values('fecha')
+
+        # Agrupar por hotel_nombre
+        for hotel_name, group in df.groupby('hotel_nombre'):
+            group = group.sort_values('fecha')  # Ordenar por fecha ascendente
             last_date = group['fecha'].max()
-            
-            # Obtener la serie de cada métrica
+
+            # Series de datos
             tasa_series = group['tasa_ocupacion'].tolist()
             reservas_series = group['reservas_confirmadas'].tolist()
             cancelaciones_series = group['cancelaciones'].tolist()
             precio_series = group['precio_promedio_noche'].tolist()
-            
-            # Realizar las predicciones para cada métrica
+
+            # Predecir cada métrica
             pred_tasa = forecast_series(tasa_series, forecast_horizon)
             pred_reservas = forecast_series(reservas_series, forecast_horizon)
             pred_cancelaciones = forecast_series(cancelaciones_series, forecast_horizon)
             pred_precio = forecast_series(precio_series, forecast_horizon)
-            
-            # Generar las predicciones para cada mes futuro
+
+            # Construir predicciones para cada mes futuro
             for i in range(forecast_horizon):
                 future_date = last_date + pd.DateOffset(months=i+1)
                 predictions.append({
                     "mes": future_date.strftime("%Y-%m"),
-                    "hotel_nombre": hotel,
+                    "hotel_nombre": hotel_name,
                     "tasa_ocupacion": round(pred_tasa[i], 2),
                     "reservas_confirmadas": int(round(pred_reservas[i])),
                     "cancelaciones": int(round(pred_cancelaciones[i])),
                     "precio_promedio_noche": round(pred_precio[i], 2)
                 })
-        
+
         return jsonify(predictions)
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 
 if __name__ == '__main__':

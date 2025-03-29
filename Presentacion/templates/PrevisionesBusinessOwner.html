@@ -99,13 +99,13 @@
                     <li>
                         <img src="/static/Images/Propiedades.png" alt="Propiedades" class="option-icon" />
                         <a href="/Propietarios/PropiedadesUsuario">Propiedades</a>
-                      </li>
-                      <li>
+                    </li>
+                    <li>
                         <img src="/static/Images/Reseñas.png" alt="Reservas" class="option-icon" />
                         <a href="/Propietarios/ReservasHoteles">Reservas</a>
-                      </li>
+                    </li>
                     <li class="active">
-                        <img src="/static/Images/Predicciones.png" alt="Predicciones" class="option-icon" />
+                        <img src="/static/Images/Previsiones.png" alt="Predicciones" class="option-icon" />
                         <a href="/Propietarios/Previsiones">Previsiones</a>
                     </li>
                 </ul>
@@ -141,25 +141,99 @@
         </div>
     </div>
 
+    <!-- Script principal para manejar el menú lateral e insertar las previsiones -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            /***********************************/
+            /* 1) Manejo del menú y sus iconos */
+            /***********************************/
+            const sideBarOptions = document.querySelectorAll('.menuPanel ul li');
+            // Array con las rutas de imágenes "en blanco"
+            const whiteIcons = [
+                "/static/Images/inicioBlanco.png",
+                "/static/Images/PropiedadesBlanco.png",
+                "/static/Images/ReseñasBlanco.png",
+                "/static/Images/PrevisionesBlanco.png"
+            ];
+
+            sideBarOptions.forEach((option, index) => {
+                const img = option.querySelector('img');
+                
+                // Si la opción ya es la activa, se actualiza la imagen a la versión blanca
+                if (option.classList.contains('active') && whiteIcons[index]) {
+                    if (!img.dataset.original) {
+                        img.dataset.original = img.src;
+                    }
+                    img.src = whiteIcons[index];
+                }
+
+                // Al pasar el mouse sobre la opción, se cambia la imagen a la versión blanca (si no está activa)
+                option.addEventListener('mouseenter', function() {
+                    if (!option.classList.contains('active') && whiteIcons[index]) {
+                        if (!img.dataset.original) {
+                            img.dataset.original = img.src;
+                        }
+                        img.src = whiteIcons[index];
+                    }
+                });
+
+                // Al quitar el mouse, se restaura la imagen original solo si la opción NO es la activa
+                option.addEventListener('mouseleave', function() {
+                    if (!option.classList.contains('active') && img.dataset.original) {
+                        img.src = img.dataset.original;
+                    }
+                });
+
+                // Al hacer clic en la opción, se actualiza la opción activa
+                option.addEventListener('click', function() {
+                    // Remover la clase "active" de todas las opciones y restaurar su imagen original
+                    sideBarOptions.forEach(o => {
+                        o.classList.remove('active');
+                        const imgTemp = o.querySelector('img');
+                        if (imgTemp && imgTemp.dataset.original) {
+                            imgTemp.src = imgTemp.dataset.original;
+                        }
+                    });
+                    // Añadir "active" a la opción clicada y actualizar su imagen a la versión blanca
+                    option.classList.add('active');
+                    if (img && whiteIcons[index]) {
+                        if (!img.dataset.original) {
+                            img.dataset.original = img.src;
+                        }
+                        img.src = whiteIcons[index];
+                    }
+                });
+            });
+
+
+            /***************************************************************/
+            /* 2) Obtener y mostrar las previsiones solo de las propiedades
+                  del usuario, usando un nuevo endpoint filtrado.         */
+            /***************************************************************/
             let predictionsData = [];
             const monthButtonsDiv = document.getElementById('monthButtons');
             const predictionsTableBody = document.getElementById('predictionsTable').querySelector('tbody');
 
-            // Se obtiene la información de previsiones desde el endpoint
-            fetch('/api/prediccionesOcupacion')
+            // Se obtiene la información de previsiones (solo hoteles del usuario)
+            fetch('/api/prediccionesOcupacion_Propietarios')
                 .then(response => response.json())
                 .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
                     predictionsData = data;
-                    // Extraer meses únicos y ordenarlos
+                    
+                    // Extraer los meses únicos y ordenarlos
                     const months = [...new Set(data.map(item => item.mes))].sort();
-                    // Crear botón para cada mes
+                    
+                    // Crear un botón para cada mes
                     months.forEach((month, index) => {
                         const btn = document.createElement('button');
                         btn.textContent = month;
                         btn.dataset.month = month;
-                        if (index === 0) btn.classList.add('active');
+                        if (index === 0) btn.classList.add('active');  // Por defecto, el primero activo
+
+                        // Al hacer clic, marcar el botón como activo y actualizar la tabla
                         btn.addEventListener('click', () => {
                             document.querySelectorAll('#monthButtons button').forEach(b => b.classList.remove('active'));
                             btn.classList.add('active');
@@ -167,6 +241,7 @@
                         });
                         monthButtonsDiv.appendChild(btn);
                     });
+
                     // Mostrar previsiones del primer mes por defecto
                     if (months.length > 0) {
                         updateTable(months[0]);
@@ -181,7 +256,7 @@
                     });
                 });
 
-            // Actualiza la tabla filtrando por el mes seleccionado
+            // Filtra y muestra la tabla según el mes seleccionado
             function updateTable(selectedMonth) {
                 predictionsTableBody.innerHTML = '';
                 const filtered = predictionsData.filter(item => item.mes === selectedMonth);

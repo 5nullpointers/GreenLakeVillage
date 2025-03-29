@@ -99,7 +99,8 @@ function initMenuInteracciones() {
   const nuevasImagenes = [
     "/static/Images/inicioBlanco.png",
     "/static/Images/PropiedadesBlanco.png",
-    "/static/Images/ReseñasBlanco.png"
+    "/static/Images/ReseñasBlanco.png",
+    "/static/Images/PrevisionesBlanco.png"
   ];
 
   opciones.forEach((opcion, index) => {
