@@ -58,6 +58,72 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   });
 
+  // --- Mapa de colores por transporte ---
+  const colorMap = {
+    "Bicicleta": "#003f5c",
+    "Metro": "#ffa600",
+    "Autobús": "#ff6361",
+    "Coche Compartido": "#ff8531",
+    "Tranvía": "#58508d",
+    "Taxi": "#bc5090"
+  };
+
+  // --- Mapa de íconos por transporte ---
+  const iconMap = {
+    "Bicicleta": "/static/images/transportes/bike.png",
+    "Metro": "/static/images/transportes/train-front.png",
+    "Autobús": "/static/images/transportes/bus-front.png",
+    "Coche Compartido": "/static/images/transportes/car-front.png",
+    "Tranvía": "/static/images/transportes/tram-front.png",
+    "Taxi": "/static/images/transportes/car-taxi-front.png"
+  };
+
+  // --- Objeto para almacenar las imágenes precargadas ---
+  const loadedImages = {};
+
+  // --- Función para precargar las imágenes y ejecutar callback al terminar ---
+  function preloadImages(callback) {
+    const keys = Object.keys(iconMap);
+    let loadedCount = 0;
+    
+    keys.forEach(label => {
+      const img = new Image();
+      img.src = iconMap[label];
+      img.onload = () => {
+        loadedCount++;
+        if (loadedCount === keys.length) {
+          callback();
+        }
+      };
+      loadedImages[label] = img;
+    });
+  }
+
+  // --- Plugin de Chart.js usando METADATA para alinear íconos ---
+  const iconOnBarPlugin = {
+    id: 'iconOnBar',
+    afterDatasetsDraw(chart, args, pluginOptions) {
+      const { ctx } = chart;
+      // Obtenemos la metadata del primer (y único) dataset
+      const meta = chart.getDatasetMeta(0);
+
+      meta.data.forEach((barElement, index) => {
+        const label = chart.data.labels[index];
+        const img = loadedImages[label];
+        if (!img) return;
+
+        // barElement.x, barElement.y => coordenadas del centro de la barra
+        const imgWidth = 24;
+        const imgHeight = 24;
+        const marginTop = 5; // margen sobre la barra
+        const xPos = barElement.x - (imgWidth / 2);
+        const yPos = barElement.y - imgHeight - marginTop;
+
+        ctx.drawImage(img, xPos, yPos, imgWidth, imgHeight);
+      });
+    }
+  };
+
   // --- Función para convertir la valoración numérica en estrellas ---
   function convertRatingToStars(rating) {
       const maxStars = 5;
@@ -176,90 +242,86 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .catch(error => console.error('Error al obtener el top de rutas:', error));
 
-  // --- Gráfico de barras (Widget Doble) ---
+  // --- Función para cargar el gráfico de barras con colores e íconos ---
   function cargarGraficoTransporte(startDate = '', endDate = '') {
-      let url = '/api/uso_transporte';
-      const params = [];
-      if (startDate) params.push(`start_date=${startDate}`);
-      if (endDate) params.push(`end_date=${endDate}`);
-      if (params.length > 0) {
-          url += '?' + params.join('&');
-      }
-
-      fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            const labels = Object.keys(data);
-            const valores = Object.values(data);
-
-            const ctx = document.getElementById('transporteChart').getContext('2d');
-            new Chart(ctx, {
-              type: 'bar',
-              data: {
-                labels: labels,
-                datasets: [{
-                  label: 'Número de Usuarios',
-                  data: valores,
-                  backgroundColor: 'rgba(0, 150, 136, 0.5)',
-                  borderColor: 'rgba(0, 150, 136, 1)',
-                  borderWidth: 1
-                }]
-              },
-              options: {
-                responsive: true,
-                scales: {
-                  y: {
-                    beginAtZero: true
-                  }
-                }
+    let url = '/api/uso_transporte';
+    const params = [];
+    if (startDate) params.push(`start_date=${startDate}`);
+    if (endDate)   params.push(`end_date=${endDate}`);
+    if (params.length > 0) {
+      url += '?' + params.join('&');
+    }
+  
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        const labels = Object.keys(data);
+        const valores = Object.values(data);
+        const backgroundColors = labels.map(label => colorMap[label] || 'rgba(0, 150, 136, 0.5)');
+  
+        if (window.miBarChart) {
+          window.miBarChart.destroy();
+        }
+  
+        const ctx = document.getElementById('transporteChart').getContext('2d');
+        window.miBarChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: '', // Vacío para no mostrar "Número de Usuarios"
+              data: valores,
+              backgroundColor: backgroundColors,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            // Para dejar margen arriba y que los íconos no se corten
+            layout: {
+              padding: {
+                top: 30 // Ajusta según necesites
               }
-            });
-        })
-        .catch(error => console.error('Error al obtener datos de transporte:', error));
+            },
+            // También puedes usar 'grace' para el eje Y
+            scales: {
+              y: {
+                beginAtZero: true,
+                grace: '10%' // Deja 10% extra arriba
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              }
+            }
+          },
+          // Usamos el plugin que emplea la metadata
+          plugins: [iconOnBarPlugin]
+        });
+      })
+      .catch(error => console.error('Error al obtener datos de transporte:', error));
   }
 
-  // Cargar el gráfico de barras inicialmente
-  cargarGraficoTransporte();
+  // --- Precargamos las imágenes y luego cargamos el gráfico de barras ---
+  preloadImages(() => {
+    // Cargamos el gráfico de barras inicialmente
+    cargarGraficoTransporte();
 
-  // Listener para filtrar por fecha en el widget doble
-  const filtrarBtn = document.getElementById('filtrarBtn');
-  if (filtrarBtn) {
+    // Listener para filtrar por fecha en el widget doble
+    const filtrarBtn = document.getElementById('filtrarBtn');
+    if (filtrarBtn) {
       filtrarBtn.addEventListener('click', () => {
-          const startDate = document.getElementById('startDate').value;
-          const endDate = document.getElementById('endDate').value;
-          cargarGraficoTransporte(startDate, endDate);
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        cargarGraficoTransporte(startDate, endDate);
       });
-  }
+    }
+  });
 
   // --- Pie Chart (Widget Normal) con leyenda SOLO iconos ---
-
-  // Aquí asignamos el color de la porción del pastel
-  // (puedes usar uno neutral o el mismo color del icono).
-  // Según tu comentario, tienes estos colores:
-  // Bicicleta => #003f5c
-  // Metro => #ffa600
-  // Autobús => #ff6361
-  // Coche => #ff8531
-  // Tranvía => #58508d
-  // Taxi => #bc5090
-  const colorMap = {
-    "Bicicleta": "#003f5c",
-    "Metro": "#ffa600",
-    "Autobús": "#ff6361",
-    "Coche Compartido": "#ff8531",
-    "Tranvía": "#58508d",
-    "Taxi": "#bc5090"
-  };
-
-  // 2) Mapa de íconos para la leyenda
-  const iconMap = {
-    "Bicicleta": "/static/images/transportes/bike.png",
-    "Metro": "/static/images/transportes/train-front.png",
-    "Autobús": "/static/images/transportes/bus-front.png",
-    "Coche Compartido": "/static/images/transportes/car-front.png",
-    "Tranvía": "/static/images/transportes/tram-front.png",
-    "Taxi": "/static/images/transportes/car-taxi-front.png"
-  };
+  // (Reutilizamos colorMap e iconMap definidos arriba)
 
   // 3) Función para generar la leyenda personalizada (solo íconos + texto)
   function buildCustomLegend(labels) {
@@ -319,14 +381,14 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             options: {
               responsive: true,
-              maintainAspectRatio: false, 
+              maintainAspectRatio: false,
               plugins: {
                 legend: {
-                  display: false 
+                  display: false
                 }
               }
             }
-          });
+        });
 
         buildCustomLegend(labels);
     })

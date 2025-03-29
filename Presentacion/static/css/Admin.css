@@ -473,7 +473,6 @@ body {
   font-size: 14px;
 }
 
-/* Contenedor interno si deseas centrar el contenido sin perder la alineación de texto */
 .widget-inner {
   max-width: 500px;
   margin: 0 auto;  
@@ -481,35 +480,39 @@ body {
   padding: 0 50px; 
 }
 
-#transporteChart {
+.bar-chart-container {
   width: 100%;
-  height: 300px;
+  padding: 0 50px 50px 50px; 
+  margin: 0 auto;
+  height: 327px;
+  max-width: 1000px;
+  position: relative;
+}
+
+.bar-chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .pie-title {
   margin-bottom: 16px;
   font-size: 20px; 
 }
-
 .pie-flex-container {
   display: flex;
   align-items: flex-start;
   gap: 2rem;             
 }
-
 .chart-container {
   width: 325px;  
   height: 325px;  
   position: relative;
-
   margin-top: -40px;
 }
-
 .chart-container canvas {
   width: 100% !important;
   height: 100% !important;
 }
-
 #customLegendContainer {
   margin-top: 5px;
 }
