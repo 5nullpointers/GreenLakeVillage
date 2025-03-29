@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .catch(error => console.error('Error al obtener el top de rutas:', error));
 
-  // --- Función para cargar el gráfico de barras (widget doble) con filtro de fecha ---
+  // --- Gráfico de barras (Widget Doble) ---
   function cargarGraficoTransporte(startDate = '', endDate = '') {
       let url = '/api/uso_transporte';
       const params = [];
@@ -192,10 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const labels = Object.keys(data);
             const valores = Object.values(data);
 
-            // Obtener el contexto del canvas
             const ctx = document.getElementById('transporteChart').getContext('2d');
-
-            // Crear el gráfico de barras con Chart.js
             new Chart(ctx, {
               type: 'bar',
               data: {
@@ -212,10 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 responsive: true,
                 scales: {
                   y: {
-                    beginAtZero: true,
-                    ticks: {
-                      callback: function(value) { return value; }
-                    }
+                    beginAtZero: true
                   }
                 }
               }
@@ -224,10 +218,10 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(error => console.error('Error al obtener datos de transporte:', error));
   }
 
-  // Cargar el gráfico de barras inicialmente sin filtro
+  // Cargar el gráfico de barras inicialmente
   cargarGraficoTransporte();
 
-  // Listener para el botón de filtrar fecha (widget doble)
+  // Listener para filtrar por fecha en el widget doble
   const filtrarBtn = document.getElementById('filtrarBtn');
   if (filtrarBtn) {
       filtrarBtn.addEventListener('click', () => {
@@ -237,14 +231,82 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   }
 
-  // --- Pie Chart para el Nuevo Widget Normal ---
-  // Se reutiliza el endpoint /api/uso_transporte para obtener datos de todos los transportes.
+  // --- Pie Chart (Widget Normal) con leyenda SOLO iconos ---
+
+  // Aquí asignamos el color de la porción del pastel
+  // (puedes usar uno neutral o el mismo color del icono).
+  // Según tu comentario, tienes estos colores:
+  // Bicicleta => #003f5c
+  // Metro => #ffa600
+  // Autobús => #ff6361
+  // Coche => #ff8531
+  // Tranvía => #58508d
+  // Taxi => #bc5090
+  const colorMap = {
+    "Bicicleta": "#003f5c",
+    "Metro": "#ffa600",
+    "Autobús": "#ff6361",
+    "Coche Compartido": "#ff8531",
+    "Tranvía": "#58508d",
+    "Taxi": "#bc5090"
+  };
+
+  // 2) Mapa de íconos para la leyenda
+  const iconMap = {
+    "Bicicleta": "/static/images/transportes/bike.png",
+    "Metro": "/static/images/transportes/train-front.png",
+    "Autobús": "/static/images/transportes/bus-front.png",
+    "Coche Compartido": "/static/images/transportes/car-front.png",
+    "Tranvía": "/static/images/transportes/tram-front.png",
+    "Taxi": "/static/images/transportes/car-taxi-front.png"
+  };
+
+  // 3) Función para generar la leyenda personalizada (solo íconos + texto)
+  function buildCustomLegend(labels) {
+    const legendContainer = document.getElementById("customLegendContainer");
+    legendContainer.innerHTML = ""; // Limpia si había algo
+
+    labels.forEach(label => {
+      const icon = iconMap[label] || "";
+
+      // Contenedor de cada item
+      const item = document.createElement("div");
+      item.style.display = "flex";
+      item.style.alignItems = "center";
+      item.style.marginBottom = "8px";
+
+      // Imagen del ícono (si existe)
+      if (icon) {
+        const iconImg = document.createElement("img");
+        iconImg.src = icon;
+        iconImg.alt = label;
+        iconImg.style.width = "24px";
+        iconImg.style.height = "24px";
+        iconImg.style.marginRight = "8px";
+        item.appendChild(iconImg);
+      }
+
+      // Texto
+      const textSpan = document.createElement("span");
+      textSpan.textContent = label;
+      textSpan.style.fontSize = "16px";
+      item.appendChild(textSpan);
+
+      legendContainer.appendChild(item);
+    });
+  }
+
+  // 4) Crear el Pie Chart y luego generar la leyenda (solo iconos)
   fetch('/api/uso_transporte')
     .then(response => response.json())
     .then(data => {
         const labels = Object.keys(data);
         const valores = Object.values(data);
 
+        // Generar el array de colores a partir del colorMap
+        const backgroundColors = labels.map(label => colorMap[label] || "#999");
+
+        // Crear el Pie Chart
         const ctxPie = document.getElementById('transportePieChart').getContext('2d');
         new Chart(ctxPie, {
             type: 'pie',
@@ -252,29 +314,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: labels,
                 datasets: [{
                     data: valores,
-                    backgroundColor: [
-                      'rgba(0,150,136,0.5)',
-                      'rgba(255,99,132,0.5)',
-                      'rgba(54,162,235,0.5)',
-                      'rgba(255,206,86,0.5)',
-                      'rgba(75,192,192,0.5)',
-                      'rgba(153,102,255,0.5)'
-                    ],
-                    borderColor: [
-                      'rgba(0,150,136,1)',
-                      'rgba(255,99,132,1)',
-                      'rgba(54,162,235,1)',
-                      'rgba(255,206,86,1)',
-                      'rgba(75,192,192,1)',
-                      'rgba(153,102,255,1)'
-                    ],
-                    borderWidth: 1
+                    backgroundColor: backgroundColors
                 }]
             },
             options: {
-                responsive: true
+              responsive: true,
+              maintainAspectRatio: false, 
+              plugins: {
+                legend: {
+                  display: false 
+                }
+              }
             }
-        });
+          });
+
+        buildCustomLegend(labels);
     })
     .catch(error => console.error('Error al obtener datos para el pie chart:', error));
 });

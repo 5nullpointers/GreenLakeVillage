@@ -150,9 +150,16 @@
 
         <!-- NUEVO: Widget normal debajo del 3er widget (col 4) -->
         <div class="panel admin-widget-5" id="widget-normal">
-          <div class="widget-inner">
-            <h3>Uso de transporte</h3>
-            <canvas id="transportePieChart"></canvas>
+          <div class="widget-inner pie-widget">
+            <h3 class="pie-title">Uso de transporte</h3>
+            <div class="pie-flex-container">
+              <!-- Contenedor para el canvas con tamaño fijo -->
+              <div class="chart-container">
+                <canvas id="transportePieChart"></canvas>
+              </div>
+              <!-- Leyenda personalizada -->
+              <div id="customLegendContainer"></div>
+            </div>
           </div>
         </div>
       </div>
