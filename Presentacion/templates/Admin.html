@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel de Administración</title>
   <!-- Enlaza tu hoja de estilos principal -->
   <link rel="stylesheet" href="/static/css/Admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
   <div class="admin-container">
     <!-- Menú Superior -->
@@ -17,7 +16,6 @@
         <div class="logo">Mi Admin - Green Lake Village</div>
       </div>
       <div class="user-profile">
-        <!-- Se ha eliminado el span del nombre -->
         <img src="/static/images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
         <div class="user-dropdown" id="userDropdown">
           <ul>
@@ -34,7 +32,6 @@
         <!-- Barra lateral -->
         <div class="sidebar" id="sidebar">
           <ul>
-            <!-- Se marca la opción activa con "active" -->
             <li class="active">
               <img src="/static/images/inicio.png" alt="Inicio" class="option-icon" />
               <span class="text-label"><a href="/admin">Inicio</a></span>
@@ -98,35 +95,78 @@
                 <div class="stat-bar">
                   <div id="ocupacionBarFill" class="stat-bar-fill" style="width: 0%;"></div>
                 </div>
-              </div>              
+              </div>
               <div class="stat-item">
                 <p>Reservas confirmadas</p>
                 <span id="reservasRate"></span>
                 <div class="stat-bar">
                   <div id="reservasBarFill" class="stat-bar-fill" style="width: 0%;"></div>
                 </div>
-              </div>              
+              </div>
               <div class="stat-item">
                 <p>Cancelaciones</p>
                 <span id="cancelacionesRate"></span>
                 <div class="stat-bar">
                   <div id="cancelacionesBarFill" class="stat-bar-fill" style="width: 0%;"></div>
                 </div>
-              </div>          
               </div>
             </div>
+          </div>
         </div>
 
-        <!-- Otros Widgets (opcional) -->
-        <div class="panel admin-widget-2">Widget 2</div>
-        <div class="panel admin-widget-3">Widget 3</div>
-        <div class="panel admin-widget-4">Widget 4</div>
+        <!-- Widgets existentes -->
+        <!-- Widget para Top 3 Hoteles -->
+        <div class="panel admin-widget-1" id="topHotelesWidget">
+          <div class="widget-inner">
+            <h3>Top 3 Hoteles mejor valorados</h3>
+            <ul id="topHotelesList"></ul>
+          </div>
+        </div>
+
+        <!-- Widget para Top 3 Servicios -->
+        <div class="panel admin-widget-2" id="topServiciosWidget">
+          <div class="widget-inner">
+            <h3>Top 3 Servicios mejor valorados</h3>
+            <ul id="topServiciosList"></ul>
+          </div>
+        </div>
+
+        <!-- Widget para Top 3 Rutas -->
+        <div class="panel admin-widget-3" id="topRutasWidget">
+          <div class="widget-inner">
+            <h3>Top 3 Rutas mejor valoradas</h3>
+            <ul id="topRutasList"></ul>
+          </div>
+        </div>
+
+        <!-- Widget doble: Visualización del uso de transporte -->
+        <div class="panel admin-widget-4" id="widget-doble">
+          <!-- Agregamos una clase exclusiva para el bar chart -->
+          <div class="widget-inner bar-chart-container">
+            <h3>Uso de transporte</h3>
+            <canvas id="transporteChart"></canvas>
+          </div>
+        </div>
+
+        <!-- NUEVO: Widget normal debajo del 3er widget (col 4) -->
+        <div class="panel admin-widget-5" id="widget-normal">
+          <div class="widget-inner pie-widget">
+            <h3 class="pie-title">Uso de transporte</h3>
+            <div class="pie-flex-container">
+              <!-- Contenedor para el canvas con tamaño fijo -->
+              <div class="chart-container">
+                <canvas id="transportePieChart"></canvas>
+              </div>
+              <!-- Leyenda personalizada -->
+              <div id="customLegendContainer"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Enlaza tu script principal -->
+  <!-- Script principal -->
   <script src="/static/js/Admin.js"></script>
 </body>
-
 </html>

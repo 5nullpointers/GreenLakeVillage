@@ -871,13 +871,14 @@ def format_number(value):
         value = float(value)
         if value >= 1000000:
             # Divide entre 1.000.000 y muestra dos decimales seguidos de "M"
-            return f"{value/1000000:.2f}Millones de"
+            return f"{value/1000000:.2f} Millones de"
         else:
             # Muestra el número con separadores de miles (puntos)
             return f"{value:,.0f}".replace(",", ".")
     except Exception:
         return value
 
+<<<<<<< HEAD
 from bson import ObjectId
 
 @app.route('/chat', methods=['POST'])
@@ -914,10 +915,90 @@ def chat_page():
 
 
 
+=======
+@app.template_filter('short_number')
+def short_number(value):
+    """
+    Devuelve un número en formato abreviado:
+      1,200 => "1.20K"
+      8793114 => "8.79M"
+    """
+    try:
+        num = float(value)
+        if num >= 1_000_000_000:
+            return f"{num / 1_000_000_000:.2f}B"
+        elif num >= 1_000_000:
+            return f"{num / 1_000_000:.2f}M"
+        elif num >= 1_000:
+            return f"{num / 1_000:.2f}K"
+        else:
+            return str(int(num))
+    except:
+        return str(value)
+>>>>>>> Admin-Interfaz
 
 @app.route('/api/estadisticas_ocupacion')
 def api_estadisticas_ocupacion():
     ocupaciones = OcupacionHoteleraDAO.obtener_todos()
+    if not ocupaciones:
+        return jsonify({
+            "tasa_ocupacion_users": 0,
+            "tasa_ocupacion_percent": 0,
+            "reservas_confirmadas": 0,
+            "reservas_percent": 0,
+            "cancelaciones": 0,
+            "cancelaciones_percent": 0
+        })
+
+    total_reservas = sum(o["reservas_confirmadas"] for o in ocupaciones)
+    total_cancelaciones = sum(o["cancelaciones"] for o in ocupaciones)
+    total_usuarios = total_reservas + total_cancelaciones
+
+    total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)
+    promedio_tasa = round(total_tasa / len(ocupaciones), 3)
+
+    if total_usuarios > 0:
+        ocupacion_users = round((promedio_tasa / 100) * total_usuarios)
+    else:
+        ocupacion_users = 0
+
+    if total_usuarios > 0:
+        reservas_percent = round((total_reservas / total_usuarios) * 100, 3)
+        cancelaciones_percent = round((total_cancelaciones / total_usuarios) * 100, 3)
+    else:
+        reservas_percent = 0
+        cancelaciones_percent = 0
+
+    # Aplica filtro short_number antes de devolver JSON
+    from flask import current_app
+    short = current_app.jinja_env.filters['short_number']  
+
+    return jsonify({
+        "tasa_ocupacion_users": short(ocupacion_users),
+        "tasa_ocupacion_percent": promedio_tasa,  
+        "reservas_confirmadas": short(total_reservas),
+        "reservas_percent": reservas_percent,
+        "cancelaciones": short(total_cancelaciones),
+        "cancelaciones_percent": cancelaciones_percent
+    })
+
+<<<<<<< HEAD
+@app.route('/api/estadisticas_ocupacion_Propietarios')
+def api_estadisticas_ocupacion_Propietarios():
+    # Nuevo: Obtener el usuario logueado y sus propiedades
+    from Persistencia.DAOS.UserDAO import UserDAO
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado."}), 401
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "Acceso no autorizado."}), 403
+    user_properties = business_owner.get("properties", [])
+    
+    # Obtener datos de ocupación y filtrar por propiedades del usuario
+    all_ocupaciones = OcupacionHoteleraDAO.obtener_todos()
+    ocupaciones = [o for o in all_ocupaciones if o.get("hotel_nombre") in user_properties]
+    
     if not ocupaciones:
         # Si no hay datos, devolvemos ceros
         return jsonify({
@@ -928,8 +1009,8 @@ def api_estadisticas_ocupacion():
             "cancelaciones": 0,
             "cancelaciones_percent": 0
         })
+    
 
-    # 1) Calcular totales
     total_reservas = sum(o["reservas_confirmadas"] for o in ocupaciones)
     total_cancelaciones = sum(o["cancelaciones"] for o in ocupaciones)
     total_usuarios = total_reservas + total_cancelaciones
@@ -938,15 +1019,12 @@ def api_estadisticas_ocupacion():
     total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)  # suma de % ocupacion
     promedio_tasa = round(total_tasa / len(ocupaciones), 3)     # promedio de % ocupacion
 
-    # 3) Convertir “tasa de ocupación” (porcentaje) a número de usuarios
-    #    Ej.: 50% de 200 usuarios => 100 usuarios
     if total_usuarios > 0:
         ocupacion_users = round((promedio_tasa / 100) * total_usuarios)
     else:
         ocupacion_users = 0
 
-    # 4) Calcular porcentajes de reservas y cancelaciones sobre el total
-    #    (si total_usuarios=0, evitamos división por cero)
+
     if total_usuarios > 0:
         reservas_percent = round((total_reservas / total_usuarios) * 100, 3)
         cancelaciones_percent = round((total_cancelaciones / total_usuarios) * 100, 3)
@@ -955,13 +1033,347 @@ def api_estadisticas_ocupacion():
         cancelaciones_percent = 0
 
     return jsonify({
-        "tasa_ocupacion_users": ocupacion_users,
-        "tasa_ocupacion_percent": promedio_tasa,        # ← con 3 decimales
-        "reservas_confirmadas": total_reservas,
-        "reservas_percent": reservas_percent,           # ← con 3 decimales
-        "cancelaciones": total_cancelaciones,
-        "cancelaciones_percent": cancelaciones_percent  # ← con 3 decimales
+        "tasa_ocupacion_users": short(ocupacion_users),
+        "tasa_ocupacion_percent": promedio_tasa,  
+        "reservas_confirmadas": short(total_reservas),
+        "reservas_percent": reservas_percent,
+        "cancelaciones": short(total_cancelaciones),
+        "cancelaciones_percent": cancelaciones_percent
     })
+
+@app.route('/api/top_hoteles')
+def api_top_hoteles():
+    top_hoteles = OpinionesTuristicasDAO.obtener_top_hoteles()
+    return jsonify(top_hoteles)
+
+@app.route('/api/top_servicios')
+def api_top_servicios():
+    top_servicios = OpinionesTuristicasDAO.obtener_top_servicios()
+    return jsonify(top_servicios)
+
+@app.route('/api/top_rutas')
+def api_top_rutas():
+    top_rutas = OpinionesTuristicasDAO.obtener_top_rutas()
+    return jsonify(top_rutas)
+
+@app.route('/api/uso_transporte')
+def api_uso_transporte():
+
+    datos = UsoTransporteDAO.obtener_todos()
+
+    resumen = {}
+    for dato in datos:
+        tipo = dato.get("tipo_transporte", "Desconocido")
+        num = dato.get("num_usuarios", 0)
+        resumen[tipo] = resumen.get(tipo, 0) + num
+    return jsonify(resumen)
+
+@app.route('/Propietarios/PropiedadesUsuario', methods=['GET'])
+def propiedades_usuario():
+    """
+    Muestra (o retorna en JSON) las propiedades de un usuario BusinessOwner.
+
+    - Si es una petición normal (GET sin 'X-Requested-With'),
+      se renderiza la plantilla 'PropiedadesUsuario.html' con Jinja2,
+      mostrando las propiedades en un <ul>.
+
+    - Si es una petición fetch/JS con 'X-Requested-With: XMLHttpRequest',
+      se retorna JSON para que el front-end rellene la tabla <table id="propiedadesTable">.
+    """
+    user_id = session.get('user_id')
+    if not user_id:
+        # Si no hay usuario en sesión, respondemos según sea fetch o normal
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({"error": "Usuario no autenticado."}), 401
+        else:
+            return "No hay usuario logueado. <a href='/login'>Ir a login</a>", 401
+
+    # 1) Buscar al usuario con el UserDAO
+    usuario = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not usuario:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({"error": "Usuario no encontrado."}), 404
+        else:
+            return "Usuario no encontrado.", 404
+
+    # 2) Extraer sus propiedades (array de strings)
+    propiedades = usuario.get("properties", [])
+
+    propiedades_info = []
+    for propiedad in propiedades:
+        # 3) Buscar datos de ocupación en "ocupacion_hotelera"
+        ocupacion = OcupacionHoteleraDAO.obtener_por_nombre(propiedad) or {}
+        # 4) Buscar opiniones en "opiniones_turisticas"
+        opiniones = list(mongo_agent.db["opiniones_turisticas"].find({"hotel_nombre": propiedad}))
+        # Calcular rating medio
+        if opiniones:
+            avg_rating = sum(op.get("puntuacion", 0) for op in opiniones) / len(opiniones)
+        else:
+            avg_rating = None
+
+        tipo_servicio = OpinionesTuristicasDAO.obtener_tipo_servicio(propiedad)
+
+        precio = ""
+
+        # Obtener precio según el tipo
+        if tipo_servicio == "Hotel":
+            precio = ocupacion.get("precio_promedio_noche", "N/A")
+        elif tipo_servicio == "Servicio":
+            restaurante = mongo_agent.db["restaurantes"].find_one({"nombre": propiedad}) or {}
+            precio = restaurante.get("precio_medio", "N/A")
+        else:
+            precio = "N/A"
+
+        # 5) Construir la info de la propiedad
+        propiedades_info.append({
+            "nombre": propiedad,
+            "tipo_servicio": tipo_servicio,
+            "ocupacion": {
+                "reservas_confirmadas": ocupacion.get("reservas_confirmadas", 0),
+                "cancelaciones": ocupacion.get("cancelaciones", 0),
+                "precio": precio
+            },
+            "opiniones": opiniones,
+            "avg_rating": avg_rating
+        })
+
+    # 6) Si la petición es fetch/JS => devolver JSON
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify(propiedades_info)
+
+    # 7) Si no es fetch => renderizar la plantilla con Jinja2
+    return render_template('PropiedadesUsuario.html', propiedades=propiedades_info)
+
+@app.route('/api/billed_Propietarios')
+def api_billed_Propietarios():
+    from Persistencia.DAOS.UserDAO import UserDAO
+    from Persistencia.DAOS.HotelesDAO import HotelesDAO
+    from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
+    from bson import ObjectId
+
+    user_id = session.get('user_id')
+    if not user_id:
+        return
+
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return
+
+    # Obtener propiedades del usuario
+    user_properties = business_owner.get("properties", [])
+
+    # Obtener precios de hoteles
+    hoteles_data = HotelesDAO.obtener_precios()
+    # Obtener reservas confirmadas
+    ocupaciones_data = OcupacionHoteleraDAO.obtener_todos()
+
+    # Construir un dict para precios
+    precios_dict = {}
+    for h in hoteles_data:
+        nombre_hotel = h.get("nombre")
+        precio_hotel = h.get("precio", 0)
+        precios_dict[nombre_hotel] = precio_hotel
+
+    # Construir un dict para reservas
+    reservas_dict = {}
+    for o in ocupaciones_data:
+        nombre_occ = o.get("hotel_nombre")
+        reservas = o.get("reservas_confirmadas", 0)
+        reservas_dict[nombre_occ] = reservas_dict.get(nombre_occ, 0) + reservas
+
+    # Calcular facturación
+    facturacion = []
+    for propiedad in user_properties:
+        precio = precios_dict.get(propiedad, 0)
+        reserv = reservas_dict.get(propiedad, 0)
+        facturacion.append({
+            "hotelName": propiedad,
+            "total": precio * reserv
+        })
+
+    # Ordenar top 3
+    facturacion.sort(key=lambda x: x["total"], reverse=True)
+    top3 = facturacion[:3]
+
+    return jsonify(top3)
+
+from bson import ObjectId
+import math  # Añade esta línea si no existe
+
+@app.route('/api/latest_reviews_propietarios')
+def api_latest_reviews_propietarios():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado."}), 401
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "Acceso no autorizado."}), 403
+    user_properties = business_owner.get("properties", [])
+    reseñas_cursor = mongo_agent.db["opiniones_turisticas"].find(
+        {"nombre_servicio": {"$in": user_properties}}
+    ).sort("fecha", -1).limit(3)
+    reseñas = list(reseñas_cursor)
+    for r in reseñas:
+        r["_id"] = str(r["_id"])
+        # Reemplazar cualquier valor NaN en el registro por None
+        for key, value in r.items():
+            if isinstance(value, float) and math.isnan(value):
+                r[key] = None
+    return jsonify(reseñas)
+
+def registrar_reto(usuario, reto_id):
+    reto_info = mongo_agent.db["retos"].find_one({"_id": ObjectId(reto_id)})
+    if not reto_info:
+        return
+
+    # Si ya se registró (sin importar el flag), no volvemos a registrar
+    retos_completados = usuario.get("retos_completados", [])
+    if any(str(r["reto_id"]) == reto_id for r in retos_completados):
+        return
+
+    nuevo_reto = {
+        "reto_id": reto_id,
+        "fecha": datetime.utcnow(),
+        "popup_mostrado": False
+    }
+    mongo_agent.db["usuarios"].update_one(
+        {"_id": usuario["_id"]},
+        {
+            "$push": {"retos_completados": nuevo_reto},
+            "$inc": {"tokens": reto_info.get("tokens", 0)}
+        }
+    )
+
+import pandas as pd
+import numpy as np
+from bson import ObjectId
+from flask import jsonify, session
+
+# Función auxiliar para predecir con regresión lineal simple
+def forecast_series(values, forecast_horizon):
+    """
+    Realiza una predicción simple usando regresión lineal sobre la serie de datos.
+    Si hay menos de 2 datos, retorna el último valor repetido 'forecast_horizon' veces.
+    """
+    n = len(values)
+    if n < 2:
+        return [values[-1]] * forecast_horizon
+    x = np.arange(n)
+    # Ajuste lineal: y = a*x + b
+    a, b = np.polyfit(x, values, 1)
+    predictions = []
+    for i in range(1, forecast_horizon + 1):
+        pred = a * (n - 1 + i) + b
+        predictions.append(pred)
+    return predictions
+
+@app.route('/api/prediccionesOcupacion_Propietarios')
+def api_predicciones_ocupacion_propietarios():
+    """
+    Devuelve las previsiones de ocupación, reservas, cancelaciones y precio
+    solo para los hoteles/restaurantes del usuario BusinessOwner.
+    
+    Se asume que la colección 'ocupacion_hotelera' tiene:
+        - hotel_nombre
+        - fecha (datetime)
+        - tasa_ocupacion (int/float)
+        - reservas_confirmadas (int)
+        - cancelaciones (int)
+        - precio_promedio_noche (float)
+    """
+    try:
+        # Verificar que el usuario está autenticado
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({"error": "Usuario no autenticado"}), 401
+
+        # Verificar que sea un BusinessOwner
+        business_owner = mongo_agent.db["usuarios"].find_one({"_id": ObjectId(user_id)})
+        if not business_owner or business_owner.get("type") != "BusinessOwner":
+            return jsonify({"error": "Acceso no autorizado"}), 403
+
+        # Obtener propiedades (hoteles) del usuario
+        user_properties = business_owner.get("properties", [])
+        if not user_properties:
+            return jsonify([])  # Sin propiedades, retorna lista vacía
+
+        # Obtener datos históricos desde 'ocupacion_hotelera' solo de esas propiedades
+        data_cursor = mongo_agent.db["ocupacion_hotelera"].find({
+            "hotel_nombre": {"$in": user_properties}
+        })
+        data = list(data_cursor)
+        if not data:
+            return jsonify([])  # Sin datos para predecir
+
+        # Convertir a DataFrame y asegurar fecha como datetime
+        df = pd.DataFrame(data)
+        df['fecha'] = pd.to_datetime(df['fecha'])
+
+        forecast_horizon = 12 # Predecir para los próximos 3 meses
+        predictions = []
+
+        # Agrupar por hotel_nombre
+        for hotel_name, group in df.groupby('hotel_nombre'):
+            group = group.sort_values('fecha')  # Ordenar por fecha ascendente
+            last_date = group['fecha'].max()
+
+            # Series de datos
+            tasa_series = group['tasa_ocupacion'].tolist()
+            reservas_series = group['reservas_confirmadas'].tolist()
+            cancelaciones_series = group['cancelaciones'].tolist()
+            precio_series = group['precio_promedio_noche'].tolist()
+
+            # Predecir cada métrica
+            pred_tasa = forecast_series(tasa_series, forecast_horizon)
+            pred_reservas = forecast_series(reservas_series, forecast_horizon)
+            pred_cancelaciones = forecast_series(cancelaciones_series, forecast_horizon)
+            pred_precio = forecast_series(precio_series, forecast_horizon)
+
+            # Construir predicciones para cada mes futuro
+            for i in range(forecast_horizon):
+                future_date = last_date + pd.DateOffset(months=i+1)
+                predictions.append({
+                    "mes": future_date.strftime("%Y-%m"),
+                    "hotel_nombre": hotel_name,
+                    "tasa_ocupacion": round(pred_tasa[i], 2),
+                    "reservas_confirmadas": int(round(pred_reservas[i])),
+                    "cancelaciones": int(round(pred_cancelaciones[i])),
+                    "precio_promedio_noche": round(pred_precio[i], 2)
+                })
+
+        return jsonify(predictions)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+=======
+@app.route('/api/top_hoteles')
+def api_top_hoteles():
+    top_hoteles = OpinionesTuristicasDAO.obtener_top_hoteles()
+    return jsonify(top_hoteles)
+
+@app.route('/api/top_servicios')
+def api_top_servicios():
+    top_servicios = OpinionesTuristicasDAO.obtener_top_servicios()
+    return jsonify(top_servicios)
+
+@app.route('/api/top_rutas')
+def api_top_rutas():
+    top_rutas = OpinionesTuristicasDAO.obtener_top_rutas()
+    return jsonify(top_rutas)
+
+@app.route('/api/uso_transporte')
+def api_uso_transporte():
+
+    datos = UsoTransporteDAO.obtener_todos()
+
+    resumen = {}
+    for dato in datos:
+        tipo = dato.get("tipo_transporte", "Desconocido")
+        num = dato.get("num_usuarios", 0)
+        resumen[tipo] = resumen.get(tipo, 0) + num
+    return jsonify(resumen)
+>>>>>>> Admin-Interfaz
 
 @app.route('/api/estadisticas_ocupacion_Propietarios')
 def api_estadisticas_ocupacion_Propietarios():

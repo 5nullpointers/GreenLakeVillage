@@ -140,3 +140,48 @@ class OpinionesTuristicasDAO:
             }
         ]
         return list(mongoDBAgent.db[OpinionesTuristicasDAO.COLLECTION].aggregate(pipeline))
+    
+    # Obtener el top 3 de hoteles
+    @staticmethod
+    def obtener_top_hoteles():
+        pipeline = [
+            { "$match": { "tipo_servicio": "Hotel" } },
+            { "$group": {
+                "_id": "$nombre_servicio",
+                "media_puntuacion": { "$avg": "$puntuacion" },
+                "numero_comentarios": { "$sum": 1 }
+            }},
+            { "$sort": { "media_puntuacion": -1 } },
+            { "$limit": 3 }
+        ]
+        return list(mongoDBAgent.db[OpinionesTuristicasDAO.COLLECTION].aggregate(pipeline))
+
+    # Obtener el top 3 de servicios
+    @staticmethod
+    def obtener_top_servicios():
+        pipeline = [
+            { "$match": { "tipo_servicio": "Servicio" } },
+            { "$group": {
+                "_id": "$nombre_servicio",
+                "media_puntuacion": { "$avg": "$puntuacion" },
+                "numero_comentarios": { "$sum": 1 }
+            }},
+            { "$sort": { "media_puntuacion": -1 } },
+            { "$limit": 3 }
+        ]
+        return list(mongoDBAgent.db[OpinionesTuristicasDAO.COLLECTION].aggregate(pipeline))
+
+    # Obtener el top 3 de rutas
+    @staticmethod
+    def obtener_top_rutas():
+        pipeline = [
+            { "$match": { "tipo_servicio": "Ruta" } },
+            { "$group": {
+                "_id": "$nombre_servicio",
+                "media_puntuacion": { "$avg": "$puntuacion" },
+                "numero_comentarios": { "$sum": 1 }
+            }},
+            { "$sort": { "media_puntuacion": -1 } },
+            { "$limit": 3 }
+        ]
+        return list(mongoDBAgent.db[OpinionesTuristicasDAO.COLLECTION].aggregate(pipeline))
