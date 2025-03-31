@@ -1029,11 +1029,11 @@ def api_estadisticas_ocupacion_Propietarios():
         cancelaciones_percent = 0
 
     return jsonify({
-        "tasa_ocupacion_users": short(ocupacion_users),
+        "tasa_ocupacion_users": ocupacion_users,
         "tasa_ocupacion_percent": promedio_tasa,  
-        "reservas_confirmadas": short(total_reservas),
+        "reservas_confirmadas": total_reservas,
         "reservas_percent": reservas_percent,
-        "cancelaciones": short(total_cancelaciones),
+        "cancelaciones": total_cancelaciones,
         "cancelaciones_percent": cancelaciones_percent
     })
 
