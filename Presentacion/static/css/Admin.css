@@ -129,16 +129,19 @@ body {
 
 /* Barra lateral */
 .sidebar {
-  grid-column: 1 / 2;
-  grid-row: 1 / 49;
+  position: fixed; /* Hace que la barra se mantenga fija en la ventana */
+  top: 0;        /* Posición desde el top */
+  left: 0;       /* Posición desde la izquierda */
+  height: 90vh; /* Ocupa el alto total de la ventana */
+  width: 250px;  /* Ajusta el ancho según tus necesidades */
   background: #ffffff;
   border-radius: 12px;
+  margin-left: 15px;
+  margin-top: 90px;
   padding: 10px;
-  z-index: 1;
+  z-index: 1000; /* Se asegura de que quede por encima */
   transition: width 0.3s ease;
   overflow: hidden;
-  align-self: stretch;  /* Se extiende con la altura de la grilla */
-  height: auto; 
 }
 
 .sidebar ul {

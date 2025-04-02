@@ -287,8 +287,7 @@ const opciones = document.querySelectorAll('.menuPanel li');
 const nuevasImagenes = [
     "/static/images/inicioBlanco.png",
     "/static/images/profileBlanco.png",
-    "/static/images/ForoBlanco.png",
-    "/static/images/ReseñasBlanco.png"
+    "/static/images/ForoBlanco.png"
 ];
 
 opciones.forEach((opcion, index) => {
@@ -312,13 +311,4 @@ opciones.forEach((opcion, index) => {
             img.src = img.dataset.original;
         }
     });
-});
-
-// Asegura que los elementos con clase activa muestren la imagen profileBlanco
-document.querySelectorAll('.menuPanel li.active').forEach((opcion, index) => {
-    const img = opcion.querySelector('img');
-    if (img) {
-        img.src = "/static/images/profileBlanco.png";
-        img.dataset.original = "/static/images/profileBlanco.png";
-    }
 });
