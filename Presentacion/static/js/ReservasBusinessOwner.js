@@ -47,10 +47,10 @@ const opciones = document.querySelectorAll('.menuPanel li');
     
 // Define las nuevas rutas para cada opción
 const nuevasImagenes = [
-    "/static/Images/inicioBlanco.png",
-    "/static/Images/PropiedadesBlanco.png",
-    "/static/Images/ReseñasBlanco.png",
-    "/static/Images/PrevisionesBlanco.png"
+    "/static/images/inicioBlanco.png",
+    "/static/images/PropiedadesBlanco.png",
+    "/static/images/ReseñasBlanco.png",
+    "/static/images/PrevisionesBlanco.png"
 ];
 
 opciones.forEach((opcion, index) => {

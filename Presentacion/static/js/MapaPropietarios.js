@@ -291,7 +291,7 @@ function crearMarcadores() {
       map: map,
       title: hotel.nombre,
       icon: {
-        url: "/static/Images/hotel.png",
+        url: "/static/images/hotel.png",
         scaledSize: new google.maps.Size(80, 80)
       }
     });
@@ -311,7 +311,7 @@ function crearMarcadores() {
 
       infoWindow.setContent(`
         <div style="min-width:250px">
-          <img src="/static/Images/Hoteles/${hotel.imagen || "default.jpg"}" 
+          <img src="/static/images/Hoteles/${hotel.imagen || "default.jpg"}" 
                alt="${hotel.nombre}" 
                style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
           <h3>${hotel.nombre}</h3>
@@ -336,7 +336,7 @@ function crearMarcadoresHoteles() {
       map: map,
       title: restaurant.nombre,
       icon: {
-        url: "/static/Images/restaurante.png",
+        url: "/static/images/restaurante.png",
         scaledSize: new google.maps.Size(80, 80)
       }
     });
@@ -355,7 +355,7 @@ function crearMarcadoresHoteles() {
 
       infoWindow.setContent(`
         <div style="min-width:250px">
-          <img src="/static/Images/Restaurantes/${restaurant.imagen || "default.jpg"}"
+          <img src="/static/images/Restaurantes/${restaurant.imagen || "default.jpg"}"
                alt="${restaurant.nombre}"
                style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
           <h3>${restaurant.nombre}</h3>

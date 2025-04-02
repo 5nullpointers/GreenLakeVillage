@@ -146,9 +146,9 @@ function initMap() {
 // Función para fallback de imagen
 function cambiarImagenFallback(img, imagenNombre) {
   img.onerror = function() {
-    img.src = "/static/Images/Hoteles/default.jpg";
+    img.src = "/static/images/Hoteles/default.jpg";
   };
-  img.src = "/static/Images/Restaurantes/" + imagenNombre;
+  img.src = "/static/images/Restaurantes/" + imagenNombre;
 }
 
 // =======================
@@ -160,7 +160,7 @@ function crearMarcadores() {
       position: { lat: hotel.lat, lng: hotel.lng },
       map: map,
       title: hotel.nombre,
-      icon: { url: "/static/Images/hotel.png", scaledSize: new google.maps.Size(80, 80) }
+      icon: { url: "/static/images/hotel.png", scaledSize: new google.maps.Size(80, 80) }
     });
 
     hotel.marker = marker;
@@ -176,7 +176,7 @@ function crearMarcadores() {
       }
       infoWindow.setContent(`
         <div style="min-width:250px">
-          <img src="/static/Images/Hoteles/${hotel.imagen || "default.jpg"}" 
+          <img src="/static/images/Hoteles/${hotel.imagen || "default.jpg"}" 
                alt="${hotel.nombre}" 
                onerror="cambiarImagenFallback(this, '${hotel.imagen}')"
                style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
@@ -197,7 +197,7 @@ function crearMarcadoresHoteles() {
       position: { lat: restaurant.lat, lng: restaurant.lng },
       map: map,
       title: restaurant.nombre,
-      icon: { url: "/static/Images/restaurante.png", scaledSize: new google.maps.Size(80, 80) }
+      icon: { url: "/static/images/restaurante.png", scaledSize: new google.maps.Size(80, 80) }
     });
     restaurant.marker = marker;
     const infoWindow = new google.maps.InfoWindow();
@@ -212,7 +212,7 @@ function crearMarcadoresHoteles() {
       }
       infoWindow.setContent(`
         <div style="min-width:250px">
-          <img src="/static/Images/Restaurantes/${restaurant.imagen || "default.jpg"}"
+          <img src="/static/images/Restaurantes/${restaurant.imagen || "default.jpg"}"
                alt="${restaurant.nombre}"
                onerror="cambiarImagenFallback(this, '${restaurant.imagen}')"
                style="width:100%; height:auto; margin-bottom:10px; max-height:150px;" />
@@ -249,7 +249,7 @@ function getSidePanelHTML(item, rating) {
   return `
     <div class="dropdown-container">
       <div class="hotel-card">
-        <img src="/static/Images/Hoteles/${item.imagen || "default.jpg"}" 
+        <img src="/static/images/Hoteles/${item.imagen || "default.jpg"}" 
              alt="${item.nombre}" 
              onerror="cambiarImagenFallback(this, '${item.imagen}')"
              class="hotel-image">

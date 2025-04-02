@@ -9,7 +9,7 @@
     /* Fondo dinámico con transición */
     body::before {
       content: "";
-      background: url('/static/Images/Hoteles/{{ hotel.imagen or "default.jpg" }}') no-repeat center center fixed;
+      background: url('/static/images/Hoteles/{{ hotel.imagen or "default.jpg" }}') no-repeat center center fixed;
       background-size: cover;
       position: fixed;
       top: 0;
@@ -38,7 +38,7 @@
       <h3>Precio</h3>
       <p><strong>{{ hotel.precio }} €</strong></p>
       <!-- Imagen del hotel (opcional) -->
-      <img src="/static/Images/Hoteles/{{ hotel.imagen or 'default.jpg' }}" alt="{{ hotel.nombre }}">
+      <img src="/static/images/Hoteles/{{ hotel.imagen or 'default.jpg' }}" alt="{{ hotel.nombre }}">
     </div>
     
     <!-- Columna Derecha -->

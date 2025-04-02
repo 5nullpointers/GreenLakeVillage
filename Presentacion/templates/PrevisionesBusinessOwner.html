@@ -76,7 +76,7 @@
     <nav class="superiorAdmin">
         <div class="logo">Previsiones Futuras - Green Lake Village</div>
         <div class="user-profile">
-            <img src="/static/Images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
+            <img src="/static/images/user-circle.png" alt="Imagen de perfil" class="profile-img" />
             <span class="user-name">{{ session.user_name or 'Nombre de Usuario' }}</span>
             <div class="user-dropdown" id="userDropdown">
                 <ul>
@@ -93,19 +93,19 @@
             <div class="menuPanel">
                 <ul>
                     <li>
-                        <img src="/static/Images/inicio.png" alt="Inicio" class="option-icon" />
+                        <img src="/static/images/inicio.png" alt="Inicio" class="option-icon" />
                         <a href="/Propietarios">Inicio</a>
                     </li>
                     <li>
-                        <img src="/static/Images/Propiedades.png" alt="Propiedades" class="option-icon" />
+                        <img src="/static/images/Propiedades.png" alt="Propiedades" class="option-icon" />
                         <a href="/Propietarios/PropiedadesUsuario">Propiedades</a>
                     </li>
                     <li>
-                        <img src="/static/Images/Reseñas.png" alt="Reservas" class="option-icon" />
+                        <img src="/static/images/Reseñas.png" alt="Reservas" class="option-icon" />
                         <a href="/Propietarios/ReservasHoteles">Reservas</a>
                     </li>
                     <li class="active">
-                        <img src="/static/Images/Previsiones.png" alt="Predicciones" class="option-icon" />
+                        <img src="/static/images/Previsiones.png" alt="Predicciones" class="option-icon" />
                         <a href="/Propietarios/Previsiones">Previsiones</a>
                     </li>
                 </ul>
@@ -150,10 +150,10 @@
             const sideBarOptions = document.querySelectorAll('.menuPanel ul li');
             // Array con las rutas de imágenes "en blanco"
             const whiteIcons = [
-                "/static/Images/inicioBlanco.png",
-                "/static/Images/PropiedadesBlanco.png",
-                "/static/Images/ReseñasBlanco.png",
-                "/static/Images/PrevisionesBlanco.png"
+                "/static/images/inicioBlanco.png",
+                "/static/images/PropiedadesBlanco.png",
+                "/static/images/ReseñasBlanco.png",
+                "/static/images/PrevisionesBlanco.png"
             ];
 
             sideBarOptions.forEach((option, index) => {
