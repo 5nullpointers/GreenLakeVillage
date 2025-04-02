@@ -106,6 +106,10 @@ body {
     flex: 1; /* Expande el contenido para empujar el footer */
 }
 
+.text-center {
+    text-align: center;
+}
+
 .left-col {
     background-color: #fff;
     border-radius: 20px;
@@ -116,7 +120,9 @@ body {
 /* Tarjetas */
 .bento-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, auto)); /* se usa auto-fit y auto para ajustar el contenido */
+    justify-content: center; /* centra la cuadrícula dentro del contenedor */
+    justify-items: center; /* centra cada card dentro de su celda */
     gap: 1rem;
     margin-bottom: 1rem;
 }
@@ -126,7 +132,7 @@ body {
     border-radius: 1rem;
     padding: 1rem;
     box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-    text-align: center;
+    width: fit-content; /* evita que se estire, permitiendo centrar el card */
 }
 
 .card h3 {
