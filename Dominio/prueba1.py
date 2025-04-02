@@ -11,16 +11,16 @@ load_dotenv(dotenv_path)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import openai
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
-from Entidades.RutasTuristicas import RutasTuristicas
 from bson.objectid import ObjectId
 from datetime import datetime, date
-from Entidades.OcupacionHotelera import OcupacionHotelera
-from Entidades.OpinionesTuristicas import OpinionesTuristicas
-from Entidades.Sostenibilidad import Sostenibilidad
-from Entidades.UsoTransporte import UsoTransporte
 from Persistencia.DAOS.OpinionesTuristicasDAO import OpinionesTuristicasDAO
 from Persistencia.DAOS.UserDAO import UserDAO
 from Persistencia.DAOS.ReservasDAO import ReservasDAO
+
+# Importar el blueprint
+from Dominio.admin import admin_bp
+from Dominio.propietarios import propietarios_bp
+
 
 # --- Codificador JSON personalizado ---
 from flask.json.provider import DefaultJSONProvider
@@ -50,14 +50,17 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 # Clave de la API de OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+# Archivo admin
+app.register_blueprint(admin_bp, url_prefix='/admin')
+# Archivo propietarios
+app.register_blueprint(propietarios_bp, url_prefix='/propietarios')
+
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Conectar a MongoDB
 from Persistencia.AgenteBD import MongoDBAgent
-from Persistencia.DAOS.RutasTuristicasDAO import RutasTuristicasDAO
 from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
 from Persistencia.DAOS.OpinionesTuristicasDAO import OpinionesTuristicasDAO
-from Persistencia.DAOS.SostenibilidadDAO import SostenibilidadDAO
 from Persistencia.DAOS.UsoTransporteDAO import UsoTransporteDAO
 mongo_agent = MongoDBAgent()
 # Verificar la conexión
@@ -150,64 +153,6 @@ def index():
 def users():
     usuarios = UserDAO.obtener_todos()
     return jsonify(usuarios), 200
-
-# Metodo para bloquear al usuario
-@app.route('/admin/blockUser', methods=['POST'])
-def block_user():
-    data = request.get_json()
-    user_id = data.get("id")
-    if not user_id:
-        return jsonify({"error": "ID de usuario no proporcionado."}), 400
-    try:
-        from bson import ObjectId
-        # Actualizar directamente en la colección "users"
-        result = mongo_agent.db['usuarios'].update_one(
-            {"_id": ObjectId(user_id)},
-            {"$set": {"blocked": True}}
-        )
-        if result.modified_count > 0:
-            return jsonify({"success": True})
-        else:
-            return jsonify({"error": "No se pudo actualizar el usuario."}), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# Metodo para desbloquear al usuario
-@app.route('/admin/unblockUser', methods=['POST'])
-def unblock_user():
-    data = request.get_json()
-    user_id = data.get("id")
-    if not user_id:
-        return jsonify({"error": "ID de usuario no proporcionado."}), 400
-    try:
-        from bson import ObjectId
-        result = mongo_agent.db['usuarios'].update_one(
-            {"_id": ObjectId(user_id)},
-            {"$set": {"blocked": False}}
-        )
-        if result.modified_count > 0:
-            return jsonify({"success": True})
-        else:
-            return jsonify({"error": "No se pudo actualizar el usuario."}), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# Nuevo endpoint para eliminar un usuario
-@app.route('/admin/deleteUser', methods=['POST'])
-def delete_user():
-    data = request.get_json()
-    user_id = data.get("id")
-    if not user_id:
-        return jsonify({"error": "ID de usuario no proporcionado."}), 400
-    try:
-        from bson import ObjectId
-        result = UserDAO.borrar_dato({"_id": ObjectId(user_id)})
-        if result.deleted_count > 0:
-            return jsonify({"success": True})
-        else:
-            return jsonify({"error": "No se pudo eliminar el usuario."}), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 @app.route('/reserva_confirmada')
 def reserva_confirmada():
@@ -321,14 +266,6 @@ def login_page():
     # Ahora la ruta '/login' redirige a loginRegister.html
     return render_template('loginRegister.html')
 
-@app.route('/Propietarios')
-def Propietarios():
-    return render_template('BusinessOwner.html')
-
-@app.route('/Propietarios/ReservasHoteles')
-def ver_reservas_hoteles():
-    return render_template("ReservasBusinessOwner.html")
-
 @app.route('/api/propietarios/reservas')
 def api_reservas_propietario():
     user_name = session.get("user_name")
@@ -349,28 +286,6 @@ def api_reservas_propietario():
     for r in reservas:
         r["_id"] = str(r["_id"])
     return jsonify(reservas)
-
-@app.route('/Propietarios/Previsiones')
-def verPrevisiones():
-    return render_template("PrevisionesBusinessOwner.html")
-
-@app.route('/MapaAdmin')
-def MapaAdmin():
-    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
-    return render_template('MapaAdmin.html', google_maps_api_key=google_maps_api_key)
-
-@app.route('/MapaPropietarios')
-def MapaPropietarios():
-    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
-    return render_template('MapaPropietarios.html', google_maps_api_key=google_maps_api_key)
-
-@app.route('/admin/UsuariosAdmin')
-def UsuariosAdmin():
-    return render_template('UsuariosAdmin.html')
-
-@app.route('/admin/ForoAdmin')
-def ForoAdmin():
-    return render_template('ForoAdmin.html')
 
 @app.route('/api/admin/crear-tema', methods=['POST'])
 def crear_tema():
@@ -395,49 +310,6 @@ def crear_tema():
         return jsonify({"success": True})
     else:
         return jsonify({"success": False}), 500
-
-@app.route('/admin')
-def admin():
-    from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
-    from Persistencia.DAOS.HotelesDAO import HotelesDAO
-    from Persistencia.DAOS.SostenibilidadDAO import SostenibilidadDAO
-
-    consumo_total = SostenibilidadDAO.obtener_Consumo()
-    totalReservas = OcupacionHoteleraDAO.UsuariosTotales()
-    hoteles = HotelesDAO.obtener_precios()
-    ocupaciones = list(mongo_agent.db["ocupacion_hotelera"].find({}, {"hotel_nombre": 1, "reservas_confirmadas": 1}))
-    
-    # Depuración: ver qué se obtiene de ocupaciones
-    # print("Datos de ocupaciones:", ocupaciones)
-    
-    # Agrupar reservas por hotel y convertir reservas a número si es necesario
-    ocup_dict = {}
-    for o in ocupaciones:
-        nombre_occ = o.get("hotel_nombre")
-        reservas = o.get("reservas_confirmadas", 0)
-        if isinstance(reservas, str):
-            try:
-                reservas = int(reservas)
-            except Exception:
-                reservas = 0
-        ocup_dict[nombre_occ] = ocup_dict.get(nombre_occ, 0) + reservas
-    # print("Diccionario de ocupaciones:", ocup_dict)
-    
-    # Calcular ingresos totales: convertir precio a numérico si es cadena
-    ingresos_totales = 0
-    for h in hoteles:
-        hotel_nombre = h.get("nombre")
-        precio = h.get("precio", 0)
-        if isinstance(precio, str):
-            try:
-                precio = float(precio)
-            except Exception:
-                precio = 0
-        ingreso = precio * ocup_dict.get(hotel_nombre, 0)
-        # print("Hotel:", hotel_nombre, "Precio:", precio, "Reservas:", ocup_dict.get(hotel_nombre, 0), "Ingreso:", ingreso)
-        ingresos_totales += ingreso
-    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
-    return render_template('Admin.html', ingresosTotales=ingresos_totales, totalReservas=totalReservas, consumoTotal=consumo_total, google_maps_api_key=google_maps_api_key)
 
 @app.route('/api/foro/temas')
 def api_foro_temas():
@@ -506,27 +378,6 @@ def api_foro_comentar():
 def UserBlock():
     return render_template('UserBlocked.html')
 
-@app.route('/admin/editUser', methods=['POST'])
-def edit_user():
-    data = request.get_json()
-    try:
-        user_id = data.get("_id")
-        if not user_id:
-            return jsonify({"success": False, "error": "Missing user _id"})
-        filtro = {"_id": ObjectId(user_id)}
-        update_data = {
-            "name": data.get("name"),
-            "email": data.get("email"),
-            "type": data.get("type")
-        }
-        result = UserDAO.actualizar_dato(filtro, update_data)
-        if result.modified_count > 0:
-            return jsonify({"success": True})
-        else:
-            return jsonify({"success": False, "error": "No se actualizó ningún registro"})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
-
 @app.route('/login', methods=['POST'])
 def login():
     email = request.form.get('email')
@@ -569,7 +420,7 @@ def login():
                     session['user_id'] = str(usuario["_id"])
                     session['user_name'] = usuario.get("name")
                     flash("Inicio de sesión exitoso!")
-                    return redirect(url_for('admin'))
+                    return redirect(url_for('admin.admin'))  # Cambio: usar endpoint "admin.admin"
                 else:
                     flash("Contraseña incorrecta.")
                     return redirect(url_for('login_page'))
@@ -578,7 +429,7 @@ def login():
                     session['user_id'] = str(usuario["_id"])
                     session['user_name'] = usuario.get("name")
                     flash("Inicio de sesión exitoso!")
-                    return redirect(url_for('Propietarios'))
+                    return redirect(url_for('propietarios.Propietarios'))  # Cambio: usar endpoint "propietarios.MapaPropietarios"
                 else:
                     flash("Contraseña incorrecta.")
                     return redirect(url_for('login_page'))
@@ -1034,82 +885,6 @@ def api_uso_transporte():
         num = dato.get("num_usuarios", 0)
         resumen[tipo] = resumen.get(tipo, 0) + num
     return jsonify(resumen)
-
-@app.route('/Propietarios/PropiedadesUsuario', methods=['GET'])
-def propiedades_usuario():
-    """
-    Muestra (o retorna en JSON) las propiedades de un usuario BusinessOwner.
-
-    - Si es una petición normal (GET sin 'X-Requested-With'),
-      se renderiza la plantilla 'PropiedadesUsuario.html' con Jinja2,
-      mostrando las propiedades en un <ul>.
-
-    - Si es una petición fetch/JS con 'X-Requested-With: XMLHttpRequest',
-      se retorna JSON para que el front-end rellene la tabla <table id="propiedadesTable">.
-    """
-    user_id = session.get('user_id')
-    if not user_id:
-        # Si no hay usuario en sesión, respondemos según sea fetch o normal
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({"error": "Usuario no autenticado."}), 401
-        else:
-            return "No hay usuario logueado. <a href='/login'>Ir a login</a>", 401
-
-    # 1) Buscar al usuario con el UserDAO
-    usuario = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
-    if not usuario:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({"error": "Usuario no encontrado."}), 404
-        else:
-            return "Usuario no encontrado.", 404
-
-    # 2) Extraer sus propiedades (array de strings)
-    propiedades = usuario.get("properties", [])
-
-    propiedades_info = []
-    for propiedad in propiedades:
-        # 3) Buscar datos de ocupación en "ocupacion_hotelera"
-        ocupacion = OcupacionHoteleraDAO.obtener_por_nombre(propiedad) or {}
-        # 4) Buscar opiniones en "opiniones_turisticas"
-        opiniones = list(mongo_agent.db["opiniones_turisticas"].find({"hotel_nombre": propiedad}))
-        # Calcular rating medio
-        if opiniones:
-            avg_rating = sum(op.get("puntuacion", 0) for op in opiniones) / len(opiniones)
-        else:
-            avg_rating = None
-
-        tipo_servicio = OpinionesTuristicasDAO.obtener_tipo_servicio(propiedad)
-
-        precio = ""
-
-        # Obtener precio según el tipo
-        if tipo_servicio == "Hotel":
-            precio = ocupacion.get("precio_promedio_noche", "N/A")
-        elif tipo_servicio == "Servicio":
-            restaurante = mongo_agent.db["restaurantes"].find_one({"nombre": propiedad}) or {}
-            precio = restaurante.get("precio_medio", "N/A")
-        else:
-            precio = "N/A"
-
-        # 5) Construir la info de la propiedad
-        propiedades_info.append({
-            "nombre": propiedad,
-            "tipo_servicio": tipo_servicio,
-            "ocupacion": {
-                "reservas_confirmadas": ocupacion.get("reservas_confirmadas", 0),
-                "cancelaciones": ocupacion.get("cancelaciones", 0),
-                "precio": precio
-            },
-            "opiniones": opiniones,
-            "avg_rating": avg_rating
-        })
-
-    # 6) Si la petición es fetch/JS => devolver JSON
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify(propiedades_info)
-
-    # 7) Si no es fetch => renderizar la plantilla con Jinja2
-    return render_template('PropiedadesUsuario.html', propiedades=propiedades_info)
 
 @app.route('/api/billed_Propietarios')
 def api_billed_Propietarios():
