@@ -1,5 +1,6 @@
 import sys
 import signal
+import requests
 import os
 import pandas as pd
 import numpy as np
@@ -67,13 +68,6 @@ else:
     # print("✅ Conexión a MongoDB establecida correctamente")
     pass
 
-# prueba1.py (fragmento)
-
-import os
-import requests
-from flask import Flask, request, jsonify, render_template
-
-
 # Clave de servidor para la Routes API v2
 # (¡No la expongas en el frontend!)
 ROUTES_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
@@ -140,23 +134,17 @@ def marcar_reto_notificado():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
-
-
 @app.route("/map")
 def map_page():
     # En lugar de usar un valor por defecto, tomamos la clave de .env
     google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
     return render_template("map.html", google_maps_api_key=google_maps_api_key)
 
-
 @app.route('/')
 def index():
     # Lo mismo para el index
     google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
     return render_template('index.html', google_maps_api_key=google_maps_api_key)
-
 
 @app.route('/users', methods=['GET'])
 def users():
@@ -220,11 +208,6 @@ def delete_user():
             return jsonify({"error": "No se pudo eliminar el usuario."}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@app.route('/map')
-def map():
-    google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
-    return render_template('map.html', google_maps_api_key=google_maps_api_key)
 
 @app.route('/reserva_confirmada')
 def reserva_confirmada():
@@ -519,8 +502,6 @@ def api_foro_comentar():
     else:
         return jsonify({"success": False}), 500
 
-
-
 @app.route('/UserBlock')
 def UserBlock():
     return render_template('UserBlocked.html')
@@ -608,7 +589,6 @@ def login():
         flash("Usuario no encontrado.")
         return redirect(url_for('login_page'))
 
-
 @app.route('/api/retos_pendientes', methods=['GET'])
 def api_retos_pendientes():
     user_id = session.get("user_id")
@@ -640,8 +620,6 @@ def api_retos_pendientes():
                 })
 
     return jsonify(retos_pendientes)
-
-
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -686,8 +664,6 @@ def register():
     flash("Registro exitoso. Ahora elige tus preferencias.")
     return redirect(url_for('preferences', user_email=email))
 
-
-
 @app.route('/preferences', methods=['GET', 'POST'])
 def preferences():
     # Obtener el correo del usuario desde la URL
@@ -708,7 +684,6 @@ def preferences():
         return redirect(url_for('map'))  # Redirigir al mapa u otra página
 
     return render_template('Preferences.html', user=usuario)
-
 
 @app.route('/save-preferences', methods=['POST'])
 def save_preferences():
@@ -747,7 +722,6 @@ def save_preferences():
         print(f"Error al guardar preferencias: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-
 @app.route('/contacto')
 def contacto():
     return render_template('contacto.html')
@@ -778,7 +752,6 @@ def api_rutas():
     for r in rutas:
         r["_id"] = str(r["_id"])  # Convertir ObjectId a string
     return jsonify(rutas)
-
 
 @app.route('/api/restaurantes')
 def api_restaurantes():
@@ -911,8 +884,6 @@ def chat_page():
         return jsonify({"response": response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
 
 @app.template_filter('short_number')
 def short_number(value):
