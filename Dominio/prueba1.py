@@ -16,7 +16,6 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from flask.json.provider import DefaultJSONProvider
 
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash
 
 from bson.objectid import ObjectId
 from bson import ObjectId
@@ -31,6 +30,7 @@ from Persistencia.DAOS.HotelesDAO import HotelesDAO
 from Dominio.admin import admin_bp
 from Dominio.propietarios import propietarios_bp
 from Dominio.reservas import reservas_bp
+from auth import auth_bp
 
 from Entidades.asistenteIA import obtener_respuesta
 
@@ -68,6 +68,8 @@ app.register_blueprint(admin_bp, url_prefix='/admin')
 app.register_blueprint(propietarios_bp, url_prefix='/propietarios')
 # Archivo reservas
 app.register_blueprint(reservas_bp, url_prefix='/reservas')
+# Archivo auth y users
+app.register_blueprint(auth_bp)
 
 # Conectar a MongoDB
 mongo_agent = MongoDBAgent()
@@ -156,16 +158,6 @@ def index():
     # Lo mismo para el index
     google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
     return render_template('index.html', google_maps_api_key=google_maps_api_key)
-
-@app.route('/users', methods=['GET'])
-def users():
-    usuarios = UserDAO.obtener_todos()
-    return jsonify(usuarios), 200
-
-@app.route('/login')
-def login_page():
-    # Ahora la ruta '/login' redirige a loginRegister.html
-    return render_template('loginRegister.html')
 
 @app.route('/api/propietarios/reservas')
 def api_reservas_propietario():
@@ -275,72 +267,6 @@ def api_foro_comentar():
     else:
         return jsonify({"success": False}), 500
 
-@app.route('/UserBlock')
-def UserBlock():
-    return render_template('UserBlocked.html')
-
-@app.route('/login', methods=['POST'])
-def login():
-    email = request.form.get('email')
-    password = request.form.get('password')
-
-    if not email or not password:
-        flash("Por favor, completa ambos campos.")
-        return redirect(url_for('login_page'))
-
-    usuario = UserDAO.obtener_dato({"email": email})
-    if usuario:
-        if usuario.get("blocked") == True:
-            return redirect(url_for('UserBlock'))
-
-        match usuario.get("type"):
-            case "Tourist":
-                if check_password_hash(usuario.get("pass"), password):
-                    session['user_id'] = str(usuario["_id"])
-                    session['user_name'] = usuario.get("name")
-                    # Buscar todos los retos activos
-                    retos = list(mongo_agent.db["retos"].find({"activo": True}))
-                    retos_pendientes = []
-                    # Obtener los retos ya completados por el usuario
-                    retos_completados = usuario.get("retos_completados", [])
-                    # Filtrar aquellos retos que no hayan sido notificados (popup_mostrado True)
-                    for reto in retos:
-                        reto_id = str(reto["_id"])
-                        if not any(str(r["reto_id"]) == reto_id and r.get("popup_mostrado", False) for r in retos_completados):
-                            retos_pendientes.append(reto)
-                    
-                    # Almacenar en la sesión la lista de retos pendientes para que el front-end los muestre
-                    session['retos_pendientes'] = retos_pendientes
-                    flash("Inicio de sesión exitoso!")
-                    return redirect(url_for('map_page'))
-                else:
-                    flash("Contraseña incorrecta.")
-                    return redirect(url_for('login_page'))
-            case "Admin":
-                if check_password_hash(usuario.get("pass"), password):
-                    session['user_id'] = str(usuario["_id"])
-                    session['user_name'] = usuario.get("name")
-                    flash("Inicio de sesión exitoso!")
-                    return redirect(url_for('admin.admin'))  # Cambio: usar endpoint "admin.admin"
-                else:
-                    flash("Contraseña incorrecta.")
-                    return redirect(url_for('login_page'))
-            case "BusinessOwner":
-                if check_password_hash(usuario.get("pass"), password):
-                    session['user_id'] = str(usuario["_id"])
-                    session['user_name'] = usuario.get("name")
-                    flash("Inicio de sesión exitoso!")
-                    return redirect(url_for('propietarios.Propietarios'))  # Cambio: usar endpoint "propietarios.MapaPropietarios"
-                else:
-                    flash("Contraseña incorrecta.")
-                    return redirect(url_for('login_page'))
-            case _:
-                flash("Tipo de usuario desconocido.")
-                return redirect(url_for('login_page'))
-    else:
-        flash("Usuario no encontrado.")
-        return redirect(url_for('login_page'))
-
 @app.route('/api/retos_pendientes', methods=['GET'])
 def api_retos_pendientes():
     user_id = session.get("user_id")
@@ -372,106 +298,6 @@ def api_retos_pendientes():
                 })
 
     return jsonify(retos_pendientes)
-
-@app.route('/register', methods=['POST'])
-def register():
-    name = request.form.get('name')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    blocked = False
-
-    if not name or not email or not password:
-        flash("Todos los campos son obligatorios.")
-        return redirect(url_for('login_page'))
-
-    if UserDAO.obtener_dato({"email": email}):
-        flash("El correo ya está registrado.")
-        return redirect(url_for('login_page'))
-
-    hashed_password = generate_password_hash(password)
-    nuevo_usuario = {
-        "name": name,
-        "email": email,
-        "pass": hashed_password,
-        "type": "Tourist",
-        "blocked": blocked,
-        "preferencias": [],
-        "retos_completados": [],
-        "tokens": 0
-    }
-
-    UserDAO.insertar_dato(nuevo_usuario)
-
-    usuario = UserDAO.obtener_dato({"email": email})
-    if usuario:
-        # Registrar el reto de registro para que no se muestre en futuras sesiones
-        registrar_reto(usuario, "647a1b9f3d5f1c4a9e8a1234")
-        # Almacenar el _id (como string) en la sesión
-        session['user_id'] = str(usuario["_id"])
-        session['user_name'] = usuario.get("name")
-    else:
-        flash("Error en el registro")
-        return redirect(url_for('login_page'))
-
-    flash("Registro exitoso. Ahora elige tus preferencias.")
-    return redirect(url_for('preferences', user_email=email))
-
-@app.route('/preferences', methods=['GET', 'POST'])
-def preferences():
-    # Obtener el correo del usuario desde la URL
-    user_email = request.args.get('user_email')
-    usuario = UserDAO.obtener_dato({"email": user_email})
-
-    if request.method == 'POST':
-        # Recibir las preferencias seleccionadas desde el formulario
-        preferences = request.form.getlist('preferences')
-
-        # Actualizar las preferencias del usuario en la base de datos
-        UserDAO.actualizar_dato(
-            {"email": user_email},
-            {"preferencias": preferences}
-        )
-
-        flash("Tus preferencias se han guardado correctamente.")
-        return redirect(url_for('map'))  # Redirigir al mapa u otra página
-
-    return render_template('Preferences.html', user=usuario)
-
-@app.route('/save-preferences', methods=['POST'])
-def save_preferences():
-    data = request.json
-    # Obtenemos el _id del usuario (almacenado en la sesión)
-    user_id = session.get('user_id')
-    preferences = data.get('preferencias')
-
-    if not user_id or not preferences:
-        return jsonify({"error": "Email o preferencias no proporcionadas"}), 400
-
-    print(f"User ID: {user_id}, Preferencias: {preferences}")  # Verificar los datos recibidos
-
-    try:
-        # Buscar al usuario en la base de datos utilizando el _id
-        user = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
-
-        # Verificar si el usuario fue encontrado
-        if not user:
-            return jsonify({"error": "Usuario no encontrado"}), 400
-
-        # Actualizar las preferencias del usuario
-        result = UserDAO.actualizar_dato(
-            {"_id": ObjectId(user_id)},
-            {"preferencias": preferences}
-        )
-
-        print(f"Resultado de la actualización: {result.modified_count} documentos modificados")
-
-        if result.modified_count > 0:
-            return jsonify({"success": True, "redirect": url_for('map')})
-        else:
-            return jsonify({"error": "No se pudo actualizar las preferencias"}), 500
-    except Exception as e:
-        print(f"Error al guardar preferencias: {str(e)}")
-        return jsonify({"error": str(e)}), 500
 
 @app.route('/contacto')
 def contacto():
