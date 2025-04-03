@@ -1,0 +1,40 @@
+.confirmation-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f8f8;
+  padding: 2rem;
+}
+.confirmation-card {
+  max-width: 500px;
+  width: 100%;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+.confirmation-card h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+.confirmation-card p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+.confirmation-card .btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+.confirmation-card .btn:hover {
+  transform: scale(1.03);
+}
