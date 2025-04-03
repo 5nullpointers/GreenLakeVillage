@@ -4,7 +4,7 @@ function updateTable() {
   const tbody = document.querySelector("#tablaReservasBody tbody");
   tbody.innerHTML = "";
   
-  fetch("/api/propietarios/reservas")
+  fetch("/propietarios/api/propietarios/reservas")
     .then(response => response.json())
     .then(data => {
         console.log("Reservas recibidas:", data); // Debug: imprimir los datos recibidos

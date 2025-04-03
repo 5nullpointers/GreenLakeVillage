@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const monthButtonsDiv = document.getElementById('monthButtons');
     const predictionsTableBody = document.getElementById('predictionsTable').querySelector('tbody');
 
-    fetch('/api/prediccionesOcupacion_Propietarios')
+    fetch('/propietarios/api/prediccionesOcupacion_Propietarios')
         .then(response => response.json())
         .then(data => {
             if (data.error) {

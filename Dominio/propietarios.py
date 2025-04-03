@@ -3,9 +3,12 @@ from Persistencia.AgenteBD import MongoDBAgent
 from Persistencia.DAOS.UserDAO import UserDAO
 from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
 from Persistencia.DAOS.OpinionesTuristicasDAO import OpinionesTuristicasDAO
+from Persistencia.DAOS.HotelesDAO import HotelesDAO
 from bson import ObjectId
 
 import os
+import pandas as pd
+import math
 
 mongo_agent = MongoDBAgent()
 propietarios_bp = Blueprint('propietarios', __name__)
@@ -106,3 +109,198 @@ def propiedades_usuario():
 
     # 7) Si no es fetch => renderizar la plantilla con Jinja2
     return render_template('PropiedadesUsuario.html', propiedades=propiedades_info)
+
+@propietarios_bp.route('/api/propietarios/reservas')
+def api_reservas_propietario():
+    user_name = session.get("user_name")
+
+    # Obtener lista de propiedades del usuario
+    usuario = mongo_agent.db["usuarios"].find_one({"name": user_name})
+    if not usuario or "properties" not in usuario:
+        return jsonify([])
+
+    nombres_hoteles = usuario["properties"]
+    
+    # Para depuración, descomenta la siguiente línea para devolver todas las reservas
+    # reservas = list(mongo_agent.db["reservas"].find({}))
+    
+    reservas = list(mongo_agent.db["reservas"].find({
+        "nombre_hotel": {"$in": nombres_hoteles}
+    }))
+    for r in reservas:
+        r["_id"] = str(r["_id"])
+    return jsonify(reservas)
+
+@propietarios_bp.route('/api/ratings_Propietarios')
+def api_ratings_Propietarios():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado"}), 401
+
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "El usuario no es un Propietario"}), 403
+
+    user_properties = business_owner.get("properties", [])
+    agregados = OpinionesTuristicasDAO.obtener_agregados()
+
+    # Filtrar los resultados de 'agregados' solo por propiedades del usuario
+    ratings_dict = {}
+    for entry in agregados:
+        if entry["_id"] in user_properties:
+            ratings_dict[entry["_id"]] = {
+                "media_puntuacion": entry["media_puntuacion"],
+                "numero_comentarios": entry["numero_comentarios"]
+            }
+    return jsonify(ratings_dict)
+
+@propietarios_bp.route('/api/billed_Propietarios')
+def api_billed_Propietarios():
+
+    user_id = session.get('user_id')
+    if not user_id:
+        return
+
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return
+
+    # Obtener propiedades del usuario
+    user_properties = business_owner.get("properties", [])
+
+    # Obtener precios de hoteles
+    hoteles_data = HotelesDAO.obtener_precios()
+    # Obtener reservas confirmadas
+    ocupaciones_data = OcupacionHoteleraDAO.obtener_todos()
+
+    # Construir un dict para precios
+    precios_dict = {}
+    for h in hoteles_data:
+        nombre_hotel = h.get("nombre")
+        precio_hotel = h.get("precio", 0)
+        precios_dict[nombre_hotel] = precio_hotel
+
+    # Construir un dict para reservas
+    reservas_dict = {}
+    for o in ocupaciones_data:
+        nombre_occ = o.get("hotel_nombre")
+        reservas = o.get("reservas_confirmadas", 0)
+        reservas_dict[nombre_occ] = reservas_dict.get(nombre_occ, 0) + reservas
+
+    # Calcular facturación
+    facturacion = []
+    for propiedad in user_properties:
+        precio = precios_dict.get(propiedad, 0)
+        reserv = reservas_dict.get(propiedad, 0)
+        facturacion.append({
+            "hotelName": propiedad,
+            "total": precio * reserv
+        })
+
+    # Ordenar top 3
+    facturacion.sort(key=lambda x: x["total"], reverse=True)
+    top3 = facturacion[:3]
+
+    return jsonify(top3)
+
+@propietarios_bp.route('/api/prediccionesOcupacion_Propietarios')
+def api_predicciones_ocupacion_propietarios():
+    from Dominio.prueba1 import forecast_series  # importación local para romper la circularidad
+    """
+    Devuelve las previsiones de ocupación, reservas, cancelaciones y precio
+    solo para los hoteles/restaurantes del usuario BusinessOwner.
+    
+    Se asume que la colección 'ocupacion_hotelera' tiene:
+        - hotel_nombre
+        - fecha (datetime)
+        - tasa_ocupacion (int/float)
+        - reservas_confirmadas (int)
+        - cancelaciones (int)
+        - precio_promedio_noche (float)
+    """
+    try:
+        # Verificar que el usuario está autenticado
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({"error": "Usuario no autenticado"}), 401
+
+        # Verificar que sea un BusinessOwner
+        business_owner = mongo_agent.db["usuarios"].find_one({"_id": ObjectId(user_id)})
+        if not business_owner or business_owner.get("type") != "BusinessOwner":
+            return jsonify({"error": "Acceso no autorizado"}), 403
+
+        # Obtener propiedades (hoteles) del usuario
+        user_properties = business_owner.get("properties", [])
+        if not user_properties:
+            return jsonify([])  # Sin propiedades, retorna lista vacía
+
+        # Obtener datos históricos desde 'ocupacion_hotelera' solo de esas propiedades
+        data_cursor = mongo_agent.db["ocupacion_hotelera"].find({
+            "hotel_nombre": {"$in": user_properties}
+        })
+        data = list(data_cursor)
+        if not data:
+            return jsonify([])  # Sin datos para predecir
+
+        # Convertir a DataFrame y asegurar fecha como datetime
+        df = pd.DataFrame(data)
+        df['fecha'] = pd.to_datetime(df['fecha'])
+
+        forecast_horizon = 12 # Predecir para los próximos 3 meses
+        predictions = []
+
+        # Agrupar por hotel_nombre
+        for hotel_name, group in df.groupby('hotel_nombre'):
+            group = group.sort_values('fecha')  # Ordenar por fecha ascendente
+            last_date = group['fecha'].max()
+
+            # Series de datos
+            tasa_series = group['tasa_ocupacion'].tolist()
+            reservas_series = group['reservas_confirmadas'].tolist()
+            cancelaciones_series = group['cancelaciones'].tolist()
+            precio_series = group['precio_promedio_noche'].tolist()
+
+            
+            # Predecir cada métrica
+            pred_tasa = forecast_series(tasa_series, forecast_horizon)
+            pred_reservas = forecast_series(reservas_series, forecast_horizon)
+            pred_cancelaciones = forecast_series(cancelaciones_series, forecast_horizon)
+            pred_precio = forecast_series(precio_series, forecast_horizon)
+
+            # Construir predicciones para cada mes futuro
+            for i in range(forecast_horizon):
+                future_date = last_date + pd.DateOffset(months=i+1)
+                predictions.append({
+                    "mes": future_date.strftime("%Y-%m"),
+                    "hotel_nombre": hotel_name,
+                    "tasa_ocupacion": round(pred_tasa[i], 2),
+                    "reservas_confirmadas": int(round(pred_reservas[i])),
+                    "cancelaciones": int(round(pred_cancelaciones[i])),
+                    "precio_promedio_noche": round(pred_precio[i], 2)
+                })
+
+        return jsonify(predictions)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@propietarios_bp.route('/api/latest_reviews_propietarios')
+def api_latest_reviews_propietarios():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado."}), 401
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "Acceso no autorizado."}), 403
+    user_properties = business_owner.get("properties", [])
+    reseñas_cursor = mongo_agent.db["opiniones_turisticas"].find(
+        {"nombre_servicio": {"$in": user_properties}}
+    ).sort("fecha", -1).limit(3)
+    reseñas = list(reseñas_cursor)
+    for r in reseñas:
+        r["_id"] = str(r["_id"])
+        # Reemplazar cualquier valor NaN en el registro por None
+        for key, value in r.items():
+            if isinstance(value, float) and math.isnan(value):
+                r[key] = None
+    return jsonify(reseñas)
