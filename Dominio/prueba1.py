@@ -32,6 +32,7 @@ from propietarios import propietarios_bp
 from reservas import reservas_bp
 from auth import auth_bp
 from forum import forum_bp
+from maps import maps_bp
 
 from Entidades.asistenteIA import obtener_respuesta
 
@@ -73,6 +74,8 @@ app.register_blueprint(reservas_bp, url_prefix='/reservas')
 app.register_blueprint(auth_bp)
 # Archivo forum
 app.register_blueprint(forum_bp)
+# Archivo maps y navegación
+app.register_blueprint(maps_bp)
 
 # Conectar a MongoDB
 mongo_agent = MongoDBAgent()
@@ -83,45 +86,6 @@ if not mongo_agent.client:
 else:
     # print("✅ Conexión a MongoDB establecida correctamente")
     pass
-
-# Clave de servidor para la Routes API v2
-# (¡No la expongas en el frontend!)
-ROUTES_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-
-@app.route("/get-route", methods=["POST"])
-def get_route():
-    """
-    Recibe { origin: {latitude, longitude}, destination: {latitude, longitude} }
-    Llama a la Routes API v2 y devuelve la polyline
-    """
-    data = request.json
-    origin = data.get("origin")
-    destination = data.get("destination")
-
-    if not origin or not destination:
-        return jsonify({"error": "Origin/destination missing"}), 400
-
-    # Construir el payload para la nueva Routes API v2
-    payload = {
-        "origin": {"location": {"latLng": origin}},
-        "destination": {"location": {"latLng": destination}},
-        "travelMode": "DRIVE"
-    }
-
-    # Llamar a la Routes API
-    headers = {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": ROUTES_API_KEY,
-        "X-Goog-FieldMask": "routes.polyline.encodedPolyline"
-    }
-    url = "https://routes.googleapis.com/directions/v2:computeRoutes"
-
-    try:
-        resp = requests.post(url, json=payload, headers=headers)
-        resp_data = resp.json()
-        return jsonify(resp_data)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
     
 @app.route('/api/retos/marcar_notificado', methods=['POST'])
 def marcar_reto_notificado():
@@ -150,18 +114,6 @@ def marcar_reto_notificado():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/map")
-def map_page():
-    # En lugar de usar un valor por defecto, tomamos la clave de .env
-    google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-    return render_template("map.html", google_maps_api_key=google_maps_api_key)
-
-@app.route('/')
-def index():
-    # Lo mismo para el index
-    google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-    return render_template('index.html', google_maps_api_key=google_maps_api_key)
-
 @app.route('/api/propietarios/reservas')
 def api_reservas_propietario():
     user_name = session.get("user_name")
@@ -183,6 +135,44 @@ def api_reservas_propietario():
         r["_id"] = str(r["_id"])
     return jsonify(reservas)
 
+@app.route('/api/admin/crear-tema', methods=['POST'])
+def crear_tema():
+    titulo = request.form.get("titulo")
+    descripcion = request.form.get("descripcion")
+    categoria = request.form.get("categoria")
+
+    if not titulo or not descripcion:
+        return jsonify({"error": "Falta el título o la descripción"}), 400
+    
+    nuevo_tema = {
+        "titulo": titulo,
+        "descripcion": descripcion,
+        "autor": session.get("user_name", "Admin"),
+        "fecha": datetime.utcnow(),
+        "categoria": categoria,
+        "estado": "activo"
+    }
+    result = mongo_agent.db["temas_forum"].insert_one(nuevo_tema)
+    #Comprobar si se ha insertado correctamente
+    if result.inserted_id:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False}), 500
+
+@app.route('/api/foro/temas')
+def api_foro_temas():
+    temas = list(mongo_agent.db["temas_forum"].find({}))
+    for tema in temas:
+        tema["_id"] = str(tema["_id"])
+    return jsonify(temas)
+
+@app.route('/api/foro/temas/<string:tema_id>/comentarios')
+def api_foro_comentarios(tema_id):
+    comentarios = list(mongo_agent.db["comentarios_forum"].find({"tema_id": tema_id}))
+    for c in comentarios:
+        c["_id"] = str(c["_id"])
+    return jsonify(comentarios)
+
 # Configuración para archivos
 UPLOAD_FOLDER = os.path.join(STATIC_DIR, 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -190,6 +180,47 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/api/foro/comentar', methods=['POST'])
+def api_foro_comentar():
+    tema_id = request.form.get("tema_id")
+    comentario_texto = request.form.get("comentario")
+    # Obtener usuario desde la sesión
+    autor = session.get("user_name", "Anónimo")
+    imagen_url = None
+
+    # Manejar la imagen si se envió
+    if 'imagen' in request.files:
+        file = request.files['imagen']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            # Construir la URL de la imagen
+            imagen_url = '/static/uploads/' + filename
+
+    comentario = {
+        "tema_id": tema_id,
+        "autor": autor,
+        "comentario": comentario_texto,
+        "imagen_url": imagen_url,
+        "fecha": datetime.utcnow()
+    }
+    result = mongo_agent.db["comentarios_forum"].insert_one(comentario)
+    if result.inserted_id:
+        # Registrar el reto de comentario si aún no ha sido completado
+        user_id = session.get("user_id")
+        if user_id:
+            try:
+                usuario = mongo_agent.db["usuarios"].find_one({"_id": ObjectId(user_id)})
+                if usuario:
+                    # Aquí debes usar el id del reto correspondiente al "Reto de Comentario"
+                    registrar_reto(usuario, "647a1ba13d5f1c4a9e8a1236")
+            except Exception as e:
+                print("Error registrando reto:", e)
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False}), 500
 
 @app.route('/api/retos_pendientes', methods=['GET'])
 def api_retos_pendientes():

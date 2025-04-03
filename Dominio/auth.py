@@ -41,7 +41,7 @@ def login():
                 session['user_id'] = str(usuario["_id"])
                 session['user_name'] = usuario.get("name")
                 flash("Inicio de sesión exitoso!")
-                return redirect(url_for('map_page'))
+                return redirect(url_for('maps.map_page'))
             else:
                 flash("Contraseña incorrecta.")
                 return redirect(url_for('auth.login_page'))
@@ -124,7 +124,7 @@ def preferences():
         preferences = request.form.getlist('preferences')
         UserDAO.actualizar_dato({"email": user_email}, {"preferencias": preferences})
         flash("Tus preferencias se han guardado correctamente.")
-        return redirect(url_for('map_page'))
+        return redirect(url_for('maps.map_page'))
     
     return render_template('Preferences.html', user=usuario)
 
@@ -147,7 +147,7 @@ def save_preferences():
 
         result = UserDAO.actualizar_dato({"_id": ObjectId(user_id)}, {"preferencias": preferences})
         if result.modified_count > 0:
-            return jsonify({"success": True, "redirect": url_for('map_page')})
+            return jsonify({"success": True, "redirect": url_for('maps.map_page')})
         else:
             return jsonify({"error": "No se pudo actualizar las preferencias"}), 500
     except Exception as e:
