@@ -1,5 +1,4 @@
 import sys
-import signal
 import requests
 import os
 import pandas as pd
@@ -12,14 +11,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import openai
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from bson.objectid import ObjectId
-from datetime import datetime, date
+from datetime import datetime
 from Persistencia.DAOS.OpinionesTuristicasDAO import OpinionesTuristicasDAO
 from Persistencia.DAOS.UserDAO import UserDAO
-from Persistencia.DAOS.ReservasDAO import ReservasDAO
 
 # Importar el blueprint
 from Dominio.admin import admin_bp
 from Dominio.propietarios import propietarios_bp
+from Dominio.reservas import reservas_bp
 
 
 # --- Codificador JSON personalizado ---
@@ -54,6 +53,8 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 app.register_blueprint(admin_bp, url_prefix='/admin')
 # Archivo propietarios
 app.register_blueprint(propietarios_bp, url_prefix='/propietarios')
+# Archivo reservas
+app.register_blueprint(reservas_bp, url_prefix='/reservas')
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -153,113 +154,6 @@ def index():
 def users():
     usuarios = UserDAO.obtener_todos()
     return jsonify(usuarios), 200
-
-@app.route('/reserva_confirmada')
-def reserva_confirmada():
-    return render_template("reserva_confirmada.html")
-
-@app.route('/reservar/<hotel_id>')
-def reservar_page(hotel_id):
-    """Muestra el formulario de reserva para un hotel concreto."""
-    hotel = mongo_agent.db["hoteles"].find_one({"_id": ObjectId(hotel_id)})
-    if not hotel:
-        return "Hotel no encontrado", 404
-
-    hotel["_id"] = str(hotel["_id"])
-    error_message = request.args.get("error", "")
-    return render_template("reservar.html", hotel=hotel, error_message=error_message)
-
-@app.route('/reservas', methods=['POST'])
-def crear_reserva():
-    """
-    Procesa el formulario de reserva:
-      hotel_id, startDate (YYYY-MM-DD), endDate (YYYY-MM-DD), numPersons (opcional).
-    Validaciones:
-      1) El usuario debe estar autenticado y tener rol "Tourist" (no ser "Anónimo").
-      2) La fecha de fin debe ser posterior a la de inicio.
-      3) La fecha de inicio no puede estar en el pasado.
-      4) No debe haber solapamientos con reservas del mismo hotel.
-    Inserta la reserva en la colección 'reservas' usando ReservasDAO.
-    """
-    # Verificar si el usuario está autenticado
-    if 'user_id' not in session:
-        return """
-        <script>
-            alert("Debes iniciar sesión para reservar.");
-            window.history.back();
-        </script>
-        """
-    
-    user_name = session.get("user_name", None)
-    from Persistencia.DAOS.UserDAO import UserDAO
-    usuario = UserDAO.obtener_dato({"_id": ObjectId(session["user_id"])})
-    if not user_name or user_name == "Anónimo" or usuario.get("type") != "Tourist":
-        return """
-        <script>
-            alert("No se puede realizar la reserva si eres Anónimo o no tienes el rol de Tourist. Por favor, inicia sesión o regístrate.");
-            window.history.back();
-        </script>
-        """
-    
-    # Obtener datos del formulario
-    hotel_id = request.form.get("hotel_id")
-    start_str = request.form.get("startDate")
-    end_str = request.form.get("endDate")
-    num_persons = request.form.get("numPersons", "0")
-
-    if not hotel_id or not start_str or not end_str:
-        return "Faltan campos obligatorios", 400
-
-    hotel_info = mongo_agent.db["hoteles"].find_one({"_id": ObjectId(hotel_id)})
-    if not hotel_info:
-        return "Hotel no encontrado", 404
-
-    try:
-        start_date = datetime.strptime(start_str, "%Y-%m-%d").date()
-        end_date = datetime.strptime(end_str, "%Y-%m-%d").date()
-    except ValueError:
-        error_msg = "Formato de fecha inválido."
-        return redirect(url_for('reservar_page', hotel_id=hotel_id, error=error_msg))
-
-    if end_date <= start_date:
-        error_msg = "La fecha de fin debe ser posterior a la de inicio."
-        return redirect(url_for('reservar_page', hotel_id=hotel_id, error=error_msg))
-
-    hoy = date.today()
-    if start_date < hoy:
-        error_msg = "No puedes reservar en una fecha pasada."
-        return redirect(url_for('reservar_page', hotel_id=hotel_id, error=error_msg))
-
-    reservas_cursor = ReservasDAO.obtener_reservas_por_hotel(hotel_id)
-    for r in reservas_cursor:
-        try:
-            r_start = datetime.strptime(r["fecha_inicio"], "%Y-%m-%d").date()
-            r_end = datetime.strptime(r["fecha_fin"], "%Y-%m-%d").date()
-        except (KeyError, ValueError):
-            continue
-        if (start_date < r_end) and (end_date > r_start):
-            error_msg = "El hotel ya está reservado en ese rango de fechas."
-            return redirect(url_for('reservar_page', hotel_id=hotel_id, error=error_msg))
-
-    nombre_hotel = hotel_info.get("nombre", "Desconocido")
-    reserva_doc = {
-        "hotelId": hotel_id,
-        "nombre_hotel": nombre_hotel,
-        "fecha_inicio": start_str,
-        "fecha_fin": end_str,
-        "numero_personas": int(num_persons) if num_persons.isdigit() else 0,
-        "nombre_usuario": user_name,
-        "fecha_reserva": datetime.utcnow()
-    }
-    ReservasDAO.insertar_reserva(reserva_doc)
-
-    mongo_agent.db["hoteles"].update_one(
-        {"_id": ObjectId(hotel_id)},
-        {"$inc": {"reservas_count": 1}}
-    )
-
-    flash("Reserva creada satisfactoriamente.")
-    return redirect(url_for('reserva_confirmada'))
 
 @app.route('/login')
 def login_page():
@@ -411,7 +305,7 @@ def login():
                     # Almacenar en la sesión la lista de retos pendientes para que el front-end los muestre
                     session['retos_pendientes'] = retos_pendientes
                     flash("Inicio de sesión exitoso!")
-                    return redirect(url_for('map'))
+                    return redirect(url_for('map_page'))
                 else:
                     flash("Contraseña incorrecta.")
                     return redirect(url_for('login_page'))

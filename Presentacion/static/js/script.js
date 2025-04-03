@@ -261,7 +261,7 @@ function getSidePanelHTML(item, rating) {
           <ul class="services">${servicesList}</ul>
           <p class="price">Desde <strong>$${item.precio || 0}</strong> por noche</p>
           <div class="buttons">
-            <a href="/reservar/${item._id}" class="btn reserve">
+            <a href="/reservas/reservar/${item._id}" class="btn reserve">
               Reservar Ahora
             </a>
             <a href="${detailsURL}" class="btn details">Ver Más Detalles</a>
