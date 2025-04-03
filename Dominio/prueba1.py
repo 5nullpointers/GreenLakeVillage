@@ -27,10 +27,12 @@ from Persistencia.DAOS.UsoTransporteDAO import UsoTransporteDAO
 from Persistencia.AgenteBD import MongoDBAgent
 from Persistencia.DAOS.HotelesDAO import HotelesDAO
 
-from Dominio.admin import admin_bp
-from Dominio.propietarios import propietarios_bp
-from Dominio.reservas import reservas_bp
+from admin import admin_bp
+from propietarios import propietarios_bp
+from reservas import reservas_bp
 from auth import auth_bp
+from forum import forum_bp
+from maps import maps_bp
 
 from Entidades.asistenteIA import obtener_respuesta
 
@@ -70,6 +72,10 @@ app.register_blueprint(propietarios_bp, url_prefix='/propietarios')
 app.register_blueprint(reservas_bp, url_prefix='/reservas')
 # Archivo auth y users
 app.register_blueprint(auth_bp)
+# Archivo forum
+app.register_blueprint(forum_bp)
+# Archivo maps y navegación
+app.register_blueprint(maps_bp)
 
 # Conectar a MongoDB
 mongo_agent = MongoDBAgent()
@@ -80,45 +86,6 @@ if not mongo_agent.client:
 else:
     # print("✅ Conexión a MongoDB establecida correctamente")
     pass
-
-# Clave de servidor para la Routes API v2
-# (¡No la expongas en el frontend!)
-ROUTES_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-
-@app.route("/get-route", methods=["POST"])
-def get_route():
-    """
-    Recibe { origin: {latitude, longitude}, destination: {latitude, longitude} }
-    Llama a la Routes API v2 y devuelve la polyline
-    """
-    data = request.json
-    origin = data.get("origin")
-    destination = data.get("destination")
-
-    if not origin or not destination:
-        return jsonify({"error": "Origin/destination missing"}), 400
-
-    # Construir el payload para la nueva Routes API v2
-    payload = {
-        "origin": {"location": {"latLng": origin}},
-        "destination": {"location": {"latLng": destination}},
-        "travelMode": "DRIVE"
-    }
-
-    # Llamar a la Routes API
-    headers = {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": ROUTES_API_KEY,
-        "X-Goog-FieldMask": "routes.polyline.encodedPolyline"
-    }
-    url = "https://routes.googleapis.com/directions/v2:computeRoutes"
-
-    try:
-        resp = requests.post(url, json=payload, headers=headers)
-        resp_data = resp.json()
-        return jsonify(resp_data)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
     
 @app.route('/api/retos/marcar_notificado', methods=['POST'])
 def marcar_reto_notificado():
@@ -146,18 +113,6 @@ def marcar_reto_notificado():
             return jsonify({"error": "No se pudo actualizar el reto."}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@app.route("/map")
-def map_page():
-    # En lugar de usar un valor por defecto, tomamos la clave de .env
-    google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-    return render_template("map.html", google_maps_api_key=google_maps_api_key)
-
-@app.route('/')
-def index():
-    # Lo mismo para el index
-    google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-    return render_template('index.html', google_maps_api_key=google_maps_api_key)
 
 @app.route('/api/propietarios/reservas')
 def api_reservas_propietario():
