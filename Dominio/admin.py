@@ -1,9 +1,11 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request, current_app
 from Persistencia.AgenteBD import MongoDBAgent
 from Persistencia.DAOS.UserDAO import UserDAO
 from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
 from Persistencia.DAOS.HotelesDAO import HotelesDAO
 from Persistencia.DAOS.SostenibilidadDAO import SostenibilidadDAO
+from Persistencia.DAOS.OpinionesTuristicasDAO import OpinionesTuristicasDAO
+from Persistencia.DAOS.UsoTransporteDAO import UsoTransporteDAO
 from bson import ObjectId
 import os
 
@@ -153,3 +155,89 @@ def edit_user():
             return jsonify({"success": False, "error": "No se actualizó ningún registro"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
+
+# -------------------------------
+# API /api/estadisticas_ocupacion - Obtener estadísticas de ocupación
+# -------------------------------
+@admin_bp.route('/api/estadisticas_ocupacion')
+def api_estadisticas_ocupacion():
+    ocupaciones = OcupacionHoteleraDAO.obtener_todos()
+    if not ocupaciones:
+        return jsonify({
+            "tasa_ocupacion_users": 0,
+            "tasa_ocupacion_percent": 0,
+            "reservas_confirmadas": 0,
+            "reservas_percent": 0,
+            "cancelaciones": 0,
+            "cancelaciones_percent": 0
+        })
+
+    total_reservas = sum(o["reservas_confirmadas"] for o in ocupaciones)
+    total_cancelaciones = sum(o["cancelaciones"] for o in ocupaciones)
+    total_usuarios = total_reservas + total_cancelaciones
+
+    total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)
+    promedio_tasa = round(total_tasa / len(ocupaciones), 3)
+
+    if total_usuarios > 0:
+        ocupacion_users = round((promedio_tasa / 100) * total_usuarios)
+    else:
+        ocupacion_users = 0
+
+    if total_usuarios > 0:
+        reservas_percent = round((total_reservas / total_usuarios) * 100, 3)
+        cancelaciones_percent = round((total_cancelaciones / total_usuarios) * 100, 3)
+    else:
+        reservas_percent = 0
+        cancelaciones_percent = 0
+
+    # Aplica filtro short_number antes de devolver JSON
+    short = current_app.jinja_env.filters['short_number']  
+
+    return jsonify({
+        "tasa_ocupacion_users": short(ocupacion_users),
+        "tasa_ocupacion_percent": promedio_tasa,  
+        "reservas_confirmadas": short(total_reservas),
+        "reservas_percent": reservas_percent,
+        "cancelaciones": short(total_cancelaciones),
+        "cancelaciones_percent": cancelaciones_percent
+    })
+
+# -------------------------------
+# API /api/top_hoteles - Obtener los 3 mejores hoteles
+# -------------------------------
+@admin_bp.route('/api/top_hoteles')
+def api_top_hoteles():
+    top_hoteles = OpinionesTuristicasDAO.obtener_top_hoteles()
+    return jsonify(top_hoteles)
+
+# -------------------------------
+# API /api/top_servicios - Obtener los 3 mejores servicios
+# -------------------------------
+@admin_bp.route('/api/top_servicios')
+def api_top_servicios():
+    top_servicios = OpinionesTuristicasDAO.obtener_top_servicios()
+    return jsonify(top_servicios)
+
+# -------------------------------
+# API /api/top_rutas - Obtener las 3 mejores rutas
+# -------------------------------
+@admin_bp.route('/api/top_rutas')
+def api_top_rutas():
+    top_rutas = OpinionesTuristicasDAO.obtener_top_rutas()
+    return jsonify(top_rutas)
+
+# -------------------------------
+# API /api/uso_transporte - Obtener estadísticas de uso de transporte
+# -------------------------------
+@admin_bp.route('/api/uso_transporte')
+def api_uso_transporte():
+
+    datos = UsoTransporteDAO.obtener_todos()
+
+    resumen = {}
+    for dato in datos:
+        tipo = dato.get("tipo_transporte", "Desconocido")
+        num = dato.get("num_usuarios", 0)
+        resumen[tipo] = resumen.get(tipo, 0) + num
+    return jsonify(resumen)

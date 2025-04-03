@@ -330,3 +330,63 @@ def api_latest_reviews_propietarios():
             if isinstance(value, float) and math.isnan(value):
                 r[key] = None
     return jsonify(reseñas)
+
+# -------------------------------
+# API /estadisticas_ocupacion_Propietarios - API de estadísticas de ocupación para propietarios
+# -------------------------------
+@propietarios_bp.route('/api/estadisticas_ocupacion_Propietarios')
+def api_estadisticas_ocupacion_Propietarios():
+    # Nuevo: Obtener el usuario logueado y sus propiedades
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Usuario no autenticado."}), 401
+    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
+    if not business_owner or business_owner.get("type") != "BusinessOwner":
+        return jsonify({"error": "Acceso no autorizado."}), 403
+    user_properties = business_owner.get("properties", [])
+    
+    # Obtener datos de ocupación y filtrar por propiedades del usuario
+    all_ocupaciones = OcupacionHoteleraDAO.obtener_todos()
+    ocupaciones = [o for o in all_ocupaciones if o.get("hotel_nombre") in user_properties]
+    
+    if not ocupaciones:
+        # Si no hay datos, devolvemos ceros
+        return jsonify({
+            "tasa_ocupacion_users": 0,
+            "tasa_ocupacion_percent": 0,
+            "reservas_confirmadas": 0,
+            "reservas_percent": 0,
+            "cancelaciones": 0,
+            "cancelaciones_percent": 0
+        })
+    
+
+    total_reservas = sum(o["reservas_confirmadas"] for o in ocupaciones)
+    total_cancelaciones = sum(o["cancelaciones"] for o in ocupaciones)
+    total_usuarios = total_reservas + total_cancelaciones
+
+    # 2) Calcular promedios
+    total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)  # suma de % ocupacion
+    promedio_tasa = round(total_tasa / len(ocupaciones), 3)     # promedio de % ocupacion
+
+    if total_usuarios > 0:
+        ocupacion_users = round((promedio_tasa / 100) * total_usuarios)
+    else:
+        ocupacion_users = 0
+
+
+    if total_usuarios > 0:
+        reservas_percent = round((total_reservas / total_usuarios) * 100, 3)
+        cancelaciones_percent = round((total_cancelaciones / total_usuarios) * 100, 3)
+    else:
+        reservas_percent = 0
+        cancelaciones_percent = 0
+
+    return jsonify({
+        "tasa_ocupacion_users": ocupacion_users,
+        "tasa_ocupacion_percent": promedio_tasa,  
+        "reservas_confirmadas": total_reservas,
+        "reservas_percent": reservas_percent,
+        "cancelaciones": total_cancelaciones,
+        "cancelaciones_percent": cancelaciones_percent
+    })

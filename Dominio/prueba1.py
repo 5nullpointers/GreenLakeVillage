@@ -9,18 +9,13 @@ import numpy as np
 import openai
 from dotenv import load_dotenv
 
-from flask import Flask, render_template, request, jsonify, session, abort, current_app
+from flask import Flask, render_template, request, jsonify, session, abort
 from flask.json.provider import DefaultJSONProvider
-
-from werkzeug.utils import secure_filename
 
 from bson.objectid import ObjectId
 from bson import ObjectId
 
 from Persistencia.DAOS.OpinionesTuristicasDAO import OpinionesTuristicasDAO
-from Persistencia.DAOS.UserDAO import UserDAO
-from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
-from Persistencia.DAOS.UsoTransporteDAO import UsoTransporteDAO
 from Persistencia.AgenteBD import MongoDBAgent
 
 from admin import admin_bp
@@ -110,44 +105,6 @@ def marcar_reto_notificado():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/admin/crear-tema', methods=['POST'])
-def crear_tema():
-    titulo = request.form.get("titulo")
-    descripcion = request.form.get("descripcion")
-    categoria = request.form.get("categoria")
-
-    if not titulo or not descripcion:
-        return jsonify({"error": "Falta el título o la descripción"}), 400
-    
-    nuevo_tema = {
-        "titulo": titulo,
-        "descripcion": descripcion,
-        "autor": session.get("user_name", "Admin"),
-        "fecha": datetime.utcnow(),
-        "categoria": categoria,
-        "estado": "activo"
-    }
-    result = mongo_agent.db["temas_forum"].insert_one(nuevo_tema)
-    #Comprobar si se ha insertado correctamente
-    if result.inserted_id:
-        return jsonify({"success": True})
-    else:
-        return jsonify({"success": False}), 500
-
-@app.route('/api/foro/temas')
-def api_foro_temas():
-    temas = list(mongo_agent.db["temas_forum"].find({}))
-    for tema in temas:
-        tema["_id"] = str(tema["_id"])
-    return jsonify(temas)
-
-@app.route('/api/foro/temas/<string:tema_id>/comentarios')
-def api_foro_comentarios(tema_id):
-    comentarios = list(mongo_agent.db["comentarios_forum"].find({"tema_id": tema_id}))
-    for c in comentarios:
-        c["_id"] = str(c["_id"])
-    return jsonify(comentarios)
-
 # Configuración para archivos
 UPLOAD_FOLDER = os.path.join(STATIC_DIR, 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -155,47 +112,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-@app.route('/api/foro/comentar', methods=['POST'])
-def api_foro_comentar():
-    tema_id = request.form.get("tema_id")
-    comentario_texto = request.form.get("comentario")
-    # Obtener usuario desde la sesión
-    autor = session.get("user_name", "Anónimo")
-    imagen_url = None
-
-    # Manejar la imagen si se envió
-    if 'imagen' in request.files:
-        file = request.files['imagen']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            # Construir la URL de la imagen
-            imagen_url = '/static/uploads/' + filename
-
-    comentario = {
-        "tema_id": tema_id,
-        "autor": autor,
-        "comentario": comentario_texto,
-        "imagen_url": imagen_url,
-        "fecha": datetime.utcnow()
-    }
-    result = mongo_agent.db["comentarios_forum"].insert_one(comentario)
-    if result.inserted_id:
-        # Registrar el reto de comentario si aún no ha sido completado
-        user_id = session.get("user_id")
-        if user_id:
-            try:
-                usuario = mongo_agent.db["usuarios"].find_one({"_id": ObjectId(user_id)})
-                if usuario:
-                    # Aquí debes usar el id del reto correspondiente al "Reto de Comentario"
-                    registrar_reto(usuario, "647a1ba13d5f1c4a9e8a1236")
-            except Exception as e:
-                print("Error registrando reto:", e)
-        return jsonify({"success": True})
-    else:
-        return jsonify({"success": False}), 500
 
 @app.route('/api/retos_pendientes', methods=['GET'])
 def api_retos_pendientes():
@@ -381,134 +297,6 @@ def short_number(value):
             return str(int(num))
     except:
         return str(value)
-
-@app.route('/api/estadisticas_ocupacion')
-def api_estadisticas_ocupacion():
-    ocupaciones = OcupacionHoteleraDAO.obtener_todos()
-    if not ocupaciones:
-        return jsonify({
-            "tasa_ocupacion_users": 0,
-            "tasa_ocupacion_percent": 0,
-            "reservas_confirmadas": 0,
-            "reservas_percent": 0,
-            "cancelaciones": 0,
-            "cancelaciones_percent": 0
-        })
-
-    total_reservas = sum(o["reservas_confirmadas"] for o in ocupaciones)
-    total_cancelaciones = sum(o["cancelaciones"] for o in ocupaciones)
-    total_usuarios = total_reservas + total_cancelaciones
-
-    total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)
-    promedio_tasa = round(total_tasa / len(ocupaciones), 3)
-
-    if total_usuarios > 0:
-        ocupacion_users = round((promedio_tasa / 100) * total_usuarios)
-    else:
-        ocupacion_users = 0
-
-    if total_usuarios > 0:
-        reservas_percent = round((total_reservas / total_usuarios) * 100, 3)
-        cancelaciones_percent = round((total_cancelaciones / total_usuarios) * 100, 3)
-    else:
-        reservas_percent = 0
-        cancelaciones_percent = 0
-
-    # Aplica filtro short_number antes de devolver JSON
-    short = current_app.jinja_env.filters['short_number']  
-
-    return jsonify({
-        "tasa_ocupacion_users": short(ocupacion_users),
-        "tasa_ocupacion_percent": promedio_tasa,  
-        "reservas_confirmadas": short(total_reservas),
-        "reservas_percent": reservas_percent,
-        "cancelaciones": short(total_cancelaciones),
-        "cancelaciones_percent": cancelaciones_percent
-    })
-
-@app.route('/api/estadisticas_ocupacion_Propietarios')
-def api_estadisticas_ocupacion_Propietarios():
-    # Nuevo: Obtener el usuario logueado y sus propiedades
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({"error": "Usuario no autenticado."}), 401
-    business_owner = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
-    if not business_owner or business_owner.get("type") != "BusinessOwner":
-        return jsonify({"error": "Acceso no autorizado."}), 403
-    user_properties = business_owner.get("properties", [])
-    
-    # Obtener datos de ocupación y filtrar por propiedades del usuario
-    all_ocupaciones = OcupacionHoteleraDAO.obtener_todos()
-    ocupaciones = [o for o in all_ocupaciones if o.get("hotel_nombre") in user_properties]
-    
-    if not ocupaciones:
-        # Si no hay datos, devolvemos ceros
-        return jsonify({
-            "tasa_ocupacion_users": 0,
-            "tasa_ocupacion_percent": 0,
-            "reservas_confirmadas": 0,
-            "reservas_percent": 0,
-            "cancelaciones": 0,
-            "cancelaciones_percent": 0
-        })
-    
-
-    total_reservas = sum(o["reservas_confirmadas"] for o in ocupaciones)
-    total_cancelaciones = sum(o["cancelaciones"] for o in ocupaciones)
-    total_usuarios = total_reservas + total_cancelaciones
-
-    # 2) Calcular promedios
-    total_tasa = sum(o["tasa_ocupacion"] for o in ocupaciones)  # suma de % ocupacion
-    promedio_tasa = round(total_tasa / len(ocupaciones), 3)     # promedio de % ocupacion
-
-    if total_usuarios > 0:
-        ocupacion_users = round((promedio_tasa / 100) * total_usuarios)
-    else:
-        ocupacion_users = 0
-
-
-    if total_usuarios > 0:
-        reservas_percent = round((total_reservas / total_usuarios) * 100, 3)
-        cancelaciones_percent = round((total_cancelaciones / total_usuarios) * 100, 3)
-    else:
-        reservas_percent = 0
-        cancelaciones_percent = 0
-
-    return jsonify({
-        "tasa_ocupacion_users": ocupacion_users,
-        "tasa_ocupacion_percent": promedio_tasa,  
-        "reservas_confirmadas": total_reservas,
-        "reservas_percent": reservas_percent,
-        "cancelaciones": total_cancelaciones,
-        "cancelaciones_percent": cancelaciones_percent
-    })
-
-@app.route('/api/top_hoteles')
-def api_top_hoteles():
-    top_hoteles = OpinionesTuristicasDAO.obtener_top_hoteles()
-    return jsonify(top_hoteles)
-
-@app.route('/api/top_servicios')
-def api_top_servicios():
-    top_servicios = OpinionesTuristicasDAO.obtener_top_servicios()
-    return jsonify(top_servicios)
-
-@app.route('/api/top_rutas')
-def api_top_rutas():
-    top_rutas = OpinionesTuristicasDAO.obtener_top_rutas()
-    return jsonify(top_rutas)
-
-@app.route('/api/uso_transporte')
-def api_uso_transporte():
-
-    datos = UsoTransporteDAO.obtener_todos()
-
-    resumen = {}
-    for dato in datos:
-        tipo = dato.get("tipo_transporte", "Desconocido")
-        num = dato.get("num_usuarios", 0)
-        resumen[tipo] = resumen.get(tipo, 0) + num
-    return jsonify(resumen)
 
 def registrar_reto(usuario, reto_id):
     reto_info = mongo_agent.db["retos"].find_one({"_id": ObjectId(reto_id)})

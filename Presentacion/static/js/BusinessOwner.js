@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Actualizar las estadísticas dinámicamente (tasa de ocupación, reservas y cancelaciones)
-    fetch('/api/estadisticas_ocupacion_Propietarios')
+    fetch('/propietarios/api/estadisticas_ocupacion_Propietarios')
     .then(response => response.json())
     .then(data => {
       if(data.error){

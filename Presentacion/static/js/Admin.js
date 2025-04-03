@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // --- Estadísticas dinámicas (tasa de ocupación, reservas y cancelaciones) ---
-  fetch('/api/estadisticas_ocupacion')
+  fetch('/admin/api/estadisticas_ocupacion')
     .then(response => response.json())
     .then(data => {
         const ocupacionElem = document.getElementById('ocupacionRate');
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => console.error('Error al obtener las estadísticas:', error));
 
   // --- Top 3 Hoteles ---
-  fetch('/api/top_hoteles')
+  fetch('/admin/api/top_hoteles')
     .then(response => response.json())
     .then(data => {
         const topHotelesList = document.getElementById('topHotelesList');
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => console.error('Error al obtener el top de hoteles:', error));
 
   // --- Top 3 Servicios ---
-  fetch('/api/top_servicios')
+  fetch('/admin/api/top_servicios')
     .then(response => response.json())
     .then(data => {
         const topServiciosList = document.getElementById('topServiciosList');
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => console.error('Error al obtener el top de servicios:', error));
 
   // --- Top 3 Rutas ---
-  fetch('/api/top_rutas')
+  fetch('/admin/api/top_rutas')
     .then(response => response.json())
     .then(data => {
         const topRutasList = document.getElementById('topRutasList');
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // --- Función para cargar el gráfico de barras con colores e íconos ---
   function cargarGraficoTransporte(startDate = '', endDate = '') {
-    let url = '/api/uso_transporte';
+    let url = '/admin/api/uso_transporte';
     const params = [];
     if (startDate) params.push(`start_date=${startDate}`);
     if (endDate)   params.push(`end_date=${endDate}`);
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // 4) Crear el Pie Chart y luego generar la leyenda (solo iconos)
-  fetch('/api/uso_transporte')
+  fetch('/admin/api/uso_transporte')
     .then(response => response.json())
     .then(data => {
         const labels = Object.keys(data);
