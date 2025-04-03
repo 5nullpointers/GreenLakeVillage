@@ -7,6 +7,9 @@ from datetime import datetime, date
 mongo_agent = MongoDBAgent()
 reservas_bp = Blueprint('reservas', __name__)
 
+# -------------------------------
+# POST / - Crear reserva
+# -------------------------------
 @reservas_bp.route('/', methods=['POST'])
 def crear_reserva():
     # Validación de autenticación del usuario
@@ -100,6 +103,9 @@ def crear_reserva():
     flash("Reserva creada satisfactoriamente.")
     return redirect(url_for('reservas.reserva_confirmada'))
 
+# -------------------------------
+# GET /reservar/<hotel_id> - Muestra el formulario de reserva para un hotel concreto
+# -------------------------------
 @reservas_bp.route('/reservar/<hotel_id>')
 def reservar_page(hotel_id):
     """Muestra el formulario de reserva para un hotel concreto."""
@@ -112,6 +118,9 @@ def reservar_page(hotel_id):
     error_message = request.args.get("error", "")
     return render_template("reservar.html", hotel=hotel, error_message=error_message)
 
+# -------------------------------
+# GET /reserva_confirmada - Página de confirmación de reserva
+# -------------------------------
 @reservas_bp.route('/reserva_confirmada')
 def reserva_confirmada():
     # Página de confirmación de reserva

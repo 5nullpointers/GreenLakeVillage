@@ -3,16 +3,13 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import math
 from datetime import datetime
 
-import requests
-import pandas as pd
 import numpy as np
 import openai
 from dotenv import load_dotenv
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, abort, current_app
+from flask import Flask, render_template, request, jsonify, session, abort, current_app
 from flask.json.provider import DefaultJSONProvider
 
 from werkzeug.utils import secure_filename
@@ -25,7 +22,6 @@ from Persistencia.DAOS.UserDAO import UserDAO
 from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
 from Persistencia.DAOS.UsoTransporteDAO import UsoTransporteDAO
 from Persistencia.AgenteBD import MongoDBAgent
-from Persistencia.DAOS.HotelesDAO import HotelesDAO
 
 from admin import admin_bp
 from propietarios import propietarios_bp

@@ -10,10 +10,9 @@ import os
 mongo_agent = MongoDBAgent()
 admin_bp = Blueprint('admin', __name__)
 
-@admin_bp.route('/ruta1')
-def ruta1():
-    return jsonify({"message": "Ruta 1 en admin"})
-
+# -------------------------------
+# GET / - Panel de administración
+# -------------------------------
 @admin_bp.route('/')
 def admin():
     consumo_total = SostenibilidadDAO.obtener_Consumo()
@@ -48,20 +47,31 @@ def admin():
     google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
     return render_template('Admin.html', ingresosTotales=ingresos_totales, totalReservas=totalReservas, consumoTotal=consumo_total, google_maps_api_key=google_maps_api_key)
 
+# -------------------------------
+# GET /MapaAdmin - Mapa de administración
+# -------------------------------
 @admin_bp.route('/MapaAdmin')
 def MapaAdmin():
     google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
     return render_template('MapaAdmin.html', google_maps_api_key=google_maps_api_key)
 
+# -------------------------------
+# GET /UsuariosAdmin - Página de gestión de usuarios
+# -------------------------------
 @admin_bp.route('/UsuariosAdmin')
 def UsuariosAdmin():
     return render_template('UsuariosAdmin.html')
 
+# -------------------------------
+# GET /ForoAdmin - Página del foro de administración
+# -------------------------------
 @admin_bp.route('/ForoAdmin')
 def ForoAdmin():
     return render_template('ForoAdmin.html')
 
-# Metodo para bloquear al usuario
+# -------------------------------
+# POST /blockUser - Bloquear usuario
+# -------------------------------
 @admin_bp.route('/blockUser', methods=['POST'])
 def block_user():
     data = request.get_json()
@@ -81,7 +91,9 @@ def block_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-# Metodo para desbloquear al usuario
+# -------------------------------
+# POST /unblockUser - Desbloquear usuario
+# -------------------------------
 @admin_bp.route('/unblockUser', methods=['POST'])
 def unblock_user():
     data = request.get_json()
@@ -100,7 +112,9 @@ def unblock_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-# Nuevo endpoint para eliminar un usuario
+# -------------------------------
+# POST /deleteUser - Eliminar usuario
+# -------------------------------
 @admin_bp.route('/deleteUser', methods=['POST'])
 def delete_user():
     data = request.get_json()
@@ -116,7 +130,9 @@ def delete_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Metodo para editar los usuarios
+# -------------------------------
+# POST /editUser - Editar usuario
+# -------------------------------
 @admin_bp.route('/editUser', methods=['POST'])
 def edit_user():
     data = request.get_json()

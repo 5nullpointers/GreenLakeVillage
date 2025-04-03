@@ -13,27 +13,38 @@ import math
 mongo_agent = MongoDBAgent()
 propietarios_bp = Blueprint('propietarios', __name__)
 
-@propietarios_bp.route('/ruta1')
-def ruta1():
-    return jsonify({"message": "Ruta 1 en propietarios"})
-
+# -------------------------------
+# GET / - Página principal de propietarios
+# -------------------------------
 @propietarios_bp.route('/')
 def Propietarios():
     return render_template('BusinessOwner.html')
 
+# -------------------------------
+# GET /Previsiones - Página de previsiones para BusinessOwner
+# -------------------------------
 @propietarios_bp.route('/Previsiones')
 def verPrevisiones():
     return render_template("PrevisionesBusinessOwner.html")
 
+# -------------------------------
+# GET /MapaPropietarios - Mapa para propietarios
+# -------------------------------
 @propietarios_bp.route('/MapaPropietarios')
 def MapaPropietarios():
     google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
     return render_template('MapaPropietarios.html', google_maps_api_key=google_maps_api_key)
 
+# -------------------------------
+# GET /ReservasHoteles - Página de reservas de hoteles
+# -------------------------------
 @propietarios_bp.route('/ReservasHoteles')
 def ver_reservas_hoteles():
     return render_template("ReservasBusinessOwner.html")
 
+# -------------------------------
+# GET /PropiedadesUsuario - Muestra propiedades del usuario BusinessOwner
+# -------------------------------
 @propietarios_bp.route('/PropiedadesUsuario', methods=['GET'])
 def propiedades_usuario():
     """
@@ -110,6 +121,9 @@ def propiedades_usuario():
     # 7) Si no es fetch => renderizar la plantilla con Jinja2
     return render_template('PropiedadesUsuario.html', propiedades=propiedades_info)
 
+# -------------------------------
+# GET /api/propietarios/reservas - API de reservas para propietarios
+# -------------------------------
 @propietarios_bp.route('/api/propietarios/reservas')
 def api_reservas_propietario():
     user_name = session.get("user_name")
@@ -131,6 +145,9 @@ def api_reservas_propietario():
         r["_id"] = str(r["_id"])
     return jsonify(reservas)
 
+# -------------------------------
+# GET /api/ratings_Propietarios - API de ratings para propietarios
+# -------------------------------
 @propietarios_bp.route('/api/ratings_Propietarios')
 def api_ratings_Propietarios():
     user_id = session.get('user_id')
@@ -154,6 +171,9 @@ def api_ratings_Propietarios():
             }
     return jsonify(ratings_dict)
 
+# -------------------------------
+# GET /api/billed_Propietarios - API de facturación para propietarios
+# -------------------------------
 @propietarios_bp.route('/api/billed_Propietarios')
 def api_billed_Propietarios():
 
@@ -203,6 +223,9 @@ def api_billed_Propietarios():
 
     return jsonify(top3)
 
+# -------------------------------
+# GET /api/prediccionesOcupacion_Propietarios - API de predicciones de ocupación para propietarios
+# -------------------------------
 @propietarios_bp.route('/api/prediccionesOcupacion_Propietarios')
 def api_predicciones_ocupacion_propietarios():
     from Dominio.prueba1 import forecast_series  # importación local para romper la circularidad
@@ -284,6 +307,9 @@ def api_predicciones_ocupacion_propietarios():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# -------------------------------
+# GET /api/latest_reviews_propietarios - API de últimas reseñas para propietarios
+# -------------------------------
 @propietarios_bp.route('/api/latest_reviews_propietarios')
 def api_latest_reviews_propietarios():
     user_id = session.get('user_id')
