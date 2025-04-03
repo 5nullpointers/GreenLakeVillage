@@ -1,30 +1,43 @@
 import sys
-import requests
 import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import math
+from datetime import datetime
+
+import requests
 import pandas as pd
 import numpy as np
-from werkzeug.utils import secure_filename
-from dotenv import load_dotenv
-dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
-load_dotenv(dotenv_path)
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import openai
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
+from dotenv import load_dotenv
+
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, abort, current_app
+from flask.json.provider import DefaultJSONProvider
+
+from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from bson.objectid import ObjectId
-from datetime import datetime
+from bson import ObjectId
+
 from Persistencia.DAOS.OpinionesTuristicasDAO import OpinionesTuristicasDAO
 from Persistencia.DAOS.UserDAO import UserDAO
+from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
+from Persistencia.DAOS.UsoTransporteDAO import UsoTransporteDAO
+from Persistencia.AgenteBD import MongoDBAgent
+from Persistencia.DAOS.HotelesDAO import HotelesDAO
 
-# Importar el blueprint
 from Dominio.admin import admin_bp
 from Dominio.propietarios import propietarios_bp
 from Dominio.reservas import reservas_bp
 
+from Entidades.asistenteIA import obtener_respuesta
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+load_dotenv(dotenv_path)
 
 # --- Codificador JSON personalizado ---
-from flask.json.provider import DefaultJSONProvider
-from bson import ObjectId
-
 class CustomJSONProvider(DefaultJSONProvider):
     def default(self, o):
         if isinstance(o, ObjectId):
@@ -56,13 +69,7 @@ app.register_blueprint(propietarios_bp, url_prefix='/propietarios')
 # Archivo reservas
 app.register_blueprint(reservas_bp, url_prefix='/reservas')
 
-from werkzeug.security import generate_password_hash, check_password_hash
-
 # Conectar a MongoDB
-from Persistencia.AgenteBD import MongoDBAgent
-from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
-from Persistencia.DAOS.OpinionesTuristicasDAO import OpinionesTuristicasDAO
-from Persistencia.DAOS.UsoTransporteDAO import UsoTransporteDAO
 mongo_agent = MongoDBAgent()
 # Verificar la conexión
 if not mongo_agent.client:
@@ -444,7 +451,6 @@ def save_preferences():
 
     try:
         # Buscar al usuario en la base de datos utilizando el _id
-        from bson import ObjectId
         user = UserDAO.obtener_dato({"_id": ObjectId(user_id)})
 
         # Verificar si el usuario fue encontrado
@@ -537,7 +543,6 @@ def api_ratings():
 
 @app.route('/api/ratings_Propietarios')
 def api_ratings_Propietarios():
-    from bson import ObjectId
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({"error": "Usuario no autenticado"}), 401
@@ -558,10 +563,6 @@ def api_ratings_Propietarios():
                 "numero_comentarios": entry["numero_comentarios"]
             }
     return jsonify(ratings_dict)
-
-from bson import ObjectId
-from flask import render_template, abort
-from Entidades.asistenteIA import obtener_respuesta
 
 @app.route('/hoteles/<string:hotel_id>')
 def hotel_detalle(hotel_id):
@@ -595,8 +596,6 @@ def format_number(value):
             return f"{value:,.0f}".replace(",", ".")
     except Exception:
         return value
-
-from bson import ObjectId
 
 @app.route('/chat', methods=['POST'])
 def chat_page():
@@ -683,7 +682,6 @@ def api_estadisticas_ocupacion():
         cancelaciones_percent = 0
 
     # Aplica filtro short_number antes de devolver JSON
-    from flask import current_app
     short = current_app.jinja_env.filters['short_number']  
 
     return jsonify({
@@ -698,7 +696,6 @@ def api_estadisticas_ocupacion():
 @app.route('/api/estadisticas_ocupacion_Propietarios')
 def api_estadisticas_ocupacion_Propietarios():
     # Nuevo: Obtener el usuario logueado y sus propiedades
-    from Persistencia.DAOS.UserDAO import UserDAO
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({"error": "Usuario no autenticado."}), 401
@@ -782,10 +779,6 @@ def api_uso_transporte():
 
 @app.route('/api/billed_Propietarios')
 def api_billed_Propietarios():
-    from Persistencia.DAOS.UserDAO import UserDAO
-    from Persistencia.DAOS.HotelesDAO import HotelesDAO
-    from Persistencia.DAOS.OcupacionHoteleraDAO import OcupacionHoteleraDAO
-    from bson import ObjectId
 
     user_id = session.get('user_id')
     if not user_id:
@@ -912,9 +905,6 @@ def api_predicciones_ocupacion_propietarios():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-from bson import ObjectId
-import math  # Añade esta línea si no existe
-
 @app.route('/api/latest_reviews_propietarios')
 def api_latest_reviews_propietarios():
     user_id = session.get('user_id')
@@ -958,11 +948,6 @@ def registrar_reto(usuario, reto_id):
             "$inc": {"tokens": reto_info.get("tokens", 0)}
         }
     )
-
-import pandas as pd
-import numpy as np
-from bson import ObjectId
-from flask import jsonify, session
 
 # Función auxiliar para predecir con regresión lineal simple
 def forecast_series(values, forecast_horizon):
