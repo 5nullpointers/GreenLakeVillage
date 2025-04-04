@@ -11,6 +11,12 @@ mongo_agent = MongoDBAgent()
 # Crear el blueprint para el foro
 forum_bp = Blueprint('forum', __name__)
 
+# Definir las extensiones permitidas y la función allowed_file local
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 # -----------------------------------------------------------------
 # POST /api/admin/crear-tema
 # Creación de un tema (posiblemente restringido a administradores)
@@ -74,11 +80,6 @@ def api_foro_comentar():
     # Manejar la imagen si se envió
     if 'imagen' in request.files:
         file = request.files['imagen']
-        ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-        def allowed_file(filename):
-            return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             # Definir la carpeta de subida (ajusta la ruta según tu estructura)
