@@ -25,6 +25,7 @@ from auth import auth_bp
 from forum import forum_bp
 from maps import maps_bp
 from retos import retos_bp
+from turismo import turismo_bp
 
 from Entidades.asistenteIA import obtener_respuesta
 
@@ -70,7 +71,8 @@ app.register_blueprint(forum_bp)
 app.register_blueprint(maps_bp)
 # Archivo retos
 app.register_blueprint(retos_bp, url_prefix='/api/retos')
-
+# Archivo turismo
+app.register_blueprint(turismo_bp)
 
 # Conectar a MongoDB
 mongo_agent = MongoDBAgent()
@@ -98,85 +100,8 @@ def contacto():
 def descubrir():
     return render_template('descubrir.html')
 
-@app.route('/api/hoteles')
-def api_hoteles():
-    """
-    Retorna un JSON con todos los hoteles guardados en MongoDB.
-    """
-    hoteles = list(mongo_agent.db["hoteles"].find({}))
-    
-    # Convertir ObjectId a string para no tener problemas al serializar
-    for h in hoteles:
-        h["_id"] = str(h["_id"])
-    
-    return jsonify(hoteles)
-
-@app.route('/api/rutas')
-def api_rutas():
-    """
-    Retorna un JSON con todas las rutas turísticas guardadas en MongoDB.
-    """
-    rutas = list(mongo_agent.db["rutas_turisticas"].find({}))
-    for r in rutas:
-        r["_id"] = str(r["_id"])  # Convertir ObjectId a string
-    return jsonify(rutas)
-
-@app.route('/api/restaurantes')
-def api_restaurantes():
-    """
-    Retorna un JSON con todos los restaurantes guardados en MongoDB.
-    """
-    restaurantes = list(mongo_agent.db["restaurantes"].find({}))
-
-    #Convertir ObjectId a string para no tener problemas al serializar
-    for r in restaurantes:
-        r["_id"] = str(r["_id"])
-
-    return jsonify(restaurantes)
-
 MAX_HISTORY = 5
 conversation_history = []
-
-@app.route('/api/ratings')
-def api_ratings():
-    """
-    Retorna un JSON con la media de puntuación y el número de opiniones
-    para cada hotel, con el nombre del servicio como clave.
-    """
-    agregados = OpinionesTuristicasDAO.obtener_agregados()
-    # Convertir la lista a un diccionario, ej.:
-    # {
-    #    "Alletra Boutique Hotel": { "media_puntuacion": 4.3, "numero_comentarios": 12 },
-    #    ...
-    # }
-    ratings_dict = {
-        entry["_id"]: {
-            "media_puntuacion": entry["media_puntuacion"],
-            "numero_comentarios": entry["numero_comentarios"]
-        }
-        for entry in agregados
-    }
-    return jsonify(ratings_dict)
-
-@app.route('/hoteles/<string:hotel_id>')
-def hotel_detalle(hotel_id):
-    """
-    Muestra una página con más detalles de un hotel, incluyendo la sección de opiniones.
-    """
-    try:
-        obj_id = ObjectId(hotel_id)
-    except:
-        return abort(400, description="ID inválido")
-
-    hotel = mongo_agent.db["hoteles"].find_one({"_id": obj_id})
-    if not hotel:
-        return abort(404, description="Hotel no encontrado")
-    hotel["_id"] = str(hotel["_id"])
-
-    # Obtener opiniones y la media de la puntuación mediante el DAO
-    opiniones, avg_rating = OpinionesTuristicasDAO.obtener_opiniones_y_media(hotel["nombre"])
-
-    return render_template('hotel_detalles.html', hotel=hotel, opiniones=opiniones, avg_rating=avg_rating)
 
 @app.template_filter('format_number')
 def format_number(value):

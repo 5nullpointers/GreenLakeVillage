@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, render_template, request, session, flash, url_for, redirect
+from flask import Blueprint, render_template, request, session, flash, url_for, redirect
 from Persistencia.AgenteBD import MongoDBAgent
 from Persistencia.DAOS.ReservasDAO import ReservasDAO
 from bson import ObjectId

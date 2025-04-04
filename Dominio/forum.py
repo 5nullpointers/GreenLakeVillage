@@ -1,9 +1,7 @@
 import os
-import math
 from datetime import datetime
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, session, abort, current_app
+from flask import Blueprint, request, jsonify, session
 from werkzeug.utils import secure_filename
-from bson.objectid import ObjectId
 
 from Persistencia.AgenteBD import MongoDBAgent
 
