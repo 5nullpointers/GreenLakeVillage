@@ -168,24 +168,6 @@ def short_number(value):
     except:
         return str(value)
 
-# Función auxiliar para predecir con regresión lineal simple
-def forecast_series(values, forecast_horizon):
-    """
-    Realiza una predicción simple usando regresión lineal sobre la serie de datos.
-    Si hay menos de 2 datos, retorna el último valor repetido 'forecast_horizon' veces.
-    """
-    n = len(values)
-    if n < 2:
-        return [values[-1]] * forecast_horizon
-    x = np.arange(n)
-    # Ajuste lineal: y = a*x + b
-    a, b = np.polyfit(x, values, 1)
-    predictions = []
-    for i in range(1, forecast_horizon + 1):
-        pred = a * (n - 1 + i) + b
-        predictions.append(pred)
-    return predictions
-
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
     app.run(host='0.0.0.0', port=5000, debug=True)
