@@ -24,6 +24,7 @@ from reservas import reservas_bp
 from auth import auth_bp
 from forum import forum_bp
 from maps import maps_bp
+from retos import retos_bp
 
 from Entidades.asistenteIA import obtener_respuesta
 
@@ -67,6 +68,9 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(forum_bp)
 # Archivo maps y navegación
 app.register_blueprint(maps_bp)
+# Archivo retos
+app.register_blueprint(retos_bp, url_prefix='/api/retos')
+
 
 # Conectar a MongoDB
 mongo_agent = MongoDBAgent()
@@ -77,33 +81,6 @@ if not mongo_agent.client:
 else:
     # print("✅ Conexión a MongoDB establecida correctamente")
     pass
-    
-@app.route('/api/retos/marcar_notificado', methods=['POST'])
-def marcar_reto_notificado():
-    user_id = session.get("user_id")
-    if not user_id:
-        return jsonify({"error": "Usuario no autenticado"}), 401
-    
-    reto_id = request.json.get("reto_id")
-    if not reto_id:
-        return jsonify({"error": "Reto id no proporcionado"}), 400
-
-    try:
-        result = mongo_agent.db["usuarios"].update_one(
-            {
-                "_id": ObjectId(user_id),
-                "retos_completados.reto_id": reto_id
-            },
-            {
-                "$set": {"retos_completados.$.popup_mostrado": True}
-            }
-        )
-        if result.modified_count > 0:
-            return jsonify({"success": True})
-        else:
-            return jsonify({"error": "No se pudo actualizar el reto."}), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 # Configuración para archivos
 UPLOAD_FOLDER = os.path.join(STATIC_DIR, 'uploads')
@@ -112,38 +89,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-@app.route('/api/retos_pendientes', methods=['GET'])
-def api_retos_pendientes():
-    user_id = session.get("user_id")
-    if not user_id:
-        return jsonify({"error": "Usuario no autenticado"}), 401
-
-    try:
-        usuario = mongo_agent.db["usuarios"].find_one({"_id": ObjectId(user_id)})
-    except Exception as e:
-        return jsonify({"error": "Error al obtener el usuario"}), 500
-
-    if not usuario:
-        return jsonify({"error": "Usuario no encontrado"}), 404
-
-    retos_pendientes = []
-    # Solo se consideran los retos completados (es decir, que existen en el arreglo)
-    # y que no han sido notificados (popup_mostrado: False)
-    retos_completados = usuario.get("retos_completados", [])
-    for registro in retos_completados:
-        if not registro.get("popup_mostrado", False):
-            reto_id = registro["reto_id"]
-            reto_info = mongo_agent.db["retos"].find_one({"_id": ObjectId(reto_id)})
-            if reto_info:
-                retos_pendientes.append({
-                    "id": str(reto_info["_id"]),
-                    "nombre": reto_info.get("name"),
-                    "descripcion": reto_info.get("descripcion"),
-                    "tokens": reto_info.get("tokens")
-                })
-
-    return jsonify(retos_pendientes)
 
 @app.route('/contacto')
 def contacto():
@@ -297,29 +242,6 @@ def short_number(value):
             return str(int(num))
     except:
         return str(value)
-
-def registrar_reto(usuario, reto_id):
-    reto_info = mongo_agent.db["retos"].find_one({"_id": ObjectId(reto_id)})
-    if not reto_info:
-        return
-
-    # Si ya se registró (sin importar el flag), no volvemos a registrar
-    retos_completados = usuario.get("retos_completados", [])
-    if any(str(r["reto_id"]) == reto_id for r in retos_completados):
-        return
-
-    nuevo_reto = {
-        "reto_id": reto_id,
-        "fecha": datetime.utcnow(),
-        "popup_mostrado": False
-    }
-    mongo_agent.db["usuarios"].update_one(
-        {"_id": usuario["_id"]},
-        {
-            "$push": {"retos_completados": nuevo_reto},
-            "$inc": {"tokens": reto_info.get("tokens", 0)}
-        }
-    )
 
 # Función auxiliar para predecir con regresión lineal simple
 def forecast_series(values, forecast_horizon):
