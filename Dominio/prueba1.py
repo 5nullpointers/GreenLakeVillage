@@ -103,19 +103,6 @@ def descubrir():
 MAX_HISTORY = 5
 conversation_history = []
 
-@app.template_filter('format_number')
-def format_number(value):
-    try:
-        value = float(value)
-        if value >= 1000000:
-            # Divide entre 1.000.000 y muestra dos decimales seguidos de "M"
-            return f"{value/1000000:.2f} Millones de"
-        else:
-            # Muestra el número con separadores de miles (puntos)
-            return f"{value:,.0f}".replace(",", ".")
-    except Exception:
-        return value
-
 @app.route('/chat', methods=['POST'])
 def chat_page():
     # Obtener el identificador del usuario de la sesión
@@ -147,26 +134,6 @@ def chat_page():
         return jsonify({"response": response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@app.template_filter('short_number')
-def short_number(value):
-    """
-    Devuelve un número en formato abreviado:
-      1,200 => "1.20K"
-      8793114 => "8.79M"
-    """
-    try:
-        num = float(value)
-        if num >= 1_000_000_000:
-            return f"{num / 1_000_000_000:.2f}B"
-        elif num >= 1_000_000:
-            return f"{num / 1_000_000:.2f}M"
-        elif num >= 1_000:
-            return f"{num / 1_000:.2f}K"
-        else:
-            return str(int(num))
-    except:
-        return str(value)
 
 if __name__ == '__main__':
     # Escucha en todas las IPs (0.0.0.0) y puerto 5000
