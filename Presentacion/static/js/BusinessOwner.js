@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Actualizar las estadísticas dinámicamente (tasa de ocupación, reservas y cancelaciones)
-    fetch('/api/estadisticas_ocupacion_Propietarios')
+    fetch('/propietarios/api/estadisticas_ocupacion_Propietarios')
     .then(response => response.json())
     .then(data => {
       if(data.error){
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => console.error('Error al obtener las estadísticas:', error));
 
     // Ajustar el widget para tomar solo las propiedades del usuario
-    fetch('/api/ratings_Propietarios')
+    fetch('/propietarios/api/ratings_Propietarios')
       .then(response => response.json())
       .then(data => {
         console.log('Datos filtrados recibidos:', data); // DEBUG
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .catch(error => console.error('Error al obtener los mejores hoteles:', error));
   
-    fetch('/api/billed_Propietarios')
+    fetch('/propietarios/api/billed_Propietarios')
       .then(response => response.json())
       .then(data => {
         const topBilledContainer = document.getElementById('BilledContainer');
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .catch(error => console.error('Error al obtener las propiedades con mayor facturación:', error));
 
     // Nuevo fetch para obtener las últimas reseñas en widget 4
-    fetch('/api/latest_reviews_propietarios')
+    fetch('/propietarios/api/latest_reviews_propietarios')
       .then(response => response.json())
       .then(data => {
         console.log('DEBUG: Reseñas recibidas:', data);  // Depuración

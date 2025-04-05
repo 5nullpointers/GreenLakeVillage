@@ -4,72 +4,58 @@
 <head>
     <meta charset="UTF-8">
     <title>Reservar Hotel</title>
-    <!-- Carga tu CSS principal (que define navbar, footer, etc.) -->
+    <!-- Carga tu CSS principal -->
     <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Nuevo CSS específico para reservar.html -->
+    <link rel="stylesheet" href="/static/css/reservar.css">
 </head>
 
-<body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0;">
+<body>
 
     <!-- ENCABEZADO (Navbar) -->
-    <nav class="navbar" style="background-color: #009688; padding: 1rem 2rem;">
-        <div class="nav-logo" style="color: #fff; font-weight: 600; font-size: 1.4rem;">
+    <nav class="navbar">
+        <div class="nav-logo">
             Green Lake
         </div>
-        <ul class="nav-links" style="display: flex; gap: 1rem; margin-left: auto;">
-            <li><a href="/map" style="color: #fff;">Hoteles</a></li>
-            <li><a href="#" style="color: #fff;">Rutas</a></li>
-            <li><a href="#" style="color: #fff;">Sitios</a></li>
-            <li><a href="#" style="color: #fff;">Foro</a></li>
+        <ul class="nav-links">
+            <li><a href="/map">Hoteles</a></li>
+            <li><a href="#">Rutas</a></li>
+            <li><a href="#">Sitios</a></li>
+            <li><a href="#">Foro</a></li>
             <!-- Enlace para Iniciar Sesión -->
-            <li><a href="/login" style="color: #fff;">Iniciar Sesión</a></li>
+            <li><a href="/login">Iniciar Sesión</a></li>
         </ul>
     </nav>
     <!-- FIN ENCABEZADO -->
 
     <!-- CONTENEDOR PRINCIPAL: Formulario centrado -->
-    <div class="main-container" style="
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #f8f8f8;
-      padding: 2rem;
-  ">
-        <div class="left-col" style="
-        max-width: 400px;
-        width: 100%;
-        background: #fff;
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        text-align: center;
-    ">
-            <h2 style="margin-bottom: 1.5rem; color: #333;">
+    <div class="main-container">
+        <div class="left-col">
+            <h2>
                 Reservar: {{ hotel.nombre }}
             </h2>
 
             <!-- Bloque para mostrar error si existe -->
             {% if error_message %}
-            <div style="background: #ffdddd; color: #900; padding: 0.5rem; margin-bottom: 1rem; border-radius: 5px;">
+            <div class="error-message">
                 {{ error_message|safe }}
             </div>
             {% endif %}
 
-            <!-- Formulario de reserva (solo fechas, sin horas) -->
-            <form action="/reservas" method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
-                <!-- Campo oculto para el id del hotel -->
+            <!-- Formulario de reserva -->
+            <form action="/reservas" method="POST">
                 <input type="hidden" name="hotel_id" value="{{ hotel._id }}">
 
-                <label for="startDate" style="text-align: left;">Fecha de inicio:</label>
+                <label for="startDate">Fecha de inicio:</label>
                 <input type="date" id="startDate" name="startDate" required>
 
-                <label for="endDate" style="text-align: left;">Fecha de fin:</label>
+                <label for="endDate">Fecha de fin:</label>
                 <input type="date" id="endDate" name="endDate" required>
 
-                <label for="numPersons" style="text-align: left;">Número de personas (opcional):</label>
+                <label for="numPersons">Número de personas (opcional):</label>
                 <input type="number" id="numPersons" name="numPersons" min="1">
 
-                <button type="submit" class="btn reserve" style="margin-top: 1rem;">
+                <button type="submit" class="btn reserve">
                     Confirmar Reserva
                 </button>
             </form>
@@ -84,9 +70,7 @@
             <a href="#">Términos de Uso</a>
         </p>
     </footer>
-
     <!-- FIN PIE DE PÁGINA -->
-
 </body>
 
 </html>

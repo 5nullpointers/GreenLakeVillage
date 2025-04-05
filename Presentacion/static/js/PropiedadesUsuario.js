@@ -2,7 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
   // Llamada al backend para obtener propiedades del usuario
-  fetch('/Propietarios/PropiedadesUsuario', {
+  fetch('/propietarios/PropiedadesUsuario', {
     headers: {
       'X-Requested-With': 'XMLHttpRequest'
     }

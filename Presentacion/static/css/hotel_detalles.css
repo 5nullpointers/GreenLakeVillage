@@ -30,6 +30,25 @@ body {
     position: relative;
 }
 
+/* CSS extraído del HTML: Fondo dinámico con transición */
+body::before {
+    content: "";
+    background: url('/static/images/Hoteles/{{ hotel.imagen or "default.jpg" }}') no-repeat center center fixed;
+    background-size: cover;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    filter: brightness(50%);
+    transition: filter 0.5s;
+}
+
+body:hover::before {
+    filter: brightness(60%);
+}
+
 /* Título principal */
 body > h1 {
     font-size: 3rem;

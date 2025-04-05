@@ -10,4 +10,4 @@ source myenv/bin/activate
 pip install -r requirements.txt
 
 # Iniciar la aplicación
-python3 Dominio/prueba1.py
+python3 Dominio/server.py

@@ -1,0 +1,59 @@
+/* Contenedor principal de los botones y la tabla */
+.containerPrincipal {
+    padding: 20px;
+}
+
+/* Contenedor para los botones de los meses */
+#monthButtons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+#monthButtons button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007BFF;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#monthButtons button.active {
+    background-color: #0056b3;
+}
+
+/* Contenedor para la tabla con scroll */
+.table-container {
+    max-height: 400px;       /* Ajusta la altura según necesites */
+    overflow-y: auto;        /* Scroll vertical */
+    overflow-x: auto;        /* Scroll horizontal si la tabla es muy ancha */
+    border: 1px solid #ddd;  /* Borde para delimitar el contenedor */
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+/* Estilos para la tabla */
+#predictionsTable {
+    width: 100%;
+    border-collapse: collapse; /* Quita espacios entre celdas */
+}
+#predictionsTable thead th {
+    position: sticky;         /* Encabezado fijo al hacer scroll */
+    top: 0;
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid #ccc;
+}
+#predictionsTable tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Color para filas pares */
+}
+#predictionsTable td,
+#predictionsTable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+#predictionsTable tr:hover {
+    background-color: #f1f1f1; /* Efecto hover */
+}
