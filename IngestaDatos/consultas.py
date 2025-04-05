@@ -29,18 +29,12 @@ def filtrar_opiniones(calificacion_minima=4.5):
     documentos = list(db["opiniones_turisticas"].find(query))
     print(tabulate(documentos, headers="keys", tablefmt="grid"))
 
-def buscar_rutas_por_ciudad(ciudad):
-    print(f"\nRutas turísticas en {ciudad}:\n")
-    query = {"ciudad": ciudad}
-    documentos = list(db["rutas_turisticas"].find(query))
-    print(tabulate(documentos, headers="keys", tablefmt="grid"))
-
 def hoteles_mayor_ocupacion(limite=5):
     print("\nHoteles con mayor ocupación:\n")
     documentos = list(db["ocupacion_hotelera"].find().sort("ocupacion", -1).limit(limite))
     print(tabulate(documentos, headers="keys", tablefmt="grid"))
 
-def promedio_ocupacion_por_ciudad():
+def promedio_ocupacion():
     print("\nPromedio de ocupación por ciudad:\n")
     pipeline = [
         {"$group": {"_id": "$ciudad", "ocupacion_media": {"$avg": "$ocupacion"}}}
@@ -62,7 +56,6 @@ listar_colecciones()
 mostrar_documentos("ocupacion_hotelera")
 contar_documentos()
 filtrar_opiniones()
-buscar_rutas_por_ciudad("Madrid")
 hoteles_mayor_ocupacion()
-promedio_ocupacion_por_ciudad()
+promedio_ocupacion()
 transporte_mas_utilizado()
