@@ -249,7 +249,7 @@ def api_billed_Propietarios():
 # -------------------------------
 @propietarios_bp.route('/api/prediccionesOcupacion_Propietarios')
 def api_predicciones_ocupacion_propietarios():
-    from Dominio.prueba1 import forecast_series  # importación local para romper la circularidad
+    from Dominio.utils import forecast_series  # Importar desde utils.py
     """
     Devuelve las previsiones de ocupación, reservas, cancelaciones y precio
     solo para los hoteles/restaurantes del usuario BusinessOwner.

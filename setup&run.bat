@@ -10,4 +10,4 @@ call myenv\Scripts\activate
 pip install -r requirements.txt
 
 :: Iniciar la aplicación
-python Dominio\prueba1.py
+python Dominio\server.py

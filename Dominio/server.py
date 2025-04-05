@@ -20,6 +20,7 @@ from maps import maps_bp
 from retos import retos_bp
 from turismo import turismo_bp
 from general import general_bp
+from Dominio.utils import format_number
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
 load_dotenv(dotenv_path)
@@ -40,7 +41,9 @@ STATIC_DIR = os.path.join(BASE_DIR, '..', 'Presentacion', 'static')
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 app.json_provider_class = CustomJSONProvider
 app.json = app.json_provider_class(app)
-
+app.json_provider_class = CustomJSONProvider
+# Registrar el filtro en Jinja2
+app.jinja_env.filters['format_number'] = format_number
 # Configurar clave secreta para sesiones y mensajes flash
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
